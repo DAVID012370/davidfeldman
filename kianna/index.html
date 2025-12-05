@@ -32,7 +32,7 @@
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-      "Segoe UI", sans-serif;
+        "Segoe UI", sans-serif;
       min-height: 100vh;
       background:
         radial-gradient(circle at top left, #19162c 0, #05060b 55%),
@@ -146,23 +146,6 @@
 
     .nav-links a:hover::after {
       width: 100%;
-    }
-
-    .nav-cta {
-      padding: 7px 13px;
-      border-radius: 999px;
-      background: linear-gradient(120deg, var(--accent), var(--accent-2));
-      color: #05060b;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
-      font-size: 12px;
-    }
-
-    .nav-cta span {
-      font-size: 15px;
     }
 
     .nav-toggle {
@@ -398,21 +381,6 @@
       position: relative;
     }
 
-    .portrait-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      background: linear-gradient(140deg, #1c1632, #05060b);
-      color: rgba(245, 239, 255, 0.8);
-      text-align: center;
-      padding: 0 12px;
-    }
-
     .portrait-glow {
       position: absolute;
       inset: auto auto -60px;
@@ -589,6 +557,23 @@
       font-size: 13px;
     }
 
+    /* Gallery */
+
+    .gallery-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      margin-top: 12px;
+    }
+
+    .gallery-img {
+      width: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    }
+
     /* Disciplines */
 
     .disciplines-grid {
@@ -678,7 +663,7 @@
       margin-top: 4px;
     }
 
-    /* Gallery / Media */
+    /* Media */
 
     .media-grid {
       display: grid;
@@ -883,11 +868,6 @@
         display: flex;
       }
 
-      .nav-cta {
-        width: 100%;
-        justify-content: center;
-      }
-
       .nav-toggle {
         display: inline-flex;
       }
@@ -912,15 +892,11 @@
           </button>
           <div class="nav-links" id="navLinks">
             <a href="#about">About</a>
+            <a href="#gallery">Gallery</a>
             <a href="#disciplines">Disciplines</a>
             <a href="#highlights">Highlights</a>
             <a href="#media">Media</a>
             <a href="#contact">Contact</a>
-            <!-- Change href below to the URL of your visualiser homepage -->
-            <a href="https://david012370.github.io/davidfeldman/" class="nav-cta">
-              Visualiser
-              <span>↗</span>
-            </a>
           </div>
         </nav>
       </div>
@@ -971,11 +947,11 @@
               <div class="hero-card-inner">
                 <div class="portrait">
                   <div class="portrait-inner">
-                    <!-- Replace this block with an <img> of Kianna -->
-                    <!-- <img src="kianna-portrait.jpg" alt="Portrait of Kianna Rain" /> -->
-                    <div class="portrait-placeholder">
-                      PLACE KIANNA'S PORTRAIT HERE
-                    </div>
+                    <img
+                      src="images/kianna-hero.jpg"
+                      alt="Portrait of Kianna Rain"
+                      style="width:100%; height:100%; object-fit:cover;"
+                    />
                     <div class="portrait-glow"></div>
                   </div>
                   <div class="pill">
@@ -1096,6 +1072,25 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery -->
+      <section id="gallery">
+        <div class="shell section-inner">
+          <div class="section-header">
+            <div class="section-title">Gallery</div>
+            <p class="section-sub">
+              Selected headshots and portraits of Kianna Rain.
+            </p>
+          </div>
+
+          <div class="gallery-grid">
+            <img src="images/kianna-hero.jpg"  alt="Kianna Rain portrait" class="gallery-img" />
+            <img src="images/kianna-1.jpg"     alt="Kianna Rain portrait" class="gallery-img" />
+            <img src="images/kianna-2.jpg"     alt="Kianna Rain portrait" class="gallery-img" />
+            <img src="images/kianna-3.jpg"     alt="Kianna Rain portrait" class="gallery-img" />
           </div>
         </div>
       </section>

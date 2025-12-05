@@ -12,18 +12,13 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
     }
 
-    html, body {
-      height: 100%;
-    }
-
     body {
       background: radial-gradient(circle at top, #141927, #050609 60%);
       color: #f5f5f5;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      overflow: hidden;
     }
 
     body.drag-over .visualizer-wrapper {
@@ -33,14 +28,11 @@
 
     .app {
       width: 100%;
-      height: 100%;
       max-width: 1200px;
-      max-height: 100vh;
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 1.1rem;
-      transition: width 0.15s ease-out, height 0.15s ease-out;
     }
 
     header {
@@ -305,7 +297,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      min-height: 0;
+      height: 65vh;
     }
 
     .visualizer-inner {
@@ -313,8 +305,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
-      height: 100%;
     }
 
     #visualizer {
@@ -339,13 +329,13 @@
     }
 
     body.perform-mode .app {
-      max-width: 100vw;
-      max-height: 100vh;
+      max-width: 100%;
       padding: 0;
       gap: 0;
     }
 
     body.perform-mode .visualizer-wrapper {
+      height: 100vh;
       border-radius: 0;
       border: none;
     }
@@ -381,17 +371,6 @@
             <option value="bars">Bars</option>
             <option value="circle">Circle</option>
             <option value="wave">Waveform</option>
-          </select>
-        </div>
-
-        <div class="select-wrapper">
-          <span class="select-label">Aspect</span>
-          <select id="aspectSelect" class="select-control">
-            <option value="16:9">16:9</option>
-            <option value="1:1">1:1</option>
-            <option value="9:16">9:16</option>
-            <option value="4:5">4:5</option>
-            <option value="2:3">2:3</option>
           </select>
         </div>
 
@@ -443,12 +422,11 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.1 · Aspect Frame</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.2 · No Aspect</div>
     </section>
   </main>
 
   <script>
-    const app = document.querySelector(".app");
     const fileInput = document.getElementById("audioFile");
     const playPauseBtn = document.getElementById("playPause");
     const statusText = document.getElementById("statusText");
@@ -465,7 +443,6 @@
     const performBtn = document.getElementById("performBtn");
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
-    const aspectSelect = document.getElementById("aspectSelect");
     const watermarkText = document.getElementById("watermarkText");
 
     let audioContext;
@@ -483,7 +460,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.1 · Neon"
+        watermark: "Spectrum · v1.2 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -507,7 +484,6 @@
 
     let currentThemeKey = "neon";
     let currentVisualizer = "bars";
-    let currentAspect = "16:9";
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -521,11 +497,7 @@
       const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
         watermarkText.textContent =
-          theme.watermark +
-          " · " +
-          currentVisualizer.toUpperCase() +
-          " · " +
-          currentAspect;
+          theme.watermark + " · " + currentVisualizer.toUpperCase();
       }
     }
 
@@ -538,41 +510,6 @@
       updateWatermark();
     });
 
-    function applyAspect(aspect) {
-      currentAspect = aspect;
-      updateWatermark();
-      layoutFrame();
-    }
-
-    aspectSelect.addEventListener("change", (e) => {
-      applyAspect(e.target.value);
-    });
-
-    function layoutFrame() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      if (document.body.classList.contains("perform-mode")) {
-        app.style.width = "100vw";
-        app.style.height = "100vh";
-      } else {
-        const [wRatio, hRatio] = currentAspect.split(":").map(Number);
-        const target = wRatio / hRatio;
-
-        let frameW = vw;
-        let frameH = frameW / target;
-        if (frameH > vh) {
-          frameH = vh;
-          frameW = frameH * target;
-        }
-
-        app.style.width = frameW + "px";
-        app.style.height = frameH + "px";
-      }
-
-      resizeCanvas();
-    }
-
     function resizeCanvas() {
       const rect = visualizerWrapper.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -584,7 +521,7 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    window.addEventListener("resize", layoutFrame);
+    window.addEventListener("resize", resizeCanvas);
 
     function initAudioContext() {
       if (!audioContext) {
@@ -743,19 +680,19 @@
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
       fullscreenBtn.textContent = isFullscreen ? "⤢" : "⛶";
-      layoutFrame();
+      resizeCanvas();
     });
 
     // Performance mode
     performBtn.addEventListener("click", () => {
       document.body.classList.toggle("perform-mode");
-      layoutFrame();
+      resizeCanvas();
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "p" || e.key === "P") {
         document.body.classList.toggle("perform-mode");
-        layoutFrame();
+        resizeCanvas();
       }
     });
 
@@ -966,8 +903,7 @@
 
     // init
     applyTheme(currentThemeKey);
-    applyAspect(currentAspect);
-    layoutFrame();
+    resizeCanvas();
     resetUIToEmpty();
   </script>
 </body>

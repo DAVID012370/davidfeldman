@@ -141,11 +141,6 @@
       opacity: 0.7;
     }
 
-    .drop-hint {
-      font-size: 0.76rem;
-      opacity: 0.6;
-    }
-
     .seek-container {
       display: flex;
       align-items: center;
@@ -235,8 +230,8 @@
   <main class="app">
     <header>
       <div class="brand">
-        <div class="brand-title">DJ Visualizer</div>
-        <div class="brand-sub">Audio reactive visuals • XP vibes soon</div>
+        <div class="brand-title">DJ VISUALIZER</div>
+        <div class="brand-sub">Audio reactive visuals · XP vibes soon</div>
       </div>
 
       <div class="controls">
@@ -250,7 +245,7 @@
 
     <div class="status-row">
       <div class="status" id="statusText">
-      Load an audio file to start. You can also drag & drop an MP3/WAV here.
+        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.
       </div>
       <div class="seek-container">
         <span class="seek-time" id="currentTime">0:00</span>
@@ -265,14 +260,14 @@
         />
         <span class="seek-time" id="durationTime">0:00</span>
       </div>
-      <div class="drop-hint">
-        💡 טיפ: אפשר לגרור קובץ מוזיקה מכל מקום אל האיזור של הוויזואלייזר.
+      <div class="status">
+        💡 Tip: You can drag a music file from anywhere onto the visualizer area.
       </div>
     </div>
 
     <section class="visualizer-wrapper">
       <canvas id="visualizer"></canvas>
-      <div class="watermark">Spectrum · v0.2 · Drag & Seek</div>
+      <div class="watermark">Spectrum · v0.2 · Drag &amp; Seek</div>
     </section>
   </main>
 
@@ -296,7 +291,6 @@
     let animationId;
     let isSeeking = false;
 
-    // Resize canvas to container
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -340,7 +334,6 @@
         return;
       }
 
-      // עצור אודיו קודם
       if (audioElement) {
         audioElement.pause();
       }
@@ -362,7 +355,6 @@
       audioSource.connect(analyser);
       analyser.connect(audioContext.destination);
 
-      // טיימליין
       seekBar.disabled = true;
       seekBar.value = 0;
       currentTimeLabel.textContent = "0:00";
@@ -413,7 +405,6 @@
       }
     });
 
-    // שליטה בטיימליין
     seekBar.addEventListener("input", () => {
       if (!audioElement) return;
       isSeeking = true;
@@ -427,11 +418,6 @@
     });
 
     function startVisualizer() {
-      const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
-      grad.addColorStop(0, "#4cc9f0");
-      grad.addColorStop(0.5, "#f72585");
-      grad.addColorStop(1, "#b5179e");
-
       function draw() {
         animationId = requestAnimationFrame(draw);
         analyser.getByteFrequencyData(dataArray);
@@ -447,6 +433,11 @@
         const barWidth = (width / barCount) * 0.75;
         const gap = (width / barCount) * 0.25;
         const midY = height / 2;
+
+        const grad = ctx.createLinearGradient(0, 0, width, 0);
+        grad.addColorStop(0, "#4cc9f0");
+        grad.addColorStop(0.5, "#f72585");
+        grad.addColorStop(1, "#b5179e");
 
         for (let i = 0; i < barCount; i++) {
           const amplitude = dataArray[i * step] / 255;
@@ -487,7 +478,6 @@
       ctx.closePath();
     }
 
-    // Drag & Drop
     function handleDragOver(e) {
       e.preventDefault();
       document.body.classList.add("drag-over");
@@ -495,7 +485,6 @@
 
     function handleDragLeave(e) {
       e.preventDefault();
-      // אם העכבר יצא מהחלון
       if (e.target === document.body || e.clientX <= 0 || e.clientY <= 0) {
         document.body.classList.remove("drag-over");
       }

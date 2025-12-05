@@ -422,7 +422,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.2 · No Aspect</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.3 · No Aspect</div>
     </section>
   </main>
 
@@ -460,7 +460,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.2 · Neon"
+        watermark: "Spectrum · v1.3 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -622,7 +622,7 @@
       event.target.value = "";
     });
 
-    playPauseBtn.addEventListener("click", async () => {
+    async function togglePlayPause() {
       if (!audioElement) return;
 
       if (!isPlaying) {
@@ -641,6 +641,10 @@
         statusText.textContent = "Paused";
         stopVisualizer();
       }
+    }
+
+    playPauseBtn.addEventListener("click", async () => {
+      await togglePlayPause();
     });
 
     volumeSlider.addEventListener("input", () => {
@@ -683,13 +687,16 @@
       resizeCanvas();
     });
 
-    // Performance mode
-    performBtn.addEventListener("click", () => {
-      document.body.classList.toggle("perform-mode");
-      resizeCanvas();
-    });
+    // Keyboard shortcuts: P = performance, SPACE = play/pause
+    document.addEventListener("keydown", async (e) => {
+      // SPACE → Play/Pause
+      if (e.code === "Space") {
+        e.preventDefault();
+        await togglePlayPause();
+        return;
+      }
 
-    document.addEventListener("keydown", (e) => {
+      // P → Performance mode
       if (e.key === "p" || e.key === "P") {
         document.body.classList.toggle("perform-mode");
         resizeCanvas();

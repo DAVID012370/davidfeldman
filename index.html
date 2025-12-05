@@ -250,6 +250,11 @@
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
     }
 
+    #fullscreenBtn {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
     .select-wrapper {
       position: relative;
       display: flex;
@@ -288,10 +293,22 @@
       background: radial-gradient(circle at center, #111322, #020307 70%);
       position: relative;
       display: flex;
-      cursor: pointer; /* click to load file */
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .visualizer-inner {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 16 / 9; /* default */
     }
 
     #visualizer {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       display: block;
@@ -336,6 +353,17 @@
           </select>
         </div>
 
+        <div class="select-wrapper">
+          <span class="select-label">Aspect</span>
+          <select id="aspectSelect" class="select-control">
+            <option value="16:9">16:9</option>
+            <option value="1:1">1:1</option>
+            <option value="9:16">9:16</option>
+            <option value="4:5">4:5</option>
+            <option value="2:3">2:3</option>
+          </select>
+        </div>
+
         <label class="file-input-label">
           Load Track
           <input id="audioFile" type="file" accept="audio/*" />
@@ -353,6 +381,7 @@
           />
         </div>
         <button id="clearTrack" title="Clear current track">✕</button>
+        <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
       </div>
     </header>
 
@@ -379,8 +408,10 @@
     </div>
 
     <section class="visualizer-wrapper">
-      <canvas id="visualizer"></canvas>
-      <div class="watermark" id="watermarkText">Spectrum · v0.5 · Modes</div>
+      <div class="visualizer-inner">
+        <canvas id="visualizer"></canvas>
+      </div>
+      <div class="watermark" id="watermarkText">Spectrum · v0.6 · Modes + Aspect</div>
     </section>
   </main>
 
@@ -391,14 +422,17 @@
     const canvas = document.getElementById("visualizer");
     const ctx = canvas.getContext("2d");
     const visualizerWrapper = document.querySelector(".visualizer-wrapper");
+    const visualizerInner = document.querySelector(".visualizer-inner");
 
     const seekBar = document.getElementById("seekBar");
     const currentTimeLabel = document.getElementById("currentTime");
     const durationTimeLabel = document.getElementById("durationTime");
     const volumeSlider = document.getElementById("volumeSlider");
     const clearTrackBtn = document.getElementById("clearTrack");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
+    const aspectSelect = document.getElementById("aspectSelect");
     const watermarkText = document.getElementById("watermarkText");
 
     let audioContext;
@@ -410,13 +444,14 @@
     let isPlaying = false;
     let animationId;
     let isSeeking = false;
+    let isFullscreen = false;
 
     const themes = {
       neon: {
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v0.5 · Neon"
+        watermark: "Spectrum · v0.6 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -440,14 +475,25 @@
 
     let currentThemeKey = "neon";
     let currentVisualizer = "bars"; // 'bars' | 'circle' | 'wave'
+    let currentAspect = "16:9";
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
       currentThemeKey = themeKey;
       document.body.style.background = theme.bodyBg;
       visualizerWrapper.style.background = theme.visBg;
+      updateWatermark();
+    }
+
+    function updateWatermark() {
+      const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
-        watermarkText.textContent = theme.watermark + " · " + currentVisualizer.toUpperCase();
+        watermarkText.textContent =
+          theme.watermark +
+          " · " +
+          currentVisualizer.toUpperCase() +
+          " · " +
+          currentAspect;
       }
     }
 
@@ -457,8 +503,26 @@
 
     visualizerSelect.addEventListener("change", (e) => {
       currentVisualizer = e.target.value;
-      const theme = themes[currentThemeKey] || themes.neon;
-      watermarkText.textContent = theme.watermark + " · " + currentVisualizer.toUpperCase();
+      updateWatermark();
+    });
+
+    function applyAspect(aspectValue) {
+      currentAspect = aspectValue;
+      const map = {
+        "16:9": "16 / 9",
+        "1:1": "1 / 1",
+        "9:16": "9 / 16",
+        "4:5": "4 / 5",
+        "2:3": "2 / 3"
+      };
+      const cssValue = map[aspectValue] || "16 / 9";
+      visualizerInner.style.aspectRatio = cssValue;
+      updateWatermark();
+      resizeCanvas();
+    }
+
+    aspectSelect.addEventListener("change", (e) => {
+      applyAspect(e.target.value);
     });
 
     function resizeCanvas() {
@@ -469,7 +533,6 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
 
     function initAudioContext() {
       if (!audioContext) {
@@ -610,6 +673,25 @@
       isPlaying = false;
       stopVisualizer();
       resetUIToEmpty();
+    });
+
+    // Fullscreen
+    fullscreenBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        if (visualizerWrapper.requestFullscreen) {
+          visualizerWrapper.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      isFullscreen = !!document.fullscreenElement;
+      fullscreenBtn.textContent = isFullscreen ? "⤢" : "⛶";
+      resizeCanvas();
     });
 
     seekBar.addEventListener("input", () => {
@@ -786,8 +868,12 @@
       ctx.closePath();
     }
 
-    visualizerWrapper.addEventListener("click", () => {
-      fileInput.click();
+    // click on visualizer area opens file picker
+    visualizerWrapper.addEventListener("click", (e) => {
+      // don't trigger when dragging
+      if (e.target === canvas || e.target === visualizerInner || e.target === visualizerWrapper) {
+        fileInput.click();
+      }
     });
 
     function handleDragOver(e) {
@@ -817,6 +903,8 @@
 
     // init
     applyTheme(currentThemeKey);
+    applyAspect(currentAspect);
+    resizeCanvas();
     resetUIToEmpty();
   </script>
 </body>

@@ -207,6 +207,7 @@
       background: radial-gradient(circle at center, #111322, #020307 70%);
       position: relative;
       display: flex;
+      cursor: pointer; /* click to load file */
     }
 
     #visualizer {
@@ -277,6 +278,7 @@
     const statusText = document.getElementById("statusText");
     const canvas = document.getElementById("visualizer");
     const ctx = canvas.getContext("2d");
+    const visualizerWrapper = document.querySelector(".visualizer-wrapper");
 
     const seekBar = document.getElementById("seekBar");
     const currentTimeLabel = document.getElementById("currentTime");
@@ -478,6 +480,12 @@
       ctx.closePath();
     }
 
+    // click on visualizer area opens file picker
+    visualizerWrapper.addEventListener("click", () => {
+      fileInput.click();
+    });
+
+    // Drag & Drop handlers
     function handleDragOver(e) {
       e.preventDefault();
       document.body.classList.add("drag-over");

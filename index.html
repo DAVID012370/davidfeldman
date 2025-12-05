@@ -5,26 +5,230 @@
   <title>DJ Visualizer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif; }
-    body { background: radial-gradient(circle at top, #141927, #050609 60%); color: #f5f5f5; min-height: 100vh; display: flex; align-items: stretch; justify-content: center; }
-    .app { width: 100%; max-width: 1200px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-    .brand { display: flex; flex-direction: column; gap: 0.2rem; }
-    .brand-title { font-size: 1.4rem; letter-spacing: 0.1em; text-transform: uppercase; }
-    .brand-sub { font-size: 0.8rem; opacity: 0.7; }
-    .controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
-    .file-input-label { position: relative; overflow: hidden; border-radius: 999px; padding: 0.6rem 1.2rem; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); backdrop-filter: blur(12px); cursor: pointer; transition: background 0.2s, transform 0.1s, border-color 0.2s; }
-    .file-input-label:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.4); }
-    .file-input-label:active { transform: scale(0.97); }
-    .file-input-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    button { border-radius: 999px; border: none; padding: 0.6rem 1.1rem; font-size: 0.85rem; cursor: pointer; background: linear-gradient(135deg,#f72585,#7209b7); color: white; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 0 20px rgba(247,37,133,0.4); opacity: 0.85; transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s; }
-    button:hover { opacity: 1; box-shadow: 0 0 30px rgba(247,37,133,0.7); }
-    button:active { transform: scale(0.97); }
-    button:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
-    .status { font-size: 0.78rem; opacity: 0.7; }
-    .visualizer-wrapper { flex: 1; border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: radial-gradient(circle at center, #111322, #020307 70%); position: relative; display: flex; }
-    #visualizer { width: 100%; height: 100%; display: block; }
-    .watermark { position: absolute; bottom: 0.9rem; right: 1.3rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; opacity: 0.45; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #141927, #050609 60%);
+      color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    body.drag-over .visualizer-wrapper {
+      outline: 2px dashed rgba(255, 255, 255, 0.4);
+      background: radial-gradient(circle at center, #181b33, #020307 75%);
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .file-input-label {
+      position: relative;
+      overflow: hidden;
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, border-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .file-input-label:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .file-input-label:active {
+      transform: scale(0.97);
+    }
+
+    .file-input-label input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f72585, #7209b7);
+      color: white;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(247, 37, 133, 0.4);
+      opacity: 0.85;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      opacity: 1;
+      box-shadow: 0 0 30px rgba(247, 37, 133, 0.7);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button:disabled {
+      opacity: 0.3;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .status-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .status {
+      font-size: 0.78rem;
+      opacity: 0.7;
+    }
+
+    .drop-hint {
+      font-size: 0.76rem;
+      opacity: 0.6;
+    }
+
+    .seek-container {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.1rem;
+    }
+
+    .seek-time {
+      font-size: 0.72rem;
+      opacity: 0.7;
+      min-width: 3.3rem;
+      text-align: center;
+      direction: ltr;
+    }
+
+    .seek-bar {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .seek-bar:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .seek-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #f72585;
+      box-shadow: 0 0 8px rgba(247, 37, 133, 0.7);
+      border: none;
+      margin-top: -4px;
+    }
+
+    .seek-bar::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #f72585;
+      box-shadow: 0 0 8px rgba(247, 37, 133, 0.7);
+      border: none;
+    }
+
+    .seek-bar::-moz-range-track {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .visualizer-wrapper {
+      flex: 1;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: radial-gradient(circle at center, #111322, #020307 70%);
+      position: relative;
+      display: flex;
+    }
+
+    #visualizer {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 0.9rem;
+      right: 1.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      opacity: 0.45;
+    }
   </style>
 </head>
 <body>
@@ -32,8 +236,9 @@
     <header>
       <div class="brand">
         <div class="brand-title">DJ Visualizer</div>
-        <div class="brand-sub">Audio reactive visuals for live sets</div>
+        <div class="brand-sub">Audio reactive visuals • XP vibes soon</div>
       </div>
+
       <div class="controls">
         <label class="file-input-label">
           Load Track
@@ -42,10 +247,32 @@
         <button id="playPause" disabled>Play</button>
       </div>
     </header>
-    <div class="status" id="statusText">Load an audio file to start the visualizer.</div>
+
+    <div class="status-row">
+      <div class="status" id="statusText">
+        טען קובץ אודיו כדי להתחיל. אפשר גם לגרור לכאן קובץ MP3/WAV.
+      </div>
+      <div class="seek-container">
+        <span class="seek-time" id="currentTime">0:00</span>
+        <input
+          type="range"
+          id="seekBar"
+          class="seek-bar"
+          min="0"
+          value="0"
+          step="0.01"
+          disabled
+        />
+        <span class="seek-time" id="durationTime">0:00</span>
+      </div>
+      <div class="drop-hint">
+        💡 טיפ: אפשר לגרור קובץ מוזיקה מכל מקום אל האיזור של הוויזואלייזר.
+      </div>
+    </div>
+
     <section class="visualizer-wrapper">
       <canvas id="visualizer"></canvas>
-      <div class="watermark">Spectrum · v0.1</div>
+      <div class="watermark">Spectrum · v0.2 · Drag & Seek</div>
     </section>
   </main>
 
@@ -56,14 +283,20 @@
     const canvas = document.getElementById("visualizer");
     const ctx = canvas.getContext("2d");
 
+    const seekBar = document.getElementById("seekBar");
+    const currentTimeLabel = document.getElementById("currentTime");
+    const durationTimeLabel = document.getElementById("durationTime");
+
     let audioContext;
     let audioSource;
     let analyser;
     let dataArray;
-    let audioElement = new Audio();
+    let audioElement = null;
     let isPlaying = false;
     let animationId;
+    let isSeeking = false;
 
+    // Resize canvas to container
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -84,12 +317,39 @@
       }
     }
 
-    fileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+    function formatTime(sec) {
+      if (!isFinite(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60)
+        .toString()
+        .padStart(2, "0");
+      return `${m}:${s}`;
+    }
 
-      if (audioElement) audioElement.pause();
-      if (audioSource) { try { audioSource.disconnect(); } catch (e) {} }
+    function stopVisualizer() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    }
+
+    function loadAudioFile(file) {
+      if (!file) return;
+      if (!file.type.startsWith("audio/")) {
+        statusText.textContent = "הקובץ אינו אודיו. נסה קובץ MP3 או WAV.";
+        return;
+      }
+
+      // עצור אודיו קודם
+      if (audioElement) {
+        audioElement.pause();
+      }
+      if (audioSource) {
+        try {
+          audioSource.disconnect();
+        } catch (e) {}
+      }
+      stopVisualizer();
 
       initAudioContext();
 
@@ -102,10 +362,34 @@
       audioSource.connect(analyser);
       analyser.connect(audioContext.destination);
 
+      // טיימליין
+      seekBar.disabled = true;
+      seekBar.value = 0;
+      currentTimeLabel.textContent = "0:00";
+      durationTimeLabel.textContent = "0:00";
+
+      audioElement.addEventListener("loadedmetadata", () => {
+        seekBar.max = audioElement.duration || 0;
+        seekBar.disabled = false;
+        durationTimeLabel.textContent = formatTime(audioElement.duration);
+      });
+
+      audioElement.addEventListener("timeupdate", () => {
+        if (!isSeeking) {
+          seekBar.value = audioElement.currentTime || 0;
+          currentTimeLabel.textContent = formatTime(audioElement.currentTime);
+        }
+      });
+
       playPauseBtn.disabled = false;
       playPauseBtn.textContent = "Play";
       isPlaying = false;
-      statusText.textContent = "Loaded: " + file.name;
+      statusText.textContent = `נטען: ${file.name}`;
+    }
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      loadAudioFile(file);
     });
 
     playPauseBtn.addEventListener("click", async () => {
@@ -118,18 +402,36 @@
         await audioElement.play();
         isPlaying = true;
         playPauseBtn.textContent = "Pause";
-        statusText.textContent = "Playing · Visualizer running";
+        statusText.textContent = "מנגן · הוויזואלייזר פעיל";
         startVisualizer();
       } else {
         audioElement.pause();
         isPlaying = false;
         playPauseBtn.textContent = "Play";
-        statusText.textContent = "Paused";
-        cancelAnimationFrame(animationId);
+        statusText.textContent = "מופסק";
+        stopVisualizer();
       }
     });
 
+    // שליטה בטיימליין
+    seekBar.addEventListener("input", () => {
+      if (!audioElement) return;
+      isSeeking = true;
+      currentTimeLabel.textContent = formatTime(seekBar.value);
+    });
+
+    seekBar.addEventListener("change", () => {
+      if (!audioElement) return;
+      audioElement.currentTime = Number(seekBar.value) || 0;
+      isSeeking = false;
+    });
+
     function startVisualizer() {
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      grad.addColorStop(0, "#4cc9f0");
+      grad.addColorStop(0.5, "#f72585");
+      grad.addColorStop(1, "#b5179e");
+
       function draw() {
         animationId = requestAnimationFrame(draw);
         analyser.getByteFrequencyData(dataArray);
@@ -145,11 +447,6 @@
         const barWidth = (width / barCount) * 0.75;
         const gap = (width / barCount) * 0.25;
         const midY = height / 2;
-
-        const grad = ctx.createLinearGradient(0, 0, width, 0);
-        grad.addColorStop(0, "#4cc9f0");
-        grad.addColorStop(0.5, "#f72585");
-        grad.addColorStop(1, "#b5179e");
 
         for (let i = 0; i < barCount; i++) {
           const amplitude = dataArray[i * step] / 255;
@@ -171,6 +468,7 @@
         ctx.lineTo(width, midY);
         ctx.stroke();
       }
+
       draw();
     }
 
@@ -188,6 +486,33 @@
       ctx.quadraticCurveTo(x, y, x + r, y);
       ctx.closePath();
     }
+
+    // Drag & Drop
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.body.classList.add("drag-over");
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      // אם העכבר יצא מהחלון
+      if (e.target === document.body || e.clientX <= 0 || e.clientY <= 0) {
+        document.body.classList.remove("drag-over");
+      }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.body.classList.remove("drag-over");
+      const files = e.dataTransfer.files;
+      if (!files || !files.length) return;
+      const file = files[0];
+      loadAudioFile(file);
+    }
+
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("drop", handleDrop);
   </script>
 </body>
 </html>

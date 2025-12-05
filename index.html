@@ -250,7 +250,7 @@
 
     <div class="status-row">
       <div class="status" id="statusText">
-        טען קובץ אודיו כדי להתחיל. אפשר גם לגרור לכאן קובץ MP3/WAV.
+      Load an audio file to start. You can also drag & drop an MP3/WAV here.
       </div>
       <div class="seek-container">
         <span class="seek-time" id="currentTime">0:00</span>
@@ -336,7 +336,7 @@
     function loadAudioFile(file) {
       if (!file) return;
       if (!file.type.startsWith("audio/")) {
-        statusText.textContent = "הקובץ אינו אודיו. נסה קובץ MP3 או WAV.";
+        statusText.textContent = "This file is not an audio file. Please use an MP3 or WAV track.";
         return;
       }
 
@@ -384,7 +384,7 @@
       playPauseBtn.disabled = false;
       playPauseBtn.textContent = "Play";
       isPlaying = false;
-      statusText.textContent = `נטען: ${file.name}`;
+      statusText.textContent = `Loaded: ${file.name}`;
     }
 
     fileInput.addEventListener("change", (event) => {
@@ -402,13 +402,13 @@
         await audioElement.play();
         isPlaying = true;
         playPauseBtn.textContent = "Pause";
-        statusText.textContent = "מנגן · הוויזואלייזר פעיל";
+        statusText.textContent = "Playing · Visualizer active";
         startVisualizer();
       } else {
         audioElement.pause();
         isPlaying = false;
         playPauseBtn.textContent = "Play";
-        statusText.textContent = "מופסק";
+        statusText.textContent = "Paused";
         stopVisualizer();
       }
     });

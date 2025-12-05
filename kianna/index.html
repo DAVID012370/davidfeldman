@@ -1,1 +1,1382 @@
-/kianna/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kianna Rain – Multidisciplinary Artist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Portfolio of Kianna Rain – multidisciplinary artist working across acting, music, painting and poetry."
+  />
+  <style>
+    :root {
+      --bg: #05060b;
+      --bg-soft: #0b0d18;
+      --accent: #f35f9a;
+      --accent-2: #5fd1f3;
+      --text: #f7f7ff;
+      --muted: #a3a8c6;
+      --border: #24263b;
+      --radius-lg: 20px;
+      --radius-xl: 26px;
+      --shadow: 0 22px 45px rgba(0, 0, 0, 0.85);
+      --max-width: 1120px;
+      --transition: 0.18s ease-out;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      "Segoe UI", sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, #19162c 0, #05060b 55%),
+        radial-gradient(circle at bottom right, #121320 0, #05060b 55%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 3px;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Header */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(
+        to bottom,
+        rgba(5, 6, 11, 0.96),
+        rgba(5, 6, 11, 0.84),
+        transparent
+      );
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 20% 0, #ffffff, #f35f9a 45%, #5fd1f3 100%);
+      box-shadow: 0 0 18px rgba(243, 95, 154, 0.8);
+    }
+
+    .brand-text {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 1.5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width var(--transition);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #05060b;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+      font-size: 12px;
+    }
+
+    .nav-cta span {
+      font-size: 15px;
+    }
+
+    .nav-toggle {
+      display: none;
+      width: 36px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(7, 9, 18, 0.9);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .nav-toggle span {
+      width: 18px;
+      height: 1.5px;
+      border-radius: 999px;
+      background: #f6f6ff;
+      position: relative;
+    }
+
+    .nav-toggle span::before,
+    .nav-toggle span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 1.5px;
+      border-radius: 999px;
+      background: inherit;
+    }
+
+    .nav-toggle span::before {
+      top: -5px;
+    }
+
+    .nav-toggle span::after {
+      top: 5px;
+    }
+
+    /* Hero */
+
+    main {
+      flex: 1;
+    }
+
+    .hero {
+      padding: 42px 0 70px;
+    }
+
+    .hero-inner {
+      display: grid;
+      gap: 38px;
+      align-items: center;
+    }
+
+    @media (min-width: 860px) {
+      .hero-inner {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(95, 209, 243, 0.22);
+      background: radial-gradient(
+        circle at top left,
+        rgba(95, 209, 243, 0.2),
+        rgba(7, 9, 16, 0.95)
+      );
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .hero-tag-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #7effd4, #16b97d);
+      box-shadow: 0 0 12px rgba(126, 255, 212, 0.9);
+    }
+
+    .hero-title {
+      font-size: clamp(32px, 4.2vw, 42px);
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      line-height: 1.12;
+      margin-bottom: 18px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub strong {
+      color: var(--text);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        background var(--transition),
+        border-color var(--transition);
+      background: transparent;
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #05060b;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 26px 50px rgba(0, 0, 0, 0.9);
+    }
+
+    .btn-ghost {
+      border-color: var(--border);
+      background: rgba(7, 9, 18, 0.96);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(243, 95, 154, 0.6);
+      background: rgba(10, 12, 26, 1);
+      color: var(--text);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hero-meta strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    /* Hero visual */
+
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-card {
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: radial-gradient(circle at 0 0, #251b3e 0, #05060b 65%);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-card-inner {
+      border-radius: 18px;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 20% 0, #f35f9a33, transparent 50%),
+        radial-gradient(circle at 100% 100%, #5fd1f333, #05060b 70%);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 540px) {
+      .hero-card-inner {
+        grid-template-columns: 1.1fr 1.6fr;
+      }
+    }
+
+    .portrait {
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      padding: 16px 10px 10px;
+      background: radial-gradient(circle at 20% 0, #f7d9ff33, #05060b 70%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .portrait-inner {
+      width: 88%;
+      max-width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      border: 2px solid rgba(243, 95, 154, 0.85);
+      background:
+        radial-gradient(circle at 25% 0, #ffffff, #f35f9a 40%, #22102d 70%, #05060b 100%);
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.95);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .portrait-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      background: linear-gradient(140deg, #1c1632, #05060b);
+      color: rgba(245, 239, 255, 0.8);
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    .portrait-glow {
+      position: absolute;
+      inset: auto auto -60px;
+      width: 160%;
+      height: 140px;
+      background: radial-gradient(circle, rgba(243, 95, 154, 0.8), transparent 70%);
+      opacity: 0.4;
+      filter: blur(20px);
+    }
+
+    .pill {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(243, 95, 154, 0.6);
+      background: rgba(6, 7, 16, 0.9);
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #7effd4, #16b97d);
+      box-shadow: 0 0 10px rgba(126, 255, 212, 0.9);
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hero-right strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(7, 9, 18, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .mini-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mini-card {
+      border-radius: 14px;
+      padding: 9px 10px;
+      background: rgba(7, 9, 18, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    /* Sections */
+
+    section {
+      padding: 30px 0 44px;
+    }
+
+    section:nth-of-type(odd) {
+      background: radial-gradient(circle at top, #0b0d18 0, #05060b 60%);
+    }
+
+    section:nth-of-type(even) {
+      background: radial-gradient(circle at top, #05060b 0, #020308 70%);
+    }
+
+    .section-inner {
+      padding-top: 10px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 420px;
+    }
+
+    /* About */
+
+    .about-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    @media (min-width: 900px) {
+      .about-grid {
+        grid-template-columns: 1.5fr 1.1fr;
+      }
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(7, 9, 18, 0.97);
+      padding: 16px 16px 18px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .card p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .list-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+
+    .chip {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(10, 12, 26, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      color: #d4d7f0;
+    }
+
+    .two-col {
+      display: grid;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    @media (min-width: 520px) {
+      .two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .two-col strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    /* Disciplines */
+
+    .disciplines-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 780px) {
+      .disciplines-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .discipline {
+      border-radius: 18px;
+      padding: 13px 13px 15px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top, #18172a 0, #05060b 60%);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .discipline h3 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .discipline span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #c4c7e4;
+      margin-bottom: 4px;
+    }
+
+    /* Highlights */
+
+    .highlights-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 780px) {
+      .highlights-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .highlight-card {
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 14px;
+      background: radial-gradient(circle at top, #151629 0, #05060b 65%);
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .highlight-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    .highlight-title {
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .highlight-meta {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .pill-soft {
+      display: inline-flex;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(9, 11, 22, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 4px;
+    }
+
+    /* Gallery / Media */
+
+    .media-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 860px) {
+      .media-grid {
+        grid-template-columns: 2fr 1.4fr;
+      }
+    }
+
+    .embed-placeholder {
+      border-radius: 18px;
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      padding: 18px;
+      background: rgba(7, 9, 18, 0.98);
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .embed-placeholder code {
+      font-size: 11px;
+      background: rgba(10, 12, 26, 1);
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+
+    .media-notes {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(7, 9, 18, 0.98);
+      padding: 15px 15px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      display: grid;
+      gap: 8px;
+    }
+
+    .media-list {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .media-item strong {
+      display: block;
+      color: var(--text);
+    }
+
+    /* Contact */
+
+    .contact-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    @media (min-width: 840px) {
+      .contact-grid {
+        grid-template-columns: 1.6fr 1.1fr;
+      }
+    }
+
+    .contact-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(5, 6, 14, 0.98);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition:
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background var(--transition);
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(243, 95, 154, 0.7);
+      box-shadow: 0 0 0 1px rgba(243, 95, 154, 0.35);
+      background: #05060b;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .contact-note {
+      margin-top: 5px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .contact-side {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(7, 9, 18, 0.98);
+      padding: 15px 15px 16px;
+      font-size: 13px;
+      color: var(--muted);
+      display: grid;
+      gap: 10px;
+    }
+
+    .contact-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .contact-line span:first-child {
+      color: #d4d7f0;
+    }
+
+    .social-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .social-pill {
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(9, 11, 22, 0.98);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .social-pill strong {
+      color: var(--text);
+    }
+
+    /* Footer */
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: #020309;
+      padding: 14px 0 18px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+    }
+
+    /* Mobile nav */
+
+    @media (max-width: 760px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 56px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(5, 6, 13, 0.98);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75);
+        flex-direction: column;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .nav-cta {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .nav-toggle {
+        display: inline-flex;
+      }
+
+      .hero {
+        padding-top: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="shell">
+        <nav class="nav">
+          <div class="brand">
+            <div class="brand-mark"></div>
+            <div class="brand-text">Kianna Rain</div>
+          </div>
+          <button class="nav-toggle" aria-label="Toggle navigation">
+            <span></span>
+          </button>
+          <div class="nav-links" id="navLinks">
+            <a href="#about">About</a>
+            <a href="#disciplines">Disciplines</a>
+            <a href="#highlights">Highlights</a>
+            <a href="#media">Media</a>
+            <a href="#contact">Contact</a>
+            <!-- Change href below to the URL of your visualiser homepage -->
+            <a href="https://david012370.github.io/davidfeldman/" class="nav-cta">
+              Visualiser
+              <span>↗</span>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="shell hero-inner">
+          <div>
+            <div class="hero-tag">
+              <span class="hero-tag-dot"></span>
+              <span>Acting · Music · Painting · Poetry</span>
+            </div>
+            <h1 class="hero-title">
+              <span>Kianna&nbsp;Rain</span><br />
+              multidimensional storytelling.
+            </h1>
+            <p class="hero-sub">
+              Kianna Rain is a multidisciplinary artist whose work flows between
+              <strong>acting, music, painting and poetry</strong> — each form feeding
+              the next. She brings spiritual and psychological depth to every character,
+              performance and canvas she touches.
+            </p>
+            <div class="hero-actions">
+              <a href="#media" class="btn btn-primary">
+                Explore selected works
+              </a>
+              <a href="#contact" class="btn btn-ghost">
+                Invite Kianna to a project
+              </a>
+            </div>
+            <div class="hero-meta">
+              <div>
+                <strong>Focus themes</strong>
+                Love · consciousness · divinity · the unseen layers of being human.
+              </div>
+              <div>
+                <strong>Mediums</strong>
+                Film & theatre acting · songwriting & production · painting · poetry.
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero visual -->
+          <div class="hero-visual">
+            <div class="hero-card">
+              <div class="hero-card-inner">
+                <div class="portrait">
+                  <div class="portrait-inner">
+                    <!-- Replace this block with an <img> of Kianna -->
+                    <!-- <img src="kianna-portrait.jpg" alt="Portrait of Kianna Rain" /> -->
+                    <div class="portrait-placeholder">
+                      PLACE KIANNA'S PORTRAIT HERE
+                    </div>
+                    <div class="portrait-glow"></div>
+                  </div>
+                  <div class="pill">
+                    <span class="pill-dot"></span>
+                    <span>Open to collaborations</span>
+                  </div>
+                </div>
+                <div class="hero-right">
+                  <div>
+                    <strong>Art as a living portal</strong>
+                    <p>
+                      Whether through a lyric, a brushstroke or a monologue, Kianna
+                      builds worlds that invite people to feel deeply and remember
+                      their own aliveness.
+                    </p>
+                    <div class="tag-row">
+                      <div class="tag">Emotion-driven performance</div>
+                      <div class="tag">Spiritual & psychological depth</div>
+                      <div class="tag">Cinematic storytelling</div>
+                    </div>
+                  </div>
+                  <div class="mini-grid">
+                    <div class="mini-card">
+                      <strong>Acting</strong>
+                      Complex, layered characters grounded in inner life and presence.
+                    </div>
+                    <div class="mini-card">
+                      <strong>Music</strong>
+                      Soundscapes between pop, indie, rock and jazz — half confession,
+                      half dream.
+                    </div>
+                    <div class="mini-card">
+                      <strong>Visual & written work</strong>
+                      Paintings and poems echo the same search for beauty, truth and
+                      transcendence.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section id="about">
+        <div class="shell section-inner">
+          <div class="section-header">
+            <div class="section-title">About</div>
+            <p class="section-sub">
+              A short overview of Kianna’s artistic universe. You can tweak or expand
+              the text any time.
+            </p>
+          </div>
+
+          <div class="about-grid">
+            <div class="card">
+              <p>
+                Kianna Rain is a multidisciplinary artist whose work flows between
+                acting, music, painting and poetry — each discipline in conversation
+                with the others. She approaches every role and performance with deep
+                emotional intelligence, folding spiritual and psychological nuance into
+                her characters.
+              </p>
+              <br />
+              <p>
+                As a singer, songwriter and producer, Kianna crafts soundscapes that
+                blur the lines between pop, indie, rock and jazz. Her music often feels
+                like both a confession and a dream — exploring love, consciousness,
+                divinity and the unseen layers of being human.
+              </p>
+              <br />
+              <p>
+                Beyond the stage and studio, she paints and writes. Her canvases and
+                poems echo the same themes found in her performances: the search for
+                beauty, truth and transcendence.
+              </p>
+              <div class="list-chips">
+                <div class="chip">Inner worlds on screen</div>
+                <div class="chip">Genre-blurring music</div>
+                <div class="chip">Spiritual & psychological motifs</div>
+                <div class="chip">Painting & written word</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="two-col">
+                <div>
+                  <strong>What she loves working on</strong>
+                  <p>
+                    Films and series with emotional depth, intimate live sets, concept
+                    albums, interdisciplinary performances, gallery-style experiences.
+                  </p>
+                </div>
+                <div>
+                  <strong>How she works</strong>
+                  <p>
+                    Collaborative, intuitive and detail-oriented — from early concept
+                    and script to final performance or recording.
+                  </p>
+                </div>
+              </div>
+
+              <div class="two-col" style="margin-top: 12px;">
+                <div>
+                  <strong>For directors & producers</strong>
+                  <p>
+                    Character-driven roles, voice work, experimental projects that
+                    require emotional and spiritual range.
+                  </p>
+                </div>
+                <div>
+                  <strong>For musicians & artists</strong>
+                  <p>
+                    Features, co-writing, vocal production, visuals and written work
+                    built around a shared concept or story.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Disciplines -->
+      <section id="disciplines">
+        <div class="shell section-inner">
+          <div class="section-header">
+            <div class="section-title">Disciplines</div>
+            <p class="section-sub">
+              Four main pillars of Kianna’s practice. Use these tiles to guide people to
+              the kind of work they’re looking for.
+            </p>
+          </div>
+
+          <div class="disciplines-grid">
+            <div class="discipline">
+              <span>Acting</span>
+              <h3>Characters with inner worlds</h3>
+              <p>
+                Film and theatre work rooted in emotional truth. Kianna explores the
+                spiritual and psychological interior of each role, bringing subtlety,
+                vulnerability and quiet strength on screen and stage.
+              </p>
+            </div>
+            <div class="discipline">
+              <span>Music</span>
+              <h3>Confession & dream</h3>
+              <p>
+                Songs that drift between pop, indie, rock and jazz — built on
+                detailed vocal arrangements and immersive production. Ideal for
+                intimate live shows, cinematic projects and cross-disciplinary work.
+              </p>
+            </div>
+            <div class="discipline">
+              <span>Painting</span>
+              <h3>Visual echoes</h3>
+              <p>
+                Canvases that mirror the themes in her performances: portals,
+                archetypes, elemental landscapes, fragments of memory and energy.
+              </p>
+            </div>
+            <div class="discipline">
+              <span>Poetry</span>
+              <h3>Language as ritual</h3>
+              <p>
+                Poems that hold the same questions as her music and acting — love,
+                divinity, embodiment, the invisible conversations between worlds.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Highlights -->
+      <section id="highlights">
+        <div class="shell section-inner">
+          <div class="section-header">
+            <div class="section-title">Highlights</div>
+            <p class="section-sub">
+              Placeholder examples you can replace with real projects: roles, songs,
+              exhibitions or performances.
+            </p>
+          </div>
+
+          <div class="highlights-grid">
+            <div class="highlight-card">
+              <div class="highlight-tag">Acting</div>
+              <div class="highlight-title">“Between Waking & Light”</div>
+              <p>
+                Lead role in an intimate, dreamlike drama exploring grief and
+                spiritual awakening. Kianna’s performance moves between raw
+                vulnerability and quiet transcendence.
+              </p>
+              <div class="highlight-meta">
+                <div class="pill-soft">Feature / festival circuit</div>
+              </div>
+            </div>
+
+            <div class="highlight-card">
+              <div class="highlight-tag">Music</div>
+              <div class="highlight-title">“Divine Static” – concept EP</div>
+              <p>
+                A short body of work that blends jazz-tinged chords, indie guitars
+                and cinematic electronics. Each track feels like a confession spoken
+                directly to the listener’s inner world.
+              </p>
+              <div class="highlight-meta">
+                <div class="pill-soft">Singer · songwriter · producer</div>
+              </div>
+            </div>
+
+            <div class="highlight-card">
+              <div class="highlight-tag">Painting & Poetry</div>
+              <div class="highlight-title">“Altars for the Invisible”</div>
+              <p>
+                A series of canvases paired with poems, installed as a small
+                immersive room. Visitors move through colour, text and sound in one
+                continuous experience.
+              </p>
+              <div class="highlight-meta">
+                <div class="pill-soft">Gallery / installation</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Media -->
+      <section id="media">
+        <div class="shell section-inner">
+          <div class="section-header">
+            <div class="section-title">Media</div>
+            <p class="section-sub">
+              Swap the placeholder with real players and links: showreel, music,
+              readings, exhibitions.
+            </p>
+          </div>
+
+          <div class="media-grid">
+            <div class="card">
+              <h3 style="font-size:14px; margin-bottom:10px;">Showreel / Music</h3>
+              <div class="embed-placeholder">
+                <p style="margin-bottom: 10px;">
+                  Embed your video or music player here. For example:
+                </p>
+                <p>
+                  <code>
+                    &lt;iframe src="YOUR_LINK"
+                      width="100%"
+                      height="320"
+                      frameborder="0"
+                      allow="autoplay; encrypted-media; fullscreen"&gt;&lt;/iframe&gt;
+                  </code>
+                </p>
+                <p style="margin-top:10px;">
+                  Replace this whole box with a YouTube, Vimeo, Spotify or SoundCloud embed.
+                </p>
+              </div>
+            </div>
+
+            <div class="media-notes">
+              <div class="media-list">
+                <div class="media-item">
+                  <strong>Acting showreel</strong>
+                  Clips focused on character depth, emotional range and close-up work.
+                </div>
+                <div class="media-item">
+                  <strong>Live sessions</strong>
+                  Intimate performances that capture the confessional / dreamlike side
+                  of her music.
+                </div>
+                <div class="media-item">
+                  <strong>Painting & poetry</strong>
+                  Still images or short videos of canvases paired with voiceover
+                  readings of her poems.
+                </div>
+              </div>
+              <p style="font-size:12px; margin-top:4px;">
+                For full portfolio access, please reach out directly with your
+                project details.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact">
+        <div class="shell section-inner">
+          <div class="section-header">
+            <div class="section-title">Contact</div>
+            <p class="section-sub">
+              For casting, collaborations, commissions or invitations to perform, share
+              a few details and how you imagine working together.
+            </p>
+          </div>
+
+          <div class="contact-grid">
+            <div class="card">
+              <!-- Front-end only form; connect to Formspree / backend if you want it to send -->
+              <form class="contact-form">
+                <div>
+                  <label for="name">Name / Organisation</label>
+                  <input id="name" type="text" placeholder="Your name or company" />
+                </div>
+                <div>
+                  <label for="email">Email</label>
+                  <input id="email" type="email" placeholder="you@example.com" />
+                </div>
+                <div>
+                  <label for="type">Project type</label>
+                  <input
+                    id="type"
+                    type="text"
+                    placeholder="Acting role, music collaboration, exhibition, etc."
+                  />
+                </div>
+                <div>
+                  <label for="message">Project details</label>
+                  <textarea
+                    id="message"
+                    placeholder="Tell me about the project, timelines, references, and what drew you to my work."
+                  ></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Send (visual form only)
+                </button>
+                <p class="contact-note">
+                  This form is visual only for now. To make it functional, connect it to
+                  a service like Formspree, Netlify Forms or your own backend.
+                </p>
+              </form>
+            </div>
+
+            <div class="contact-side">
+              <div>
+                <strong style="color:#f7f7ff;">Direct contact</strong>
+                <div class="contact-line" style="margin-top:4px;">
+                  <span>Email</span>
+                  <!-- Replace with real email -->
+                  <span>kiannarain.art@example.com</span>
+                </div>
+                <div class="contact-line">
+                  <span>Location</span>
+                  <span>Available for remote & on-site work (by request)</span>
+                </div>
+              </div>
+
+              <div>
+                <strong style="color:#f7f7ff;">Social</strong>
+                <div class="social-row">
+                  <!-- Replace # with real profiles -->
+                  <a href="#" class="social-pill"><strong>Instagram</strong> / @kianna.rain</a>
+                  <a href="#" class="social-pill"><strong>Spotify</strong> artist</a>
+                  <a href="#" class="social-pill"><strong>YouTube</strong> channel</a>
+                  <a href="#" class="social-pill"><strong>Portfolio</strong> (linktree / site)</a>
+                </div>
+              </div>
+
+              <div>
+                <strong style="color:#f7f7ff;">For collaborators</strong>
+                <p style="margin-top:4px;">
+                  Please share how you discovered Kianna’s work, what you’re creating,
+                  and any scripts, moodboards or songs you’d like her to see.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer-inner">
+        <div>© <span id="year"></span> Kianna Rain. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="#top">Back to top</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // mobile nav
+    const navToggle = document.querySelector(".nav-toggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (navToggle && navLinks) {
+      navToggle.addEventListener("click", () => {
+        navLinks.classList.toggle("open");
+      });
+      navLinks.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          navLinks.classList.remove("open");
+        });
+      });
+    }
+
+    // year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

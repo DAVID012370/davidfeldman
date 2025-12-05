@@ -130,6 +130,27 @@
       box-shadow: none;
     }
 
+    #clearTrack {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 0.45rem 0.8rem;
+      color: #fff;
+      opacity: 0.6;
+      box-shadow: none;
+      font-weight: 500;
+    }
+
+    #clearTrack:hover {
+      opacity: 1;
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+
+    #fullscreenBtn {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
     .status-row {
       display: flex;
       flex-direction: column;
@@ -234,27 +255,6 @@
       border: none;
     }
 
-    #clearTrack {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      padding: 0.45rem 0.8rem;
-      color: #fff;
-      opacity: 0.6;
-      box-shadow: none;
-      font-weight: 500;
-    }
-
-    #clearTrack:hover {
-      opacity: 1;
-      border-color: rgba(255, 255, 255, 0.7);
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
-    }
-
-    #fullscreenBtn {
-      padding: 0.45rem 0.8rem;
-      font-size: 0.85rem;
-    }
-
     .select-wrapper {
       position: relative;
       display: flex;
@@ -296,21 +296,21 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      height: 65vh; /* fixed visual area */
     }
 
     .visualizer-inner {
       position: relative;
       width: 100%;
+      height: 100%;
       max-width: 100%;
       max-height: 100%;
-      aspect-ratio: 16 / 9; /* default */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #visualizer {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
       display: block;
     }
 
@@ -411,7 +411,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v0.6 · Modes + Aspect</div>
+      <div class="watermark" id="watermarkText">Spectrum · v0.7 · Aspect Safe</div>
     </section>
   </main>
 
@@ -444,14 +444,13 @@
     let isPlaying = false;
     let animationId;
     let isSeeking = false;
-    let isFullscreen = false;
 
     const themes = {
       neon: {
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v0.6 · Neon"
+        watermark: "Spectrum · v0.7 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -476,6 +475,14 @@
     let currentThemeKey = "neon";
     let currentVisualizer = "bars"; // 'bars' | 'circle' | 'wave'
     let currentAspect = "16:9";
+
+    const aspectMap = {
+      "16:9": [16, 9],
+      "1:1": [1, 1],
+      "9:16": [9, 16],
+      "4:5": [4, 5],
+      "2:3": [2, 3]
+    };
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -508,15 +515,6 @@
 
     function applyAspect(aspectValue) {
       currentAspect = aspectValue;
-      const map = {
-        "16:9": "16 / 9",
-        "1:1": "1 / 1",
-        "9:16": "9 / 16",
-        "4:5": "4 / 5",
-        "2:3": "2 / 3"
-      };
-      const cssValue = map[aspectValue] || "16 / 9";
-      visualizerInner.style.aspectRatio = cssValue;
       updateWatermark();
       resizeCanvas();
     }
@@ -526,12 +524,30 @@
     });
 
     function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
+      const wrapperRect = visualizerWrapper.getBoundingClientRect();
+      const maxW = wrapperRect.width;
+      const maxH = wrapperRect.height;
+
+      const [wRatio, hRatio] = aspectMap[currentAspect] || aspectMap["16:9"];
+      const targetRatio = wRatio / hRatio;
+
+      // התאם את הקנבס כך שיישאר בתוך המסגרת בלי לגלול
+      let drawW = maxW;
+      let drawH = drawW / targetRatio;
+      if (drawH > maxH) {
+        drawH = maxH;
+        drawW = drawH * targetRatio;
+      }
+
+      canvas.style.width = drawW + "px";
+      canvas.style.height = drawH + "px";
+
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = drawW * dpr;
+      canvas.height = drawH * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+
     window.addEventListener("resize", resizeCanvas);
 
     function initAudioContext() {
@@ -689,7 +705,7 @@
     });
 
     document.addEventListener("fullscreenchange", () => {
-      isFullscreen = !!document.fullscreenElement;
+      const isFullscreen = !!document.fullscreenElement;
       fullscreenBtn.textContent = isFullscreen ? "⤢" : "⛶";
       resizeCanvas();
     });
@@ -868,10 +884,9 @@
       ctx.closePath();
     }
 
-    // click on visualizer area opens file picker
+    // click on visualizer area opens file picker (avoid clicking controls)
     visualizerWrapper.addEventListener("click", (e) => {
-      // don't trigger when dragging
-      if (e.target === canvas || e.target === visualizerInner || e.target === visualizerWrapper) {
+      if (e.target === visualizerWrapper || e.target === visualizerInner || e.target === canvas) {
         fileInput.click();
       }
     });

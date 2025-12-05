@@ -296,15 +296,11 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      height: 65vh; /* fixed visual area */
+      height: 65vh;
     }
 
     .visualizer-inner {
       position: relative;
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-      max-height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -411,7 +407,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v0.7 · Aspect Safe</div>
+      <div class="watermark" id="watermarkText">Spectrum · v0.8 · Aspect Tight</div>
     </section>
   </main>
 
@@ -450,7 +446,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v0.7 · Neon"
+        watermark: "Spectrum · v0.8 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -531,7 +527,6 @@
       const [wRatio, hRatio] = aspectMap[currentAspect] || aspectMap["16:9"];
       const targetRatio = wRatio / hRatio;
 
-      // התאם את הקנבס כך שיישאר בתוך המסגרת בלי לגלול
       let drawW = maxW;
       let drawH = drawW / targetRatio;
       if (drawH > maxH) {
@@ -539,10 +534,13 @@
         drawW = drawH * targetRatio;
       }
 
-      canvas.style.width = drawW + "px";
-      canvas.style.height = drawH + "px";
+      // צמצום השטח – הקנבס שולט בגודל הקונטיינר הפנימי
+      visualizerInner.style.width = drawW + "px";
+      visualizerInner.style.height = drawH + "px";
 
       const dpr = window.devicePixelRatio || 1;
+      canvas.style.width = drawW + "px";
+      canvas.style.height = drawH + "px";
       canvas.width = drawW * dpr;
       canvas.height = drawH * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -751,10 +749,10 @@
     function drawBars(width, height, c1, c2, c3) {
       analyser.getByteFrequencyData(dataArray);
 
-      const barCount = 96;
+      const barCount = 128; // יותר פסים – נראה מלא עד הסוף
       const step = Math.floor(dataArray.length / barCount);
-      const barWidth = (width / barCount) * 0.75;
-      const gap = (width / barCount) * 0.25;
+      const barWidth = (width / barCount) * 0.9;
+      const gap = (width / barCount) * 0.1;
       const midY = height / 2;
 
       const grad = ctx.createLinearGradient(0, 0, width, 0);
@@ -769,9 +767,9 @@
         const yTop = midY - barHeight;
 
         ctx.fillStyle = grad;
-        drawRoundRect(x, yTop, barWidth, barHeight, 6);
+        drawRoundRect(x, yTop, barWidth, barHeight, 5);
         ctx.fill();
-        drawRoundRect(x, midY, barWidth, barHeight, 6);
+        drawRoundRect(x, midY, barWidth, barHeight, 5);
         ctx.fill();
       }
 
@@ -786,7 +784,7 @@
     function drawCircle(width, height, c1, c2, c3) {
       analyser.getByteFrequencyData(dataArray);
 
-      const radius = Math.min(width, height) * 0.22;
+      const radius = Math.min(width, height) * 0.3; // קצת יותר גדול
       const centerX = width / 2;
       const centerY = height / 2;
 
@@ -797,7 +795,7 @@
 
       const barCount = 96;
       const step = Math.floor(dataArray.length / barCount);
-      const maxBarLength = Math.min(width, height) * 0.35;
+      const maxBarLength = Math.min(width, height) * 0.4;
 
       ctx.save();
       ctx.translate(centerX, centerY);
@@ -825,8 +823,8 @@
 
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius * 0.92, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      ctx.lineWidth = 1.2;
       ctx.stroke();
     }
 
@@ -884,7 +882,6 @@
       ctx.closePath();
     }
 
-    // click on visualizer area opens file picker (avoid clicking controls)
     visualizerWrapper.addEventListener("click", (e) => {
       if (e.target === visualizerWrapper || e.target === visualizerInner || e.target === canvas) {
         fileInput.click();

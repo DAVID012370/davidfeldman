@@ -31,46 +31,16 @@
       background: radial-gradient(circle at center, #181b33, #020307 75%);
     }
 
-    /* ברירת מחדל – אם לא בחרו אספקט, נשתמש ב-16:9 */
     .app {
       width: 100%;
       height: 100%;
       max-width: 1200px;
+      max-height: 100vh;
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 1.1rem;
-    }
-
-    /* אספקט רטיו על כל הפריים של האפליקציה */
-    body.aspect-16-9 .app {
-      aspect-ratio: 16 / 9;
-      max-width: 100vw;
-      max-height: 100vh;
-    }
-
-    body.aspect-1-1 .app {
-      aspect-ratio: 1 / 1;
-      max-width: 100vw;
-      max-height: 100vh;
-    }
-
-    body.aspect-9-16 .app {
-      aspect-ratio: 9 / 16;
-      max-width: 100vw;
-      max-height: 100vh;
-    }
-
-    body.aspect-4-5 .app {
-      aspect-ratio: 4 / 5;
-      max-width: 100vw;
-      max-height: 100vh;
-    }
-
-    body.aspect-2-3 .app {
-      aspect-ratio: 2 / 3;
-      max-width: 100vw;
-      max-height: 100vh;
+      transition: width 0.15s ease-out, height 0.15s ease-out;
     }
 
     header {
@@ -386,7 +356,7 @@
     }
   </style>
 </head>
-<body class="aspect-16-9">
+<body>
   <main class="app">
     <header>
       <div class="brand">
@@ -473,18 +443,18 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.0 · Frame Aspect</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.1 · Aspect Frame</div>
     </section>
   </main>
 
   <script>
+    const app = document.querySelector(".app");
     const fileInput = document.getElementById("audioFile");
     const playPauseBtn = document.getElementById("playPause");
     const statusText = document.getElementById("statusText");
     const canvas = document.getElementById("visualizer");
     const ctx = canvas.getContext("2d");
     const visualizerWrapper = document.querySelector(".visualizer-wrapper");
-    const visualizerInner = document.querySelector(".visualizer-inner");
 
     const seekBar = document.getElementById("seekBar");
     const currentTimeLabel = document.getElementById("currentTime");
@@ -513,7 +483,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.0 · Neon"
+        watermark: "Spectrum · v1.1 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -569,23 +539,39 @@
     });
 
     function applyAspect(aspect) {
-      document.body.classList.remove(
-        "aspect-16-9",
-        "aspect-1-1",
-        "aspect-9-16",
-        "aspect-4-5",
-        "aspect-2-3"
-      );
-      const cls = "aspect-" + aspect.replace(":", "-");
-      document.body.classList.add(cls);
       currentAspect = aspect;
       updateWatermark();
-      resizeCanvas();
+      layoutFrame();
     }
 
     aspectSelect.addEventListener("change", (e) => {
       applyAspect(e.target.value);
     });
+
+    function layoutFrame() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (document.body.classList.contains("perform-mode")) {
+        app.style.width = "100vw";
+        app.style.height = "100vh";
+      } else {
+        const [wRatio, hRatio] = currentAspect.split(":").map(Number);
+        const target = wRatio / hRatio;
+
+        let frameW = vw;
+        let frameH = frameW / target;
+        if (frameH > vh) {
+          frameH = vh;
+          frameW = frameH * target;
+        }
+
+        app.style.width = frameW + "px";
+        app.style.height = frameH + "px";
+      }
+
+      resizeCanvas();
+    }
 
     function resizeCanvas() {
       const rect = visualizerWrapper.getBoundingClientRect();
@@ -598,7 +584,7 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", layoutFrame);
 
     function initAudioContext() {
       if (!audioContext) {
@@ -757,19 +743,19 @@
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
       fullscreenBtn.textContent = isFullscreen ? "⤢" : "⛶";
-      resizeCanvas();
+      layoutFrame();
     });
 
     // Performance mode
     performBtn.addEventListener("click", () => {
       document.body.classList.toggle("perform-mode");
-      resizeCanvas();
+      layoutFrame();
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "p" || e.key === "P") {
         document.body.classList.toggle("perform-mode");
-        resizeCanvas();
+        layoutFrame();
       }
     });
 
@@ -948,7 +934,7 @@
     }
 
     visualizerWrapper.addEventListener("click", (e) => {
-      if (e.target === visualizerWrapper || e.target === visualizerInner || e.target === canvas) {
+      if (e.target === visualizerWrapper || e.target === canvas) {
         fileInput.click();
       }
     });
@@ -981,7 +967,7 @@
     // init
     applyTheme(currentThemeKey);
     applyAspect(currentAspect);
-    resizeCanvas();
+    layoutFrame();
     resetUIToEmpty();
   </script>
 </body>

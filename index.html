@@ -146,9 +146,10 @@
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
     }
 
-    #fullscreenBtn {
+    #fullscreenBtn,
+    #performBtn {
       padding: 0.45rem 0.8rem;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     .status-row {
@@ -319,6 +320,30 @@
       letter-spacing: 0.18em;
       opacity: 0.45;
     }
+
+    /* ---------- PERFORMANCE MODE ---------- */
+
+    body.perform-mode header,
+    body.perform-mode .status-row {
+      display: none;
+    }
+
+    body.perform-mode .app {
+      max-width: 100%;
+      padding: 0;
+      gap: 0;
+    }
+
+    body.perform-mode .visualizer-wrapper {
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+    }
+
+    body.perform-mode .watermark {
+      opacity: 0.25;
+      font-size: 0.6rem;
+    }
   </style>
 </head>
 <body>
@@ -378,6 +403,7 @@
         </div>
         <button id="clearTrack" title="Clear current track">✕</button>
         <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
+        <button id="performBtn" title="Toggle clean performance view">PERF</button>
       </div>
     </header>
 
@@ -407,7 +433,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v0.8 · Aspect Tight</div>
+      <div class="watermark" id="watermarkText">Spectrum · v0.9 · Performance Mode</div>
     </section>
   </main>
 
@@ -426,6 +452,7 @@
     const volumeSlider = document.getElementById("volumeSlider");
     const clearTrackBtn = document.getElementById("clearTrack");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const performBtn = document.getElementById("performBtn");
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
     const aspectSelect = document.getElementById("aspectSelect");
@@ -446,7 +473,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v0.8 · Neon"
+        watermark: "Spectrum · v0.9 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -534,7 +561,6 @@
         drawW = drawH * targetRatio;
       }
 
-      // צמצום השטח – הקנבס שולט בגודל הקונטיינר הפנימי
       visualizerInner.style.width = drawW + "px";
       visualizerInner.style.height = drawH + "px";
 
@@ -708,6 +734,20 @@
       resizeCanvas();
     });
 
+    // Performance mode (clean view)
+    performBtn.addEventListener("click", () => {
+      document.body.classList.toggle("perform-mode");
+      resizeCanvas();
+    });
+
+    // Keyboard shortcuts: P for perform mode
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "p" || e.key === "P") {
+        document.body.classList.toggle("perform-mode");
+        resizeCanvas();
+      }
+    });
+
     seekBar.addEventListener("input", () => {
       if (!audioElement) return;
       isSeeking = true;
@@ -749,7 +789,7 @@
     function drawBars(width, height, c1, c2, c3) {
       analyser.getByteFrequencyData(dataArray);
 
-      const barCount = 128; // יותר פסים – נראה מלא עד הסוף
+      const barCount = 128;
       const step = Math.floor(dataArray.length / barCount);
       const barWidth = (width / barCount) * 0.9;
       const gap = (width / barCount) * 0.1;
@@ -784,7 +824,7 @@
     function drawCircle(width, height, c1, c2, c3) {
       analyser.getByteFrequencyData(dataArray);
 
-      const radius = Math.min(width, height) * 0.3; // קצת יותר גדול
+      const radius = Math.min(width, height) * 0.3;
       const centerX = width / 2;
       const centerY = height / 2;
 

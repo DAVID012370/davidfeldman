@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DJ Visualizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif; }
+    body { background: radial-gradient(circle at top, #141927, #050609 60%); color: #f5f5f5; min-height: 100vh; display: flex; align-items: stretch; justify-content: center; }
+    .app { width: 100%; max-width: 1200px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .brand { display: flex; flex-direction: column; gap: 0.2rem; }
+    .brand-title { font-size: 1.4rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .brand-sub { font-size: 0.8rem; opacity: 0.7; }
+    .controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .file-input-label { position: relative; overflow: hidden; border-radius: 999px; padding: 0.6rem 1.2rem; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); backdrop-filter: blur(12px); cursor: pointer; transition: background 0.2s, transform 0.1s, border-color 0.2s; }
+    .file-input-label:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.4); }
+    .file-input-label:active { transform: scale(0.97); }
+    .file-input-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    button { border-radius: 999px; border: none; padding: 0.6rem 1.1rem; font-size: 0.85rem; cursor: pointer; background: linear-gradient(135deg,#f72585,#7209b7); color: white; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 0 20px rgba(247,37,133,0.4); opacity: 0.85; transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s; }
+    button:hover { opacity: 1; box-shadow: 0 0 30px rgba(247,37,133,0.7); }
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
+    .status { font-size: 0.78rem; opacity: 0.7; }
+    .visualizer-wrapper { flex: 1; border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: radial-gradient(circle at center, #111322, #020307 70%); position: relative; display: flex; }
+    #visualizer { width: 100%; height: 100%; display: block; }
+    .watermark { position: absolute; bottom: 0.9rem; right: 1.3rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; opacity: 0.45; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="brand-title">DJ Visualizer</div>
+        <div class="brand-sub">Audio reactive visuals for live sets</div>
+      </div>
+      <div class="controls">
+        <label class="file-input-label">
+          Load Track
+          <input id="audioFile" type="file" accept="audio/*" />
+        </label>
+        <button id="playPause" disabled>Play</button>
+      </div>
+    </header>
+    <div class="status" id="statusText">Load an audio file to start the visualizer.</div>
+    <section class="visualizer-wrapper">
+      <canvas id="visualizer"></canvas>
+      <div class="watermark">Spectrum · v0.1</div>
+    </section>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById("audioFile");
+    const playPauseBtn = document.getElementById("playPause");
+    const statusText = document.getElementById("statusText");
+    const canvas = document.getElementById("visualizer");
+    const ctx = canvas.getContext("2d");
+
+    let audioContext;
+    let audioSource;
+    let analyser;
+    let dataArray;
+    let audioElement = new Audio();
+    let isPlaying = false;
+    let animationId;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function initAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+      }
+    }
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (audioElement) audioElement.pause();
+      if (audioSource) { try { audioSource.disconnect(); } catch (e) {} }
+
+      initAudioContext();
+
+      const fileURL = URL.createObjectURL(file);
+      audioElement = new Audio(fileURL);
+      audioElement.crossOrigin = "anonymous";
+      audioElement.loop = true;
+
+      audioSource = audioContext.createMediaElementSource(audioElement);
+      audioSource.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      playPauseBtn.disabled = false;
+      playPauseBtn.textContent = "Play";
+      isPlaying = false;
+      statusText.textContent = "Loaded: " + file.name;
+    });
+
+    playPauseBtn.addEventListener("click", async () => {
+      if (!audioElement) return;
+
+      if (!isPlaying) {
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+        await audioElement.play();
+        isPlaying = true;
+        playPauseBtn.textContent = "Pause";
+        statusText.textContent = "Playing · Visualizer running";
+        startVisualizer();
+      } else {
+        audioElement.pause();
+        isPlaying = false;
+        playPauseBtn.textContent = "Play";
+        statusText.textContent = "Paused";
+        cancelAnimationFrame(animationId);
+      }
+    });
+
+    function startVisualizer() {
+      function draw() {
+        animationId = requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+
+        const width = canvas.width / (window.devicePixelRatio || 1);
+        const height = canvas.height / (window.devicePixelRatio || 1);
+
+        ctx.fillStyle = "rgba(3, 4, 9, 0.35)";
+        ctx.fillRect(0, 0, width, height);
+
+        const barCount = 96;
+        const step = Math.floor(dataArray.length / barCount);
+        const barWidth = (width / barCount) * 0.75;
+        const gap = (width / barCount) * 0.25;
+        const midY = height / 2;
+
+        const grad = ctx.createLinearGradient(0, 0, width, 0);
+        grad.addColorStop(0, "#4cc9f0");
+        grad.addColorStop(0.5, "#f72585");
+        grad.addColorStop(1, "#b5179e");
+
+        for (let i = 0; i < barCount; i++) {
+          const amplitude = dataArray[i * step] / 255;
+          const barHeight = amplitude * (height * 0.9) * 0.5;
+          const x = i * (barWidth + gap);
+          const yTop = midY - barHeight;
+
+          ctx.fillStyle = grad;
+          drawRoundRect(x, yTop, barWidth, barHeight, 6);
+          ctx.fill();
+          drawRoundRect(x, midY, barWidth, barHeight, 6);
+          ctx.fill();
+        }
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, midY);
+        ctx.lineTo(width, midY);
+        ctx.stroke();
+      }
+      draw();
+    }
+
+    function drawRoundRect(x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+  </script>
+</body>
+</html>

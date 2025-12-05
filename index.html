@@ -250,19 +250,21 @@
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
     }
 
-    .theme-select-wrapper {
+    .select-wrapper {
       position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
     }
 
-    .theme-select-label {
+    .select-label {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       opacity: 0.7;
-      margin-right: 0.25rem;
     }
 
-    .theme-select {
+    .select-control {
       font-size: 0.8rem;
       padding: 0.45rem 0.8rem;
       border-radius: 999px;
@@ -274,7 +276,7 @@
       backdrop-filter: blur(10px);
     }
 
-    .theme-select:focus {
+    .select-control:focus {
       border-color: rgba(255, 255, 255, 0.6);
     }
 
@@ -315,13 +317,22 @@
       </div>
 
       <div class="controls">
-        <div class="theme-select-wrapper">
-          <span class="theme-select-label">Theme</span>
-          <select id="themeSelect" class="theme-select">
+        <div class="select-wrapper">
+          <span class="select-label">Theme</span>
+          <select id="themeSelect" class="select-control">
             <option value="neon">Neon</option>
             <option value="xp">XP Blue</option>
             <option value="vapor">Vaporwave</option>
             <option value="minimal">Minimal</option>
+          </select>
+        </div>
+
+        <div class="select-wrapper">
+          <span class="select-label">Visualizer</span>
+          <select id="visualizerSelect" class="select-control">
+            <option value="bars">Bars</option>
+            <option value="circle">Circle</option>
+            <option value="wave">Waveform</option>
           </select>
         </div>
 
@@ -369,7 +380,7 @@
 
     <section class="visualizer-wrapper">
       <canvas id="visualizer"></canvas>
-      <div class="watermark" id="watermarkText">Spectrum · v0.4 · Themes</div>
+      <div class="watermark" id="watermarkText">Spectrum · v0.5 · Modes</div>
     </section>
   </main>
 
@@ -387,12 +398,14 @@
     const volumeSlider = document.getElementById("volumeSlider");
     const clearTrackBtn = document.getElementById("clearTrack");
     const themeSelect = document.getElementById("themeSelect");
+    const visualizerSelect = document.getElementById("visualizerSelect");
     const watermarkText = document.getElementById("watermarkText");
 
     let audioContext;
     let audioSource;
     let analyser;
     let dataArray;
+    let waveArray;
     let audioElement = null;
     let isPlaying = false;
     let animationId;
@@ -400,28 +413,24 @@
 
     const themes = {
       neon: {
-        name: "Neon",
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v0.4 · Neon"
+        watermark: "Spectrum · v0.5 · Neon"
       },
       xp: {
-        name: "XP Blue",
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
         visBg: "radial-gradient(circle at center, #0b2c6a, #020716 75%)",
         barColors: ["#8fd3ff", "#ffffff", "#4a90e2"],
         watermark: "Spectrum · XP mode"
       },
       vapor: {
-        name: "Vaporwave",
         bodyBg: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a1c4fd 100%)",
         visBg: "radial-gradient(circle at center, rgba(10,10,25,0.95), rgba(4,4,12,0.98))",
         barColors: ["#ff9a9e", "#fecdff", "#a1c4fd"],
         watermark: "Spectrum · Vaporwave"
       },
       minimal: {
-        name: "Minimal",
         bodyBg: "linear-gradient(135deg, #111111, #222222)",
         visBg: "radial-gradient(circle at center, #050505, #101010 80%)",
         barColors: ["#ffffff", "#cccccc", "#999999"],
@@ -430,6 +439,7 @@
     };
 
     let currentThemeKey = "neon";
+    let currentVisualizer = "bars"; // 'bars' | 'circle' | 'wave'
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -437,12 +447,18 @@
       document.body.style.background = theme.bodyBg;
       visualizerWrapper.style.background = theme.visBg;
       if (watermarkText) {
-        watermarkText.textContent = theme.watermark;
+        watermarkText.textContent = theme.watermark + " · " + currentVisualizer.toUpperCase();
       }
     }
 
     themeSelect.addEventListener("change", (e) => {
       applyTheme(e.target.value);
+    });
+
+    visualizerSelect.addEventListener("change", (e) => {
+      currentVisualizer = e.target.value;
+      const theme = themes[currentThemeKey] || themes.neon;
+      watermarkText.textContent = theme.watermark + " · " + currentVisualizer.toUpperCase();
     });
 
     function resizeCanvas() {
@@ -462,6 +478,7 @@
         analyser.fftSize = 2048;
         const bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
+        waveArray = new Uint8Array(bufferLength);
       }
     }
 
@@ -611,7 +628,6 @@
       function draw() {
         if (!analyser || !dataArray) return;
         animationId = requestAnimationFrame(draw);
-        analyser.getByteFrequencyData(dataArray);
 
         const width = canvas.width / (window.devicePixelRatio || 1);
         const height = canvas.height / (window.devicePixelRatio || 1);
@@ -619,41 +635,140 @@
         ctx.fillStyle = "rgba(3, 4, 9, 0.35)";
         ctx.fillRect(0, 0, width, height);
 
-        const barCount = 96;
-        const step = Math.floor(dataArray.length / barCount);
-        const barWidth = (width / barCount) * 0.75;
-        const gap = (width / barCount) * 0.25;
-        const midY = height / 2;
-
         const theme = themes[currentThemeKey] || themes.neon;
         const [c1, c2, c3] = theme.barColors;
-        const grad = ctx.createLinearGradient(0, 0, width, 0);
-        grad.addColorStop(0, c1);
-        grad.addColorStop(0.5, c2);
-        grad.addColorStop(1, c3);
 
-        for (let i = 0; i < barCount; i++) {
-          const amplitude = dataArray[i * step] / 255;
-          const barHeight = amplitude * (height * 0.9) * 0.5;
-          const x = i * (barWidth + gap);
-          const yTop = midY - barHeight;
-
-          ctx.fillStyle = grad;
-          drawRoundRect(x, yTop, barWidth, barHeight, 6);
-          ctx.fill();
-          drawRoundRect(x, midY, barWidth, barHeight, 6);
-          ctx.fill();
+        if (currentVisualizer === "wave") {
+          drawWaveform(width, height, c1, c2, c3);
+        } else if (currentVisualizer === "circle") {
+          drawCircle(width, height, c1, c2, c3);
+        } else {
+          drawBars(width, height, c1, c2, c3);
         }
-
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, midY);
-        ctx.lineTo(width, midY);
-        ctx.stroke();
       }
 
       draw();
+    }
+
+    function drawBars(width, height, c1, c2, c3) {
+      analyser.getByteFrequencyData(dataArray);
+
+      const barCount = 96;
+      const step = Math.floor(dataArray.length / barCount);
+      const barWidth = (width / barCount) * 0.75;
+      const gap = (width / barCount) * 0.25;
+      const midY = height / 2;
+
+      const grad = ctx.createLinearGradient(0, 0, width, 0);
+      grad.addColorStop(0, c1);
+      grad.addColorStop(0.5, c2);
+      grad.addColorStop(1, c3);
+
+      for (let i = 0; i < barCount; i++) {
+        const amplitude = dataArray[i * step] / 255;
+        const barHeight = amplitude * (height * 0.9) * 0.5;
+        const x = i * (barWidth + gap);
+        const yTop = midY - barHeight;
+
+        ctx.fillStyle = grad;
+        drawRoundRect(x, yTop, barWidth, barHeight, 6);
+        ctx.fill();
+        drawRoundRect(x, midY, barWidth, barHeight, 6);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, midY);
+      ctx.lineTo(width, midY);
+      ctx.stroke();
+    }
+
+    function drawCircle(width, height, c1, c2, c3) {
+      analyser.getByteFrequencyData(dataArray);
+
+      const radius = Math.min(width, height) * 0.22;
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      const grad = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
+      grad.addColorStop(0, c1);
+      grad.addColorStop(0.5, c2);
+      grad.addColorStop(1, c3);
+
+      const barCount = 96;
+      const step = Math.floor(dataArray.length / barCount);
+      const maxBarLength = Math.min(width, height) * 0.35;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+
+      for (let i = 0; i < barCount; i++) {
+        const amplitude = dataArray[i * step] / 255;
+        const barLength = amplitude * maxBarLength;
+
+        const angle = (i / barCount) * Math.PI * 2;
+        ctx.save();
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.moveTo(0, radius);
+        ctx.lineTo(0, radius + barLength);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = Math.max(2, (Math.PI * radius) / barCount / 1.3);
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 0.92, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function drawWaveform(width, height, c1, c2, c3) {
+      analyser.getByteTimeDomainData(waveArray);
+
+      const grad = ctx.createLinearGradient(0, 0, width, 0);
+      grad.addColorStop(0, c1);
+      grad.addColorStop(0.5, c2);
+      grad.addColorStop(1, c3);
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = grad;
+      ctx.beginPath();
+
+      const sliceWidth = width / waveArray.length;
+      let x = 0;
+      const midY = height / 2;
+
+      for (let i = 0; i < waveArray.length; i++) {
+        const v = waveArray[i] / 255;
+        const y = midY + (v - 0.5) * height * 0.6;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+      }
+
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, midY);
+      ctx.lineTo(width, midY);
+      ctx.stroke();
     }
 
     function drawRoundRect(x, y, width, height, radius) {

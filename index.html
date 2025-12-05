@@ -63,7 +63,7 @@
     .controls {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
       flex-wrap: wrap;
       justify-content: flex-end;
     }
@@ -199,6 +199,57 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
+    .volume-wrapper {
+      display: flex;
+      align-items: center;
+      padding: 0 0.3rem;
+    }
+
+    .volume-slider {
+      width: 70px;
+      height: 4px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4cc9f0;
+      box-shadow: 0 0 8px #4cc9f0;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4cc9f0;
+      box-shadow: 0 0 8px #4cc9f0;
+      border: none;
+    }
+
+    #clearTrack {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 0.45rem 0.8rem;
+      color: #fff;
+      opacity: 0.6;
+      box-shadow: none;
+      font-weight: 500;
+    }
+
+    #clearTrack:hover {
+      opacity: 1;
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+
     .visualizer-wrapper {
       flex: 1;
       border-radius: 1.5rem;
@@ -241,6 +292,18 @@
           <input id="audioFile" type="file" accept="audio/*" />
         </label>
         <button id="playPause" disabled>Play</button>
+        <div class="volume-wrapper">
+          <input
+            id="volumeSlider"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="1"
+            class="volume-slider"
+          />
+        </div>
+        <button id="clearTrack" title="Clear current track">✕</button>
       </div>
     </header>
 
@@ -268,7 +331,7 @@
 
     <section class="visualizer-wrapper">
       <canvas id="visualizer"></canvas>
-      <div class="watermark">Spectrum · v0.2 · Drag &amp; Seek</div>
+      <div class="watermark">Spectrum · v0.3 · Drag · Seek · Volume</div>
     </section>
   </main>
 
@@ -283,6 +346,8 @@
     const seekBar = document.getElementById("seekBar");
     const currentTimeLabel = document.getElementById("currentTime");
     const durationTimeLabel = document.getElementById("durationTime");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const clearTrackBtn = document.getElementById("clearTrack");
 
     let audioContext;
     let audioSource;
@@ -329,6 +394,17 @@
       }
     }
 
+    function resetUIToEmpty() {
+      playPauseBtn.disabled = true;
+      playPauseBtn.textContent = "Play";
+      seekBar.disabled = true;
+      seekBar.value = 0;
+      currentTimeLabel.textContent = "0:00";
+      durationTimeLabel.textContent = "0:00";
+      statusText.textContent = "Load an audio file to start. You can also drag & drop an MP3/WAV here.";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     function loadAudioFile(file) {
       if (!file) return;
       if (!file.type.startsWith("audio/")) {
@@ -352,6 +428,7 @@
       audioElement = new Audio(fileURL);
       audioElement.crossOrigin = "anonymous";
       audioElement.loop = true;
+      audioElement.volume = Number(volumeSlider.value || 1);
 
       audioSource = audioContext.createMediaElementSource(audioElement);
       audioSource.connect(analyser);
@@ -384,6 +461,8 @@
     fileInput.addEventListener("change", (event) => {
       const file = event.target.files[0];
       loadAudioFile(file);
+      // reset input so selecting the same file again still triggers change
+      event.target.value = "";
     });
 
     playPauseBtn.addEventListener("click", async () => {
@@ -407,6 +486,30 @@
       }
     });
 
+    // volume control
+    volumeSlider.addEventListener("input", () => {
+      if (audioElement) {
+        audioElement.volume = Number(volumeSlider.value);
+      }
+    });
+
+    // clear current track
+    clearTrackBtn.addEventListener("click", () => {
+      if (audioElement) {
+        audioElement.pause();
+      }
+      if (audioSource) {
+        try {
+          audioSource.disconnect();
+        } catch (e) {}
+      }
+      audioElement = null;
+      isPlaying = false;
+      stopVisualizer();
+      resetUIToEmpty();
+    });
+
+    // seek bar
     seekBar.addEventListener("input", () => {
       if (!audioElement) return;
       isSeeking = true;
@@ -421,6 +524,7 @@
 
     function startVisualizer() {
       function draw() {
+        if (!analyser || !dataArray) return;
         animationId = requestAnimationFrame(draw);
         analyser.getByteFrequencyData(dataArray);
 
@@ -510,6 +614,9 @@
     window.addEventListener("dragover", handleDragOver);
     window.addEventListener("dragleave", handleDragLeave);
     window.addEventListener("drop", handleDrop);
+
+    // init UI text
+    resetUIToEmpty();
   </script>
 </body>
 </html>

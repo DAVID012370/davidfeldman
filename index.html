@@ -2,1348 +2,916 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Kianna Rain – Portfolio</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="Official portfolio of Kianna Rain – vocalist, songwriter and performer."
-  />
+  <title>DJ Visualizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      --bg: #050610;
-      --bg-soft: #0c0f1f;
-      --accent: #f35f9a;
-      --accent-soft: rgba(243, 95, 154, 0.18);
-      --accent-2: #5fd1f3;
-      --text: #f4f4f7;
-      --muted: #9ea3c0;
-      --border: #23263a;
-      --radius-lg: 20px;
-      --radius-xl: 28px;
-      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
-      --transition-fast: 0.18s ease-out;
-      --max-width: 1120px;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, #15162a 0, #050610 55%);
-      color: var(--text);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    a:focus-visible,
-    button:focus-visible,
-    input:focus-visible,
-    textarea:focus-visible,
-    .btn:focus-visible {
-      outline: 2px solid var(--accent-2);
-      outline-offset: 3px;
-    }
-
-    /* Layout */
-
-    .page {
+      background: radial-gradient(circle at top, #141927, #050609 60%);
+      color: #f5f5f5;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
     }
 
-    .shell {
+    body.drag-over .visualizer-wrapper {
+      outline: 2px dashed rgba(255, 255, 255, 0.4);
+      background: radial-gradient(circle at center, #181b33, #020307 75%);
+    }
+
+    .app {
       width: 100%;
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 16px;
+      max-width: 1200px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
     }
 
     header {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      backdrop-filter: blur(18px);
-      background: linear-gradient(
-        to bottom,
-        rgba(5, 6, 16, 0.94),
-        rgba(5, 6, 16, 0.82),
-        transparent
-      );
-      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-    }
-
-    .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 0;
-      gap: 16px;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
 
     .brand {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      font-size: 14px;
     }
 
-    .brand-icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 10%, #ffffff, #f35f9a 45%, #5fd1f3 100%);
-      box-shadow: 0 0 18px rgba(243, 95, 154, 0.7);
+    .brand-sub {
+      font-size: 0.8rem;
+      opacity: 0.7;
     }
 
-    .nav-links {
+    .controls {
       display: flex;
       align-items: center;
-      gap: 18px;
-      font-size: 14px;
-      color: var(--muted);
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .nav-links a {
+    .file-input-label {
       position: relative;
-      padding-bottom: 4px;
-    }
-
-    .nav-links a::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 0;
-      height: 1.5px;
+      overflow: hidden;
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      transition: width var(--transition-fast);
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 15px;
-      border-radius: 999px;
-      background: linear-gradient(120deg, var(--accent), var(--accent-2));
-      color: #050610;
-      font-weight: 600;
-      font-size: 13px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
-    }
-
-    .nav-cta span {
-      font-size: 16px;
-    }
-
-    .nav-toggle {
-      display: none;
-      width: 36px;
-      height: 32px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(12, 15, 31, 0.8);
-      align-items: center;
-      justify-content: center;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
       cursor: pointer;
-      transition: border-color var(--transition-fast),
-        background var(--transition-fast);
+      transition: background 0.2s, transform 0.1s, border-color 0.2s;
+      white-space: nowrap;
     }
 
-    .nav-toggle span {
-      width: 18px;
-      height: 1.5px;
-      border-radius: 999px;
-      background: #f6f6fa;
-      position: relative;
+    .file-input-label:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
-    .nav-toggle span::before,
-    .nav-toggle span::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      width: 18px;
-      height: 1.5px;
-      border-radius: 999px;
-      background: inherit;
+    .file-input-label:active {
+      transform: scale(0.97);
     }
 
-    .nav-toggle span::before {
-      top: -5px;
-    }
-
-    .nav-toggle span::after {
-      top: 5px;
-    }
-
-    .nav-toggle:hover,
-    .nav-toggle:focus-visible {
-      border-color: rgba(243, 95, 154, 0.7);
-      background: rgba(12, 15, 31, 1);
-    }
-
-    /* Hero */
-
-    .hero {
-      padding: 40px 0 72px;
-    }
-
-    .hero-inner {
-      display: grid;
-      gap: 36px;
-      align-items: center;
-    }
-
-    @media (min-width: 840px) {
-      .hero-inner {
-        grid-template-columns: 1.25fr 1fr;
-      }
-    }
-
-    .hero-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(95, 209, 243, 0.22);
-      background: radial-gradient(
-        circle at top left,
-        rgba(95, 209, 243, 0.18),
-        rgba(12, 15, 31, 0.95)
-      );
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-
-    .hero-tag-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: radial-gradient(circle, #79ffce, #0fba7b);
-      box-shadow: 0 0 12px rgba(121, 255, 206, 0.9);
-    }
-
-    .hero-title {
-      font-size: clamp(32px, 4vw, 40px);
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 16px;
-    }
-
-    .hero-title span {
-      background: linear-gradient(120deg, var(--accent), var(--accent-2));
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .hero-sub {
-      color: var(--muted);
-      font-size: 15px;
-      max-width: 460px;
-      margin-bottom: 24px;
-    }
-
-    .hero-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 26px;
-    }
-
-    .badge {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: rgba(10, 11, 22, 0.8);
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 17px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        background var(--transition-fast),
-        border-color var(--transition-fast);
-    }
-
-    .btn-primary {
-      background: linear-gradient(120deg, var(--accent), var(--accent-2));
-      color: #050610;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.75);
-    }
-
-    .btn-ghost {
-      background: rgba(9, 11, 26, 0.85);
-      border-color: var(--border);
-      color: var(--muted);
-    }
-
-    .btn-ghost:hover {
-      border-color: rgba(243, 95, 154, 0.5);
-      background: rgba(12, 15, 31, 1);
-    }
-
-    .hero-meta {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .hero-meta strong {
-      display: block;
-      color: var(--text);
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
-
-    /* Hero Visual */
-
-    .hero-visual {
-      position: relative;
-    }
-
-    .hero-card {
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      background: radial-gradient(circle at top, #1b1630 0, #080815 45%, #050610 100%);
-      padding: 18px;
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-      min-height: 280px;
-    }
-
-    .hero-card-inner {
-      border-radius: 18px;
-      background: radial-gradient(circle at 20% 0, #f35f9a22, #0c0f1f 55%);
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      padding: 16px;
-      display: grid;
-      gap: 16px;
-    }
-
-    @media (min-width: 520px) {
-      .hero-card-inner {
-        grid-template-columns: 1.1fr 1.4fr;
-      }
-    }
-
-    .portrait {
-      border-radius: 18px;
-      background: radial-gradient(circle at 30% 0, #f35f9a33, #050610);
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      overflow: hidden;
-      padding: 18px 12px 8px;
-    }
-
-    .portrait-inner {
-      width: 90%;
-      max-width: 260px;
-      height: 260px;
-      border-radius: 999px;
-      border: 2px solid rgba(243, 95, 154, 0.8);
-      background:
-        radial-gradient(circle at 30% 0, #f9e9ff, #f35f9a 40%, #22102d 70%, #050610 100%);
-      position: relative;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
-      overflow: hidden;
-    }
-
-    .portrait-placeholder {
+    .file-input-label input {
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f72585, #7209b7);
+      color: white;
+      font-weight: 600;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      background: linear-gradient(140deg, #1a1330 0, #050610 65%);
-      color: rgba(245, 239, 255, 0.76);
+      box-shadow: 0 0 20px rgba(247, 37, 133, 0.4);
+      opacity: 0.85;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
+      white-space: nowrap;
     }
 
-    .portrait-glow {
-      position: absolute;
-      inset: auto auto -60px;
-      width: 160%;
-      height: 140px;
-      background: radial-gradient(circle, rgba(243, 95, 154, 0.7), transparent 70%);
-      opacity: 0.35;
-      filter: blur(18px);
+    button:hover {
+      opacity: 1;
+      box-shadow: 0 0 30px rgba(247, 37, 133, 0.7);
     }
 
-    .pill {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      background: rgba(5, 6, 16, 0.85);
-      border: 1px solid rgba(243, 95, 154, 0.4);
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    button:active {
+      transform: scale(0.97);
     }
 
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: radial-gradient(circle, #79ffce, #0fba7b);
-      box-shadow: 0 0 10px rgba(121, 255, 206, 0.8);
+    button:disabled {
+      opacity: 0.3;
+      cursor: default;
+      box-shadow: none;
     }
 
-    .hero-right {
+    #clearTrack {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 0.45rem 0.8rem;
+      color: #fff;
+      opacity: 0.6;
+      box-shadow: none;
+      font-weight: 500;
+    }
+
+    #clearTrack:hover {
+      opacity: 1;
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+
+    #fullscreenBtn,
+    #performBtn {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    .status-row {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      justify-content: space-between;
+      gap: 0.35rem;
     }
 
-    .stat-row {
+    .status {
+      font-size: 0.78rem;
+      opacity: 0.7;
+    }
+
+    .seek-container {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.1rem;
     }
 
-    .mini-card {
+    .seek-time {
+      font-size: 0.72rem;
+      opacity: 0.7;
+      min-width: 3.3rem;
+      text-align: center;
+      direction: ltr;
+    }
+
+    .seek-bar {
       flex: 1;
-      min-width: 120px;
-      border-radius: 14px;
-      padding: 10px 11px;
-      background: rgba(5, 6, 18, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .mini-card strong {
-      display: block;
-      color: var(--text);
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      font-size: 11px;
-    }
-
-    .tag {
-      padding: 4px 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
       border-radius: 999px;
-      background: rgba(8, 10, 24, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      color: var(--muted);
+      background: rgba(255, 255, 255, 0.15);
+      outline: none;
+      cursor: pointer;
     }
 
-    /* Sections */
-
-    section {
-      padding: 28px 0 40px;
-    }
-
-    section:nth-of-type(odd) {
-      background: radial-gradient(circle at top, #0c0f1f 0, #050610 60%);
-    }
-
-    section:nth-of-type(even) {
-      background: radial-gradient(circle at top, #050610 0, #020309 70%);
-    }
-
-    .section-inner {
-      padding-top: 10px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .section-title {
-      font-size: 18px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .section-sub {
-      font-size: 13px;
-      color: var(--muted);
-      max-width: 420px;
-    }
-
-    /* About */
-
-    .about-grid {
-      display: grid;
-      gap: 20px;
-    }
-
-    @media (min-width: 880px) {
-      .about-grid {
-        grid-template-columns: 1.5fr 1fr;
-      }
-    }
-
-    .card {
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: rgba(8, 9, 22, 0.96);
-      padding: 16px 16px 18px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
-    }
-
-    .card p {
-      font-size: 14px;
-      color: var(--muted);
-    }
-
-    .list-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-      font-size: 11px;
-    }
-
-    .chip {
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(13, 16, 32, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      color: #cbcfe8;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .two-col span {
-      display: block;
-    }
-
-    .two-col strong {
-      display: block;
-      color: var(--text);
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
-
-    /* Work */
-
-    .work-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    @media (min-width: 720px) {
-      .work-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    .work-card {
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: radial-gradient(circle at top, #15172b 0, #050610 60%);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        border-color var(--transition-fast);
+    .seek-bar:disabled {
+      opacity: 0.35;
       cursor: default;
     }
 
-    .work-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 26px 50px rgba(0, 0, 0, 0.9);
-      border-color: rgba(243, 95, 154, 0.7);
+    .seek-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #f72585;
+      box-shadow: 0 0 8px rgba(247, 37, 133, 0.7);
+      border: none;
+      margin-top: -4px;
     }
 
-    .work-tag {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    .seek-bar::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #f72585;
+      box-shadow: 0 0 8px rgba(247, 37, 133, 0.7);
+      border: none;
     }
 
-    .work-title {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .work-text {
-      font-size: 13px;
-      color: var(--muted);
-      flex: 1;
-    }
-
-    .work-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .pill-soft {
-      padding: 4px 8px;
+    .seek-bar::-moz-range-track {
+      height: 4px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(8, 9, 22, 0.9);
+      background: rgba(255, 255, 255, 0.15);
     }
 
-    /* Music section */
-
-    .music-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    @media (min-width: 720px) {
-      .music-grid {
-        grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
-      }
-    }
-
-    .embed-placeholder {
-      border-radius: 18px;
-      border: 1px dashed rgba(255, 255, 255, 0.16);
-      padding: 18px;
-      font-size: 13px;
-      color: var(--muted);
-      text-align: center;
-      background: rgba(8, 10, 24, 0.9);
-    }
-
-    .embed-placeholder code {
-      font-size: 11px;
-      background: rgba(12, 15, 31, 0.9);
-      padding: 3px 6px;
-      border-radius: 6px;
-    }
-
-    .playlist-list {
-      display: grid;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .playlist-item {
+    .volume-wrapper {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: rgba(10, 11, 25, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      align-items: center;
+      padding: 0 0.3rem;
     }
 
-    .playlist-item strong {
-      display: block;
-      color: var(--text);
-      font-size: 13px;
-    }
-
-    /* Contact */
-
-    .contact-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    @media (min-width: 780px) {
-      .contact-grid {
-        grid-template-columns: 1.6fr 1fr;
-      }
-    }
-
-    .contact-form {
-      display: grid;
-      gap: 10px;
-    }
-
-    label {
-      font-size: 12px;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 9px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(6, 7, 18, 0.98);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 13px;
+    .volume-slider {
+      width: 70px;
+      height: 4px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
       outline: none;
-      transition: border-color var(--transition-fast),
-        box-shadow var(--transition-fast),
-        background var(--transition-fast);
     }
 
-    input:focus,
-    textarea:focus {
-      border-color: rgba(243, 95, 154, 0.7);
-      box-shadow: 0 0 0 1px rgba(243, 95, 154, 0.3);
-      background: #050610;
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4cc9f0;
+      box-shadow: 0 0 8px #4cc9f0;
     }
 
-    textarea {
-      min-height: 110px;
-      resize: vertical;
+    .volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4cc9f0;
+      box-shadow: 0 0 8px #4cc9f0;
+      border: none;
     }
 
-    .contact-note {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .contact-side {
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: rgba(8, 9, 22, 0.97);
-      padding: 16px 16px 18px;
-      font-size: 13px;
-      color: var(--muted);
-      display: grid;
-      gap: 10px;
-    }
-
-    .contact-line {
+    .select-wrapper {
+      position: relative;
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .contact-line span:first-child {
-      color: #cbcfe8;
-    }
-
-    .social-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .social-pill {
-      padding: 6px 9px;
-      border-radius: 999px;
-      background: rgba(7, 9, 20, 0.96);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .social-pill strong {
-      color: var(--text);
-    }
-
-    /* Footer */
-
-    footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      padding: 14px 0 18px;
-      font-size: 11px;
-      color: var(--muted);
-      background: #02030a;
-      margin-top: auto;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 0.25rem;
     }
 
-    .footer-links {
+    .select-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.7;
+    }
+
+    .select-control {
+      font-size: 0.8rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(4, 4, 10, 0.8);
+      color: #f5f5f5;
+      outline: none;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .select-control:focus {
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .visualizer-wrapper {
+      flex: 1;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: radial-gradient(circle at center, #111322, #020307 70%);
+      position: relative;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      height: 65vh;
     }
 
-    .footer-links a {
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 3px;
+    .visualizer-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .notice {
-      margin-top: 8px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(95, 209, 243, 0.3);
-      background: rgba(12, 15, 31, 0.9);
-      color: #d4e8ff;
-      font-size: 12px;
+    #visualizer {
+      display: block;
     }
 
-    /* Mobile nav */
-
-    @media (max-width: 720px) {
-      .nav-links {
-        display: none;
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        top: 56px;
-        padding: 10px 12px;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        background: rgba(5, 6, 16, 0.98);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      }
-
-      .nav-links.open {
-        display: flex;
-      }
-
-      .nav-links a,
-      .nav-cta {
-        padding: 8px 10px;
-      }
-
-      .nav {
-        position: relative;
-      }
-
-      .nav-toggle {
-        display: inline-flex;
-      }
-
-      .hero {
-        padding-top: 30px;
-      }
+    .watermark {
+      position: absolute;
+      bottom: 0.9rem;
+      right: 1.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      opacity: 0.45;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
+    /* ---------- PERFORMANCE MODE ---------- */
+
+    body.perform-mode header,
+    body.perform-mode .status-row {
+      display: none;
+    }
+
+    body.perform-mode .app {
+      max-width: 100%;
+      padding: 0;
+      gap: 0;
+    }
+
+    body.perform-mode .visualizer-wrapper {
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+    }
+
+    body.perform-mode .watermark {
+      opacity: 0.25;
+      font-size: 0.6rem;
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <!-- Header -->
+  <main class="app">
     <header>
-      <div class="shell">
-        <nav class="nav">
-          <div class="brand">
-            <div class="brand-icon"></div>
-            <div>KIANNA RAIN</div>
-          </div>
-          <button class="nav-toggle" aria-label="Toggle menu" type="button">
-            <span></span>
-          </button>
-          <div class="nav-links" id="navLinks">
-            <a href="#about">About</a>
-            <a href="#work">Highlights</a>
-            <a href="#music">Music</a>
-            <a href="#contact">Contact</a>
-            <a href="#contact" class="nav-cta">
-              Bookings
-              <span>↗</span>
-            </a>
-          </div>
-        </nav>
+      <div class="brand">
+        <div class="brand-title">DJ VISUALIZER</div>
+        <div class="brand-sub">Audio reactive visuals · XP vibes soon</div>
+      </div>
+
+      <div class="controls">
+        <div class="select-wrapper">
+          <span class="select-label">Theme</span>
+          <select id="themeSelect" class="select-control">
+            <option value="neon">Neon</option>
+            <option value="xp">XP Blue</option>
+            <option value="vapor">Vaporwave</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </div>
+
+        <div class="select-wrapper">
+          <span class="select-label">Visualizer</span>
+          <select id="visualizerSelect" class="select-control">
+            <option value="bars">Bars</option>
+            <option value="circle">Circle</option>
+            <option value="wave">Waveform</option>
+          </select>
+        </div>
+
+        <label class="file-input-label">
+          Load Track
+          <input id="audioFile" type="file" accept="audio/*" />
+        </label>
+        <button id="playPause" disabled>Play</button>
+        <div class="volume-wrapper">
+          <input
+            id="volumeSlider"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="1"
+            class="volume-slider"
+          />
+        </div>
+        <button id="clearTrack" title="Clear current track">✕</button>
+        <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
+        <button id="performBtn" title="Toggle clean performance view">PERF</button>
       </div>
     </header>
 
-    <!-- Hero -->
-    <main>
-      <section class="hero" id="top">
-        <div class="shell hero-inner">
-          <div>
-            <div class="hero-tag">
-              <span class="hero-tag-dot"></span>
-              <span>Vocalist · Songwriter · Live Performer</span>
-            </div>
-            <h1 class="hero-title">
-              Meet <span>Kianna&nbsp;Rain</span><br />
-              emotive voice, cinematic energy.
-            </h1>
-            <p class="hero-sub">
-              Kianna crafts emotional, atmospheric performances that live between
-              alt-pop, electronic and cinematic sound. Intimate toplines, big hooks,
-              and a strong visual world to match.
-            </p>
-
-            <div class="hero-badges">
-              <div class="badge">Session vocals · Toplining</div>
-              <div class="badge">Live shows · Studio work</div>
-              <div class="badge">Concept visuals · Storytelling</div>
-            </div>
-
-            <div class="hero-actions">
-              <!-- Replace href with real link (Spotify, SoundCloud, etc.) -->
-              <a href="#" class="btn btn-primary">
-                Listen to selected tracks
-              </a>
-              <a href="#contact" class="btn btn-ghost">
-                Book for a project
-              </a>
-            </div>
-
-            <div class="hero-meta">
-              <div>
-                <strong>Based in</strong>
-                <span>Tel Aviv · Toronto (available worldwide)</span>
-              </div>
-              <div>
-                <strong>Available for</strong>
-                <span>Features · Hooks · Live sets · Studio sessions</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Hero Visual Card -->
-          <div class="hero-visual">
-            <div class="hero-card">
-              <div class="hero-card-inner">
-                <div class="portrait">
-                  <div class="portrait-inner">
-                    <!-- Replace with real portrait -->
-                    <!-- <img src="kianna-portrait.jpg" alt="Kianna Rain portrait" /> -->
-                    <div class="portrait-placeholder">
-                      ADD KIANNAs PHOTO HERE
-                    </div>
-                    <div class="portrait-glow"></div>
-                  </div>
-                  <div class="pill">
-                    <span class="pill-dot"></span>
-                    <span>Accepting 2025 bookings</span>
-                  </div>
-                </div>
-                <div class="hero-right">
-                  <div class="stat-row">
-                    <div class="mini-card">
-                      <strong>Voice</strong>
-                      <span>Warm, emotional tone with modern pop edge. Layered harmonies and cinematic ad-libs.</span>
-                    </div>
-                    <div class="mini-card">
-                      <strong>Range</strong>
-                      <span>Soft whispers to powerful choruses. Great for electronic, house, alt-pop & cinematic.</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="tag-row">
-                      <div class="tag">Studio-ready stems</div>
-                      <div class="tag">English · (add languages)</div>
-                      <div class="tag">Remote & in-person</div>
-                    </div>
-                    <p style="margin-top: 10px; font-size: 12px; color: var(--muted);">
-                      “Kianna brings a unique emotional color – she sounds like a movie scene
-                      in one take.”
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- About -->
-      <section id="about">
-        <div class="shell section-inner">
-          <div class="section-header">
-            <div class="section-title">About</div>
-            <p class="section-sub">
-              Short bio that shows who Kianna is, what she sounds like, and what she
-              loves creating. You can edit this text however you want.
-            </p>
-          </div>
-
-          <div class="about-grid">
-            <div class="card">
-              <p>
-                Kianna Rain is a vocalist and songwriter blending intimate storytelling
-                with cinematic, electronic production. Her voice sits right in the space
-                between fragile and powerful – perfect for emotional drops, late-night
-                house, dark pop and vibey soundtrack moments.
-              </p>
-              <br />
-              <p>
-                In the studio, she’s fast with melodies and harmonies, building full
-                toplines, hooks and ad-libs that feel instantly alive. On stage, she
-                brings a mix of raw emotion and confidence – connecting with the crowd
-                while staying fully in the music.
-              </p>
-
-              <div class="list-chips">
-                <div class="chip">Toplines from scratch</div>
-                <div class="chip">Writing from concepts or references</div>
-                <div class="chip">Stacked harmonies & textures</div>
-                <div class="chip">Vocal production ideas</div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="two-col">
-                <div>
-                  <strong>For Artists & Producers</strong>
-                  <span>Features · hooks · toplines over your beats & tracks.</span>
-                </div>
-                <div>
-                  <strong>For Labels & Sync</strong>
-                  <span>Emotion-driven vocals for electronic, house, pop & cinematic projects.</span>
-                </div>
-              </div>
-
-              <div class="two-col" style="margin-top: 14px;">
-                <div>
-                  <strong>Session options</strong>
-                  <span>Remote stems, writing sessions, or in-studio recording (location dependent).</span>
-                </div>
-                <div>
-                  <strong>Delivery</strong>
-                  <span>Dry & processed stems · doubles · harmonies · ad-libs.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Work highlights -->
-      <section id="work">
-        <div class="shell section-inner">
-          <div class="section-header">
-            <div class="section-title">Highlights</div>
-            <p class="section-sub">
-              A few example “tiles” you can customize with real tracks, shows and
-              collaborations.
-            </p>
-          </div>
-
-          <div class="work-grid">
-            <div class="work-card">
-              <div class="work-tag">Track Feature</div>
-              <div class="work-title">“Midnight Static” – House / Bass</div>
-              <p class="work-text">
-                Dark, cinematic verses opening into a wide, euphoric chorus. Kianna’s
-                layered harmonies ride the drop and bring the whole track to life.
-              </p>
-              <div class="work-meta">
-                <div class="pill-soft">Vocals & topline</div>
-                <!-- Replace with real link if you want -->
-                <a href="#" style="text-decoration: underline; text-underline-offset: 3px;">Listen</a>
-              </div>
-            </div>
-
-            <div class="work-card">
-              <div class="work-tag">Live</div>
-              <div class="work-title">Electronic club performance</div>
-              <p class="work-text">
-                Hybrid DJ + vocal set – live hooks, harmonies, ad-libs over heavy
-                basslines and house grooves, blending performance with club energy.
-              </p>
-              <div class="work-meta">
-                <div class="pill-soft">Clubs · Festivals</div>
-                <span>Hybrid live / DJ set</span>
-              </div>
-            </div>
-
-            <div class="work-card">
-              <div class="work-tag">Concept</div>
-              <div class="work-title">Cinematic vocal packs</div>
-              <p class="work-text">
-                Haunting phrases, vocal swells and textures built for producers making
-                melodic bass, future garage, cinematic beats and emotional EDM.
-              </p>
-              <div class="work-meta">
-                <div class="pill-soft">Custom packs on request</div>
-                <span>Contact for details</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Music -->
-      <section id="music">
-        <div class="shell section-inner">
-          <div class="section-header">
-            <div class="section-title">Music</div>
-            <p class="section-sub">
-              Swap the placeholder with a real player (Spotify, SoundCloud, YouTube)
-              and list a few key tracks or performances you want people to hear first.
-            </p>
-          </div>
-
-          <div class="music-grid">
-            <div class="card">
-              <h3 style="font-size: 14px; margin-bottom: 10px;">Featured playlist</h3>
-              <div class="embed-placeholder">
-                <p style="margin-bottom: 10px;">
-                  Embed your player here. For example:
-                </p>
-                <p>
-                  <code>&lt;iframe src="YOUR_SPOTIFY_OR_SOUNDCLOUD_EMBED_URL"
-                    width="100%" height="352" frameborder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"&gt;&lt;/iframe&gt;</code>
-                </p>
-                <p style="margin-top: 10px;">
-                  Replace this whole box with the real embed code when you’re ready.
-                </p>
-              </div>
-            </div>
-
-            <div class="card">
-              <h3 style="font-size: 14px; margin-bottom: 10px;">Good starting points</h3>
-              <div class="playlist-list">
-                <div class="playlist-item">
-                  <div>
-                    <strong>1. Late Night City</strong>
-                    <span>Moody electronic track with intimate verses and big emotional chorus.</span>
-                  </div>
-                  <span>Feature</span>
-                </div>
-                <div class="playlist-item">
-                  <div>
-                    <strong>2. Gravity</strong>
-                    <span>Melodic bass tune with stacked harmonies and cinematic ad-libs.</span>
-                  </div>
-                  <span>Topline</span>
-                </div>
-                <div class="playlist-item">
-                  <div>
-                    <strong>3. Rain in Neon</strong>
-                    <span>Alt-pop / electronic crossover – perfect to hear the softer side.</span>
-                  </div>
-                  <span>Solo</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Contact -->
-      <section id="contact">
-        <div class="shell section-inner">
-          <div class="section-header">
-            <div class="section-title">Contact</div>
-            <p class="section-sub">
-              For sessions, features, writing, or live performances – send a message
-              with as many details as you can (style, tempo, references, deadlines).
-            </p>
-          </div>
-
-          <div class="contact-grid">
-            <div class="card">
-              <!-- This is a front-end form only. Hook it to email / backend if you want it to actually send. -->
-              <form class="contact-form" id="contactForm">
-                <div>
-                  <label for="name">Name / Artist name</label>
-                  <input id="name" type="text" placeholder="Your name or project name" required />
-                </div>
-                <div>
-                  <label for="email">Email</label>
-                  <input id="email" type="email" placeholder="your@email.com" required />
-                </div>
-                <div>
-                  <label for="project">Project type</label>
-                  <input
-                    id="project"
-                    type="text"
-                    placeholder="Feature, topline, live show, vocal pack..."
-                    required
-                  />
-                </div>
-                <div>
-                  <label for="message">Project details</label>
-                  <textarea
-                    id="message"
-                    placeholder="Tell me about the track / project, mood, references, deadlines, and anything important."
-                    required
-                  ></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                  <span>Send (front-end only for now)</span>
-                </button>
-                <p class="contact-note" id="formNote">
-                  This form is visual only – connect it to a service like Formspree, Netlify
-                  Forms, or your own backend to actually send messages.
-                </p>
-              </form>
-            </div>
-
-            <div class="contact-side">
-              <div>
-                <strong style="color: #f5f5ff;">Direct contact</strong>
-                <div class="contact-line" style="margin-top: 4px;">
-                  <span>Email</span>
-                  <!-- Replace with real email -->
-                  <span>kiannarainmusic@example.com</span>
-                </div>
-                <div class="contact-line">
-                  <span>Based in</span>
-                  <span>Tel Aviv · Toronto · Remote worldwide</span>
-                </div>
-              </div>
-
-              <div>
-                <strong style="color: #f5f5ff;">Social & links</strong>
-                <div class="social-row">
-                  <!-- Replace with real links -->
-                  <a href="#" class="social-pill"><strong>Instagram</strong> / @kianna.rain</a>
-                  <a href="#" class="social-pill"><strong>Spotify</strong> artist</a>
-                  <a href="#" class="social-pill"><strong>SoundCloud</strong> profile</a>
-                  <a href="#" class="social-pill"><strong>YouTube</strong> channel</a>
-                </div>
-              </div>
-
-              <div>
-                <strong style="color: #f5f5ff;">Good to know</strong>
-                <p style="margin-top: 4px;">
-                  Please include BPM, key (if known), reference tracks, and whether you
-                  already have lyrics or want full writing from scratch.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-      <div class="shell footer-inner">
-        <div>© <span id="year"></span> Kianna Rain. All rights reserved.</div>
-        <div class="footer-links">
-          <a href="#top">Back to top</a>
-        </div>
+    <div class="status-row">
+      <div class="status" id="statusText">
+        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.
       </div>
-    </footer>
-  </div>
+      <div class="seek-container">
+        <span class="seek-time" id="currentTime">0:00</span>
+        <input
+          type="range"
+          id="seekBar"
+          class="seek-bar"
+          min="0"
+          value="0"
+          step="0.01"
+          disabled
+        />
+        <span class="seek-time" id="durationTime">0:00</span>
+      </div>
+      <div class="status">
+        💡 Tip: You can drag a music file from anywhere onto the visualizer area.
+      </div>
+    </div>
+
+    <section class="visualizer-wrapper">
+      <div class="visualizer-inner">
+        <canvas id="visualizer"></canvas>
+      </div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.3 · No Aspect</div>
+    </section>
+  </main>
 
   <script>
-    // Mobile nav toggle
-    const navToggle = document.querySelector(".nav-toggle");
-    const navLinks = document.getElementById("navLinks");
+    const fileInput = document.getElementById("audioFile");
+    const playPauseBtn = document.getElementById("playPause");
+    const statusText = document.getElementById("statusText");
+    const canvas = document.getElementById("visualizer");
+    const ctx = canvas.getContext("2d");
+    const visualizerWrapper = document.querySelector(".visualizer-wrapper");
 
-    if (navToggle && navLinks) {
-      navToggle.addEventListener("click", () => {
-        navLinks.classList.toggle("open");
-      });
+    const seekBar = document.getElementById("seekBar");
+    const currentTimeLabel = document.getElementById("currentTime");
+    const durationTimeLabel = document.getElementById("durationTime");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const clearTrackBtn = document.getElementById("clearTrack");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const performBtn = document.getElementById("performBtn");
+    const themeSelect = document.getElementById("themeSelect");
+    const visualizerSelect = document.getElementById("visualizerSelect");
+    const watermarkText = document.getElementById("watermarkText");
 
-      navLinks.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          navLinks.classList.remove("open");
-        });
-      });
+    let audioContext;
+    let audioSource;
+    let analyser;
+    let dataArray;
+    let waveArray;
+    let audioElement = null;
+    let isPlaying = false;
+    let animationId;
+    let isSeeking = false;
+
+    const themes = {
+      neon: {
+        bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
+        visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
+        barColors: ["#4cc9f0", "#f72585", "#b5179e"],
+        watermark: "Spectrum · v1.3 · Neon"
+      },
+      xp: {
+        bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
+        visBg: "radial-gradient(circle at center, #0b2c6a, #020716 75%)",
+        barColors: ["#8fd3ff", "#ffffff", "#4a90e2"],
+        watermark: "Spectrum · XP mode"
+      },
+      vapor: {
+        bodyBg: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a1c4fd 100%)",
+        visBg: "radial-gradient(circle at center, rgba(10,10,25,0.95), rgba(4,4,12,0.98))",
+        barColors: ["#ff9a9e", "#fecdff", "#a1c4fd"],
+        watermark: "Spectrum · Vaporwave"
+      },
+      minimal: {
+        bodyBg: "linear-gradient(135deg, #111111, #222222)",
+        visBg: "radial-gradient(circle at center, #050505, #101010 80%)",
+        barColors: ["#ffffff", "#cccccc", "#999999"],
+        watermark: "Spectrum · Minimal"
+      }
+    };
+
+    let currentThemeKey = "neon";
+    let currentVisualizer = "bars";
+
+    function applyTheme(themeKey) {
+      const theme = themes[themeKey] || themes.neon;
+      currentThemeKey = themeKey;
+      document.body.style.background = theme.bodyBg;
+      visualizerWrapper.style.background = theme.visBg;
+      updateWatermark();
     }
 
-    // Contact form notice (front-end only)
-    const contactForm = document.getElementById("contactForm");
-    const formNote = document.getElementById("formNote");
-
-    if (contactForm && formNote) {
-      contactForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const nameValue = contactForm.querySelector("#name")?.value.trim();
-        formNote.textContent =
-          "Thanks" +
-          (nameValue ? `, ${nameValue}` : "") +
-          "! This form is a visual demo — please email kiannarainmusic@example.com to get in touch.";
-        formNote.classList.add("notice");
-      });
+    function updateWatermark() {
+      const theme = themes[currentThemeKey] || themes.neon;
+      if (watermarkText) {
+        watermarkText.textContent =
+          theme.watermark + " · " + currentVisualizer.toUpperCase();
+      }
     }
 
-    // Year in footer
-    document.getElementById("year").textContent = new Date().getFullYear();
+    themeSelect.addEventListener("change", (e) => {
+      applyTheme(e.target.value);
+    });
+
+    visualizerSelect.addEventListener("change", (e) => {
+      currentVisualizer = e.target.value;
+      updateWatermark();
+    });
+
+    function resizeCanvas() {
+      const rect = visualizerWrapper.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.style.width = rect.width + "px";
+      canvas.style.height = rect.height + "px";
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    function initAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        waveArray = new Uint8Array(bufferLength);
+      }
+    }
+
+    function formatTime(sec) {
+      if (!isFinite(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60)
+        .toString()
+        .padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function stopVisualizer() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    }
+
+    function resetUIToEmpty() {
+      playPauseBtn.disabled = true;
+      playPauseBtn.textContent = "Play";
+      seekBar.disabled = true;
+      seekBar.value = 0;
+      currentTimeLabel.textContent = "0:00";
+      durationTimeLabel.textContent = "0:00";
+      statusText.textContent =
+        "Load an audio file to start. You can also drag & drop an MP3/WAV here.";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function loadAudioFile(file) {
+      if (!file) return;
+      if (!file.type.startsWith("audio/")) {
+        statusText.textContent =
+          "This file is not an audio file. Please use an MP3 or WAV track.";
+        return;
+      }
+
+      if (audioElement) {
+        audioElement.pause();
+      }
+      if (audioSource) {
+        try {
+          audioSource.disconnect();
+        } catch (e) {}
+      }
+      stopVisualizer();
+
+      initAudioContext();
+
+      const fileURL = URL.createObjectURL(file);
+      audioElement = new Audio(fileURL);
+      audioElement.crossOrigin = "anonymous";
+      audioElement.loop = true;
+      audioElement.volume = Number(volumeSlider.value || 1);
+
+      audioSource = audioContext.createMediaElementSource(audioElement);
+      audioSource.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      seekBar.disabled = true;
+      seekBar.value = 0;
+      currentTimeLabel.textContent = "0:00";
+      durationTimeLabel.textContent = "0:00";
+
+      audioElement.addEventListener("loadedmetadata", () => {
+        seekBar.max = audioElement.duration || 0;
+        seekBar.disabled = false;
+        durationTimeLabel.textContent = formatTime(audioElement.duration);
+      });
+
+      audioElement.addEventListener("timeupdate", () => {
+        if (!isSeeking) {
+          seekBar.value = audioElement.currentTime || 0;
+          currentTimeLabel.textContent = formatTime(audioElement.currentTime);
+        }
+      });
+
+      playPauseBtn.disabled = false;
+      playPauseBtn.textContent = "Play";
+      isPlaying = false;
+      statusText.textContent = `Loaded: ${file.name}`;
+    }
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      loadAudioFile(file);
+      event.target.value = "";
+    });
+
+    async function togglePlayPause() {
+      if (!audioElement) return;
+
+      if (!isPlaying) {
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+        await audioElement.play();
+        isPlaying = true;
+        playPauseBtn.textContent = "Pause";
+        statusText.textContent = "Playing · Visualizer active";
+        startVisualizer();
+      } else {
+        audioElement.pause();
+        isPlaying = false;
+        playPauseBtn.textContent = "Play";
+        statusText.textContent = "Paused";
+        stopVisualizer();
+      }
+    }
+
+    playPauseBtn.addEventListener("click", async () => {
+      await togglePlayPause();
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      if (audioElement) {
+        audioElement.volume = Number(volumeSlider.value);
+      }
+    });
+
+    clearTrackBtn.addEventListener("click", () => {
+      if (audioElement) {
+        audioElement.pause();
+      }
+      if (audioSource) {
+        try {
+          audioSource.disconnect();
+        } catch (e) {}
+      }
+      audioElement = null;
+      isPlaying = false;
+      stopVisualizer();
+      resetUIToEmpty();
+    });
+
+    // Fullscreen
+    fullscreenBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        if (visualizerWrapper.requestFullscreen) {
+          visualizerWrapper.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      const isFullscreen = !!document.fullscreenElement;
+      fullscreenBtn.textContent = isFullscreen ? "⤢" : "⛶";
+      resizeCanvas();
+    });
+
+    // Keyboard shortcuts: P = performance, SPACE = play/pause
+    document.addEventListener("keydown", async (e) => {
+      // SPACE → Play/Pause
+      if (e.code === "Space") {
+        e.preventDefault();
+        await togglePlayPause();
+        return;
+      }
+
+      // P → Performance mode
+      if (e.key === "p" || e.key === "P") {
+        document.body.classList.toggle("perform-mode");
+        resizeCanvas();
+      }
+    });
+
+    seekBar.addEventListener("input", () => {
+      if (!audioElement) return;
+      isSeeking = true;
+      currentTimeLabel.textContent = formatTime(seekBar.value);
+    });
+
+    seekBar.addEventListener("change", () => {
+      if (!audioElement) return;
+      audioElement.currentTime = Number(seekBar.value) || 0;
+      isSeeking = false;
+    });
+
+    function startVisualizer() {
+      function draw() {
+        if (!analyser || !dataArray) return;
+        animationId = requestAnimationFrame(draw);
+
+        const width = canvas.width / (window.devicePixelRatio || 1);
+        const height = canvas.height / (window.devicePixelRatio || 1);
+
+        ctx.fillStyle = "rgba(3, 4, 9, 0.35)";
+        ctx.fillRect(0, 0, width, height);
+
+        const theme = themes[currentThemeKey] || themes.neon;
+        const [c1, c2, c3] = theme.barColors;
+
+        if (currentVisualizer === "wave") {
+          drawWaveform(width, height, c1, c2, c3);
+        } else if (currentVisualizer === "circle") {
+          drawCircle(width, height, c1, c2, c3);
+        } else {
+          drawBars(width, height, c1, c2, c3);
+        }
+      }
+
+      draw();
+    }
+
+    function drawBars(width, height, c1, c2, c3) {
+      analyser.getByteFrequencyData(dataArray);
+
+      const barCount = 128;
+      const step = Math.floor(dataArray.length / barCount);
+      const barWidth = (width / barCount) * 0.9;
+      const gap = (width / barCount) * 0.1;
+      const midY = height / 2;
+
+      const grad = ctx.createLinearGradient(0, 0, width, 0);
+      grad.addColorStop(0, c1);
+      grad.addColorStop(0.5, c2);
+      grad.addColorStop(1, c3);
+
+      for (let i = 0; i < barCount; i++) {
+        const amplitude = dataArray[i * step] / 255;
+        const barHeight = amplitude * (height * 0.9) * 0.5;
+        const x = i * (barWidth + gap);
+        const yTop = midY - barHeight;
+
+        ctx.fillStyle = grad;
+        drawRoundRect(x, yTop, barWidth, barHeight, 5);
+        ctx.fill();
+        drawRoundRect(x, midY, barWidth, barHeight, 5);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, midY);
+      ctx.lineTo(width, midY);
+      ctx.stroke();
+    }
+
+    function drawCircle(width, height, c1, c2, c3) {
+      analyser.getByteFrequencyData(dataArray);
+
+      const radius = Math.min(width, height) * 0.3;
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      const grad = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
+      grad.addColorStop(0, c1);
+      grad.addColorStop(0.5, c2);
+      grad.addColorStop(1, c3);
+
+      const barCount = 96;
+      const step = Math.floor(dataArray.length / barCount);
+      const maxBarLength = Math.min(width, height) * 0.4;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+
+      for (let i = 0; i < barCount; i++) {
+        const amplitude = dataArray[i * step] / 255;
+        const barLength = amplitude * maxBarLength;
+
+        const angle = (i / barCount) * Math.PI * 2;
+        ctx.save();
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.moveTo(0, radius);
+        ctx.lineTo(0, radius + barLength);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = Math.max(2, (Math.PI * radius) / barCount / 1.3);
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 0.92, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+
+    function drawWaveform(width, height, c1, c2, c3) {
+      analyser.getByteTimeDomainData(waveArray);
+
+      const grad = ctx.createLinearGradient(0, 0, width, 0);
+      grad.addColorStop(0, c1);
+      grad.addColorStop(0.5, c2);
+      grad.addColorStop(1, c3);
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = grad;
+      ctx.beginPath();
+
+      const sliceWidth = width / waveArray.length;
+      let x = 0;
+      const midY = height / 2;
+
+      for (let i = 0; i < waveArray.length; i++) {
+        const v = waveArray[i] / 255;
+        const y = midY + (v - 0.5) * height * 0.6;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+      }
+
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, midY);
+      ctx.lineTo(width, midY);
+      ctx.stroke();
+    }
+
+    function drawRoundRect(x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    visualizerWrapper.addEventListener("click", (e) => {
+      if (e.target === visualizerWrapper || e.target === canvas) {
+        fileInput.click();
+      }
+    });
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.body.classList.add("drag-over");
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      if (e.target === document.body || e.clientX <= 0 || e.clientY <= 0) {
+        document.body.classList.remove("drag-over");
+      }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.body.classList.remove("drag-over");
+      const files = e.dataTransfer.files;
+      if (!files || !files.length) return;
+      const file = files[0];
+      loadAudioFile(file);
+    }
+
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("drop", handleDrop);
+
+    // init
+    applyTheme(currentThemeKey);
+    resizeCanvas();
+    resetUIToEmpty();
   </script>
 </body>
 </html>

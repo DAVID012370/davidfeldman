@@ -77,7 +77,7 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       opacity: 0.7;
-      transition: background 0.15s, opacity 0.15s, border-color 0.15s;
+      transition: background 0.15s, opacity 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
 
     .view-tab.active {
@@ -232,47 +232,6 @@
 
     .logo-controls.hidden {
       display: none;
-    }
-
-    /* light toggle chips */
-    .chip-toggle {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      padding: 0.25rem 0.7rem;
-      font-size: 0.7rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      opacity: 0.6;
-      cursor: pointer;
-      user-select: none;
-      gap: 0.35rem;
-      background: rgba(5, 5, 12, 0.75);
-    }
-
-    .chip-toggle input {
-      display: none;
-    }
-
-    .chip-toggle-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      background: transparent;
-    }
-
-    .chip-toggle.active {
-      opacity: 1;
-      border-color: rgba(255, 255, 255, 0.7);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .chip-toggle.active .chip-toggle-dot {
-      background: #4cc9f0;
-      box-shadow: 0 0 6px #4cc9f0;
-      border-color: transparent;
     }
 
     .visualizer-wrapper {
@@ -501,20 +460,7 @@
         </select>
       </div>
 
-      <!-- tiny behaviour chips -->
-      <label class="chip-toggle active" id="stopAudioChip" title="If ON, audio stops when switching to Logo view">
-        <input type="checkbox" id="stopAudioOnLogo" checked />
-        <span class="chip-toggle-dot"></span>
-        Stop audio on Logo
-      </label>
-
-      <label class="chip-toggle" id="clearLogoChip" title="If ON, logo is cleared when switching back to Visualizer">
-        <input type="checkbox" id="clearLogoOnVisualizer" />
-        <span class="chip-toggle-dot"></span>
-        Clear logo on Visualizer
-      </label>
-
-      <!-- logo controls ONLY in logo view -->
+      <!-- logo controls ONLY when logo is enabled -->
       <div class="logo-controls hidden" id="logoControls">
         <label class="file-input-label">
           Logo
@@ -632,11 +578,6 @@
     const viewTabs = document.querySelectorAll(".view-tab");
     const logoControls = document.getElementById("logoControls");
 
-    const stopAudioChip = document.getElementById("stopAudioChip");
-    const clearLogoChip = document.getElementById("clearLogoChip");
-    const stopAudioOnLogoInput = document.getElementById("stopAudioOnLogo");
-    const clearLogoOnVisualizerInput = document.getElementById("clearLogoOnVisualizer");
-
     let audioContext;
     let audioSource;
     let analyser;
@@ -657,6 +598,10 @@
     let recordedChunks = [];
     let isRecording = false;
     let audioDestForRecording = null;
+
+    // NEW: two booleans for multi-select view
+    let visualEnabled = true;
+    let logoEnabled = false;
 
     const themes = {
       neon: {
@@ -688,7 +633,6 @@
     let currentThemeKey = "neon";
     let currentVisualizer = "bars";
     let currentFx = "none";
-    let currentView = "visualizer";
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -698,9 +642,16 @@
       updateWatermark();
     }
 
+    function getViewLabel() {
+      if (visualEnabled && logoEnabled) return "Visual + Logo";
+      if (visualEnabled) return "Visualizer";
+      if (logoEnabled) return "Logo";
+      return "Idle";
+    }
+
     function updateWatermark() {
       const theme = themes[currentThemeKey] || themes.neon;
-      const viewLabel = currentView === "logo" ? "Logo View" : "Visualizer";
+      const viewLabel = getViewLabel();
       const fxLabel = currentFx === "vhs" ? " · CRT" : "";
       const recLabel = isRecording ? " · REC" : "";
       watermarkText.textContent =
@@ -721,72 +672,42 @@
       updateWatermark();
     });
 
-    /* chip behaviour toggles */
-    function syncChipVisual(labelEl, inputEl) {
-      labelEl.classList.toggle("active", inputEl.checked);
+    function updateViewTabsUI() {
+      viewTabs.forEach((btn) => {
+        const view = btn.dataset.view;
+        if (view === "visualizer") {
+          btn.classList.toggle("active", visualEnabled);
+        } else if (view === "logo") {
+          btn.classList.toggle("active", logoEnabled);
+        }
+      });
+      if (logoEnabled) {
+        logoControls.classList.remove("hidden");
+      } else {
+        logoControls.classList.add("hidden");
+      }
+      updateWatermark();
     }
 
-    stopAudioChip.addEventListener("click", (e) => {
-      if (e.target.tagName !== "INPUT") {
-        stopAudioOnLogoInput.checked = !stopAudioOnLogoInput.checked;
-      }
-      syncChipVisual(stopAudioChip, stopAudioOnLogoInput);
-    });
-
-    clearLogoChip.addEventListener("click", (e) => {
-      if (e.target.tagName !== "INPUT") {
-        clearLogoOnVisualizerInput.checked = !clearLogoOnVisualizerInput.checked;
-      }
-      syncChipVisual(clearLogoChip, clearLogoOnVisualizerInput);
-    });
-
-    syncChipVisual(stopAudioChip, stopAudioOnLogoInput);
-    syncChipVisual(clearLogoChip, clearLogoOnVisualizerInput);
-
-    /* VIEW SWITCH – no prompts, uses toggles */
     viewTabs.forEach((btn) => {
       btn.addEventListener("click", () => {
-        const targetView = btn.dataset.view || "visualizer";
-        if (targetView === currentView) return;
-
-        // leaving Visualizer → Logo
-        if (currentView === "visualizer" &&
-            targetView === "logo" &&
-            stopAudioOnLogoInput.checked &&
-            audioElement &&
-            isPlaying) {
-          audioElement.pause();
-          isPlaying = false;
-          playPauseBtn.textContent = "Play";
-          statusText.textContent = "Paused (auto stop when switching to Logo).";
+        const view = btn.dataset.view;
+        if (view === "visualizer") {
+          visualEnabled = !visualEnabled;
+        } else if (view === "logo") {
+          logoEnabled = !logoEnabled;
         }
 
-        // leaving Logo → Visualizer
-        if (currentView === "logo" &&
-            targetView === "visualizer" &&
-            clearLogoOnVisualizerInput.checked &&
-            logoImage) {
-          logoImage = null;
-          if (logoUrl) {
-            URL.revokeObjectURL(logoUrl);
-            logoUrl = null;
+        // ensure not both off – keep at least the one you just clicked
+        if (!visualEnabled && !logoEnabled) {
+          if (view === "visualizer") {
+            visualEnabled = true;
+          } else {
+            logoEnabled = true;
           }
-          statusText.textContent = "Logo cleared (auto clear when switching to Visualizer).";
         }
 
-        currentView = targetView;
-
-        viewTabs.forEach((b) => {
-          b.classList.toggle("active", b.dataset.view === currentView);
-        });
-
-        if (currentView === "logo") {
-          logoControls.classList.remove("hidden");
-        } else {
-          logoControls.classList.add("hidden");
-        }
-
-        updateWatermark();
+        updateViewTabsUI();
       });
     });
 
@@ -1100,9 +1021,8 @@
         visualizer: currentVisualizer,
         fx: currentFx,
         volume: volumeSlider.value,
-        view: currentView,
-        stopAudioOnLogo: stopAudioOnLogoInput.checked,
-        clearLogoOnVisualizer: clearLogoOnVisualizerInput.checked
+        visualEnabled,
+        logoEnabled
       };
       try {
         localStorage.setItem("djvizPreset", JSON.stringify(preset));
@@ -1138,26 +1058,16 @@
             audioElement.volume = Number(preset.volume);
           }
         }
-        if (typeof preset.stopAudioOnLogo === "boolean") {
-          stopAudioOnLogoInput.checked = preset.stopAudioOnLogo;
-          syncChipVisual(stopAudioChip, stopAudioOnLogoInput);
+        if (typeof preset.visualEnabled === "boolean") {
+          visualEnabled = preset.visualEnabled;
         }
-        if (typeof preset.clearLogoOnVisualizer === "boolean") {
-          clearLogoOnVisualizerInput.checked = preset.clearLogoOnVisualizer;
-          syncChipVisual(clearLogoChip, clearLogoOnVisualizerInput);
+        if (typeof preset.logoEnabled === "boolean") {
+          logoEnabled = preset.logoEnabled;
         }
-        if (preset.view) {
-          currentView = preset.view;
-          viewTabs.forEach((b) =>
-            b.classList.toggle("active", b.dataset.view === currentView)
-          );
-          if (currentView === "logo") {
-            logoControls.classList.remove("hidden");
-          } else {
-            logoControls.classList.add("hidden");
-          }
-        }
-        updateWatermark();
+        // make sure at least one is true
+        if (!visualEnabled && !logoEnabled) visualEnabled = true;
+
+        updateViewTabsUI();
         if (showMessage) statusText.textContent = "Preset loaded.";
       } catch (e) {
         if (showMessage) statusText.textContent = "Error loading preset.";
@@ -1224,6 +1134,23 @@
       isSeeking = false;
     });
 
+    function computeLevelFromFreq(arr) {
+      if (!arr || !arr.length) return 0;
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) sum += arr[i];
+      return sum / arr.length;
+    }
+
+    function computeLevelFromWave(arr) {
+      if (!arr || !arr.length) return 0;
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
+        const diff = Math.abs(arr[i] - 128);
+        sum += diff;
+      }
+      return (sum / arr.length) * 2; // roughly 0–255
+    }
+
     function startVisualizer() {
       if (animationId) return;
 
@@ -1239,30 +1166,43 @@
         const theme = themes[currentThemeKey] || themes.neon;
         const [c1, c2, c3] = theme.barColors;
 
-        if (currentView === "visualizer") {
+        let logoLevel = 0;
+
+        if (analyser && (visualEnabled || logoEnabled)) {
+          if (currentVisualizer === "wave" && visualEnabled) {
+            analyser.getByteTimeDomainData(waveArray);
+            logoLevel = computeLevelFromWave(waveArray);
+          } else {
+            analyser.getByteFrequencyData(dataArray);
+            logoLevel = computeLevelFromFreq(dataArray);
+          }
+        }
+
+        if (visualEnabled) {
           if (currentVisualizer === "wave") {
+            if (analyser && waveArray) {
+              analyser.getByteTimeDomainData(waveArray);
+            }
             drawWaveform(width, height, c1, c2, c3);
           } else if (currentVisualizer === "circle") {
+            if (analyser && dataArray) {
+              analyser.getByteFrequencyData(dataArray);
+            }
             drawCircle(width, height, c1, c2, c3);
           } else {
+            if (analyser && dataArray) {
+              analyser.getByteFrequencyData(dataArray);
+            }
             drawBars(width, height, c1, c2, c3);
           }
+        }
 
-          if (currentFx === "vhs") {
-            applyVhsFx(width, height);
-          }
-        } else {
-          let level = 0;
-          if (analyser && dataArray) {
-            analyser.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-            level = sum / (dataArray.length || 1);
-          }
-          drawLogoCenter(width, height, level);
-          if (currentFx === "vhs") {
-            applyVhsFx(width, height);
-          }
+        if (logoEnabled && logoImage) {
+          drawLogoCenter(width, height, logoLevel);
+        }
+
+        if (currentFx === "vhs" && (visualEnabled || logoEnabled)) {
+          applyVhsFx(width, height);
         }
       }
 
@@ -1553,6 +1493,7 @@
     applyTheme(currentThemeKey);
     resizeCanvas();
     resetUIToEmpty();
+    updateViewTabsUI();
     loadPresetFromStorage(false);
     startVisualizer();
   </script>

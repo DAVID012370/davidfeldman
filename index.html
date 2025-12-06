@@ -479,7 +479,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.7 · Logo / CRT</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.8 · Logo CRT mode</div>
     </section>
   </main>
 
@@ -575,7 +575,7 @@
       const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
         let recLabel = isRecording ? " · REC" : "";
-        let fxLabel = currentFx === "vhs" ? " · CRT" : "";
+        let fxLabel = currentFx === "vhs" ? " · CRT LOGO" : "";
         watermarkText.textContent =
           theme.watermark + " · " + currentVisualizer.toUpperCase() + fxLabel + recLabel;
       }
@@ -1025,18 +1025,22 @@
         const width = canvas.width / (window.devicePixelRatio || 1);
         const height = canvas.height / (window.devicePixelRatio || 1);
 
-        ctx.fillStyle = "rgba(3, 4, 9, 0.4)";
+        ctx.fillStyle = "rgba(3, 4, 9, 0.5)";
         ctx.fillRect(0, 0, width, height);
 
         const theme = themes[currentThemeKey] || themes.neon;
         const [c1, c2, c3] = theme.barColors;
 
-        if (currentVisualizer === "wave") {
-          drawWaveform(width, height, c1, c2, c3);
-        } else if (currentVisualizer === "circle") {
-          drawCircle(width, height, c1, c2, c3);
-        } else {
-          drawBars(width, height, c1, c2, c3);
+        const logoCrtMode = currentFx === "vhs" && logoImage;
+
+        if (!logoCrtMode) {
+          if (currentVisualizer === "wave") {
+            drawWaveform(width, height, c1, c2, c3);
+          } else if (currentVisualizer === "circle") {
+            drawCircle(width, height, c1, c2, c3);
+          } else {
+            drawBars(width, height, c1, c2, c3);
+          }
         }
 
         if (currentFx === "vhs") {
@@ -1044,7 +1048,7 @@
         }
 
         if (logoImage) {
-          drawLogoOverlay(width, height);
+          drawLogoOverlay(width, height, logoCrtMode);
         }
       }
 
@@ -1187,9 +1191,7 @@
       ctx.closePath();
     }
 
-    // Stronger CRT / VHS effect
     function applyVhsFx(width, height) {
-      // Slight vignette
       const grad = ctx.createRadialGradient(
         width / 2,
         height / 2,
@@ -1205,7 +1207,6 @@
       ctx.fillRect(0, 0, width, height);
       ctx.restore();
 
-      // Scanlines
       ctx.save();
       ctx.globalAlpha = 0.28;
       ctx.fillStyle = "#000000";
@@ -1214,7 +1215,6 @@
       }
       ctx.restore();
 
-      // Random noise streaks
       ctx.save();
       ctx.globalAlpha = 0.12;
       for (let i = 0; i < 40; i++) {
@@ -1227,7 +1227,6 @@
       }
       ctx.restore();
 
-      // Subtle frame border
       ctx.save();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
       ctx.lineWidth = 2;
@@ -1235,21 +1234,18 @@
       ctx.restore();
     }
 
-    // Logo in center with CRT-style glow / RGB shift when FX = VHS
-    function drawLogoOverlay(width, height) {
+    function drawLogoOverlay(width, height, crtMode) {
       if (!logoImage) return;
 
-      const isCrt = currentFx === "vhs";
+      if (!crtMode) {
+        const margin = 16;
+        const maxWidth = width * 0.2;
+        const scale = Math.min(maxWidth / logoImage.width, 1);
+        const logoW = logoImage.width * scale;
+        const logoH = logoImage.height * scale;
+        const x = margin;
+        const y = height - logoH - margin;
 
-      const baseMax = isCrt ? width * 0.45 : width * 0.2;
-      const scale = Math.min(baseMax / logoImage.width, 1);
-      const logoW = logoImage.width * scale;
-      const logoH = logoImage.height * scale;
-
-      const x = isCrt ? (width - logoW) / 2 : 16;
-      const y = isCrt ? (height - logoH) / 2 : height - logoH - 16;
-
-      if (!isCrt) {
         ctx.save();
         ctx.globalAlpha = 0.9;
         ctx.drawImage(logoImage, x, y, logoW, logoH);
@@ -1257,31 +1253,34 @@
         return;
       }
 
-      // CRT mode: pulsing scale with audio energy
       analyser.getByteFrequencyData(dataArray);
       let avg = 0;
       for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
       avg /= dataArray.length || 1;
       const pulse = 1 + (avg / 255) * 0.08;
 
-      const cx = width / 2;
-      const cy = height / 2;
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      const maxWidth = width * 0.45;
+      const baseScale = Math.min(maxWidth / logoImage.width, 1);
+      const logoW = logoImage.width * baseScale;
+      const logoH = logoImage.height * baseScale;
+
+      const lx = centerX - logoW / 2;
+      const ly = centerY - logoH / 2;
 
       ctx.save();
-      ctx.translate(cx, cy);
+      ctx.translate(centerX, centerY);
       ctx.scale(pulse, pulse);
-      ctx.translate(-cx, -cy);
+      ctx.translate(-centerX, -centerY);
 
-      const lx = (width - logoW) / 2;
-      const ly = (height - logoH) / 2;
-
-      // Soft glow behind logo
       const glowGrad = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
+        centerX,
+        centerY,
         0,
-        width / 2,
-        height / 2,
+        centerX,
+        centerY,
         Math.max(logoW, logoH)
       );
       glowGrad.addColorStop(0, "rgba(0,255,180,0.45)");
@@ -1290,14 +1289,12 @@
       ctx.fillStyle = glowGrad;
       ctx.fillRect(lx - logoW * 0.3, ly - logoH * 0.3, logoW * 1.6, logoH * 1.6);
 
-      // RGB split passes
       ctx.globalCompositeOperation = "screen";
       ctx.globalAlpha = 0.7;
-      ctx.drawImage(logoImage, lx - 2, ly, logoW, logoH); // red-ish
+      ctx.drawImage(logoImage, lx - 2, ly, logoW, logoH);
       ctx.globalAlpha = 0.7;
-      ctx.drawImage(logoImage, lx + 2, ly, logoW, logoH); // cyan-ish
+      ctx.drawImage(logoImage, lx + 2, ly, logoW, logoH);
 
-      // Base logo
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
       ctx.drawImage(logoImage, lx, ly, logoW, logoH);

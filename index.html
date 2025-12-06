@@ -701,13 +701,6 @@
       return `${m}:${s}`;
     }
 
-    function stopVisualizer() {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-      }
-    }
-
     function resetUIToEmpty() {
       playPauseBtn.disabled = true;
       playPauseBtn.textContent = "Play";
@@ -745,7 +738,6 @@
       if (audioSource) {
         try { audioSource.disconnect(); } catch (e) {}
       }
-      stopVisualizer();
 
       if (currentFileUrl) {
         URL.revokeObjectURL(currentFileUrl);
@@ -830,20 +822,18 @@
       if (!audioElement) return;
 
       if (!isPlaying) {
-        if (audioContext.state === "suspended") {
+        if (audioContext && audioContext.state === "suspended") {
           await audioContext.resume();
         }
         await audioElement.play();
         isPlaying = true;
         playPauseBtn.textContent = "Pause";
         statusText.textContent = "Playing · Visualizer active";
-        startVisualizer();
       } else {
         audioElement.pause();
         isPlaying = false;
         playPauseBtn.textContent = "Play";
         statusText.textContent = "Paused";
-        stopVisualizer();
       }
     }
 
@@ -869,7 +859,6 @@
       currentFile = null;
       audioElement = null;
       isPlaying = false;
-      stopVisualizer();
       resetUIToEmpty();
     });
 
@@ -1101,8 +1090,9 @@
     });
 
     function startVisualizer() {
+      if (animationId) return; // already running
+
       function draw() {
-        if (!analyser || !dataArray) return;
         animationId = requestAnimationFrame(draw);
 
         const width = canvas.width / (window.devicePixelRatio || 1);
@@ -1126,12 +1116,15 @@
           if (currentFx === "vhs") {
             applyVhsFx(width, height);
           }
-
-          if (logoImage) {
-            drawLogoCorner(width, height);
-          }
         } else {
-          drawLogoCenter(width, height);
+          let level = 0;
+          if (analyser && dataArray) {
+            analyser.getByteFrequencyData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+            level = sum / (dataArray.length || 1);
+          }
+          drawLogoCenter(width, height, level);
           if (currentFx === "vhs") {
             applyVhsFx(width, height);
           }
@@ -1142,6 +1135,7 @@
     }
 
     function drawBars(width, height, c1, c2, c3) {
+      if (!analyser || !dataArray) return;
       analyser.getByteFrequencyData(dataArray);
 
       const barCount = 96;
@@ -1177,6 +1171,7 @@
     }
 
     function drawCircle(width, height, c1, c2, c3) {
+      if (!analyser || !dataArray) return;
       analyser.getByteFrequencyData(dataArray);
 
       const radius = Math.min(width, height) * 0.3;
@@ -1224,6 +1219,7 @@
     }
 
     function drawWaveform(width, height, c1, c2, c3) {
+      if (!analyser || !waveArray) return;
       analyser.getByteTimeDomainData(waveArray);
 
       const grad = ctx.createLinearGradient(0, 0, width, 0);
@@ -1320,30 +1316,11 @@
       ctx.restore();
     }
 
-    function drawLogoCorner(width, height) {
-      if (!logoImage) return;
-      const margin = 16;
-      const maxWidth = width * 0.18;
-      const scale = Math.min(maxWidth / logoImage.width, 1);
-      const logoW = logoImage.width * scale;
-      const logoH = logoImage.height * scale;
-      const x = margin;
-      const y = height - logoH - margin;
-
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      ctx.drawImage(logoImage, x, y, logoW, logoH);
-      ctx.restore();
-    }
-
-    function drawLogoCenter(width, height) {
+    function drawLogoCenter(width, height, level) {
       if (!logoImage) return;
 
-      analyser.getByteFrequencyData(dataArray);
-      let avg = 0;
-      for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
-      avg /= dataArray.length || 1;
-      const pulse = 1 + (avg / 255) * 0.08;
+      const avg = level || 0;
+      const pulse = 1 + (avg / 255) * 0.08; // 1 when no audio
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -1442,6 +1419,7 @@
     resizeCanvas();
     resetUIToEmpty();
     loadPresetFromStorage(false);
+    startVisualizer(); // run loop always so Logo works even without audio
   </script>
 </body>
 </html>

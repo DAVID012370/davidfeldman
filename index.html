@@ -379,6 +379,7 @@
           <input id="audioFile" type="file" accept="audio/*" />
         </label>
         <button id="playPause" disabled>Play</button>
+
         <div class="volume-wrapper">
           <input
             id="volumeSlider"
@@ -390,7 +391,10 @@
             class="volume-slider"
           />
         </div>
+
         <button id="clearTrack" title="Clear current track">✕</button>
+        <button id="downloadAudio" title="Download audio file" disabled>DL Audio</button>
+        <button id="downloadFrame" title="Download visualizer frame">DL PNG</button>
         <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
         <button id="performBtn" title="Toggle clean performance view">PERF</button>
       </div>
@@ -414,7 +418,8 @@
         <span class="seek-time" id="durationTime">0:00</span>
       </div>
       <div class="status">
-        💡 Tip: You can drag a music file from anywhere onto the visualizer area.
+        💡 Tip: You can drag a music file from anywhere onto the visualizer area.  
+        Space = Play/Pause · P = Performance
       </div>
     </div>
 
@@ -422,7 +427,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.3 · No Aspect</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.4 · Download Ready</div>
     </section>
   </main>
 
@@ -444,6 +449,8 @@
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
     const watermarkText = document.getElementById("watermarkText");
+    const downloadAudioBtn = document.getElementById("downloadAudio");
+    const downloadFrameBtn = document.getElementById("downloadFrame");
 
     let audioContext;
     let audioSource;
@@ -455,12 +462,15 @@
     let animationId;
     let isSeeking = false;
 
+    let currentFile = null;
+    let currentFileUrl = null;
+
     const themes = {
       neon: {
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.3 · Neon"
+        watermark: "Spectrum · v1.4 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -557,6 +567,7 @@
       seekBar.value = 0;
       currentTimeLabel.textContent = "0:00";
       durationTimeLabel.textContent = "0:00";
+      downloadAudioBtn.disabled = true;
       statusText.textContent =
         "Load an audio file to start. You can also drag & drop an MP3/WAV here.";
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -580,10 +591,16 @@
       }
       stopVisualizer();
 
+      // ניהול ה-blob של הקובץ בשביל הורדה
+      if (currentFileUrl) {
+        URL.revokeObjectURL(currentFileUrl);
+      }
+      currentFile = file;
+      currentFileUrl = URL.createObjectURL(file);
+
       initAudioContext();
 
-      const fileURL = URL.createObjectURL(file);
-      audioElement = new Audio(fileURL);
+      audioElement = new Audio(currentFileUrl);
       audioElement.crossOrigin = "anonymous";
       audioElement.loop = true;
       audioElement.volume = Number(volumeSlider.value || 1);
@@ -612,6 +629,7 @@
 
       playPauseBtn.disabled = false;
       playPauseBtn.textContent = "Play";
+      downloadAudioBtn.disabled = false;
       isPlaying = false;
       statusText.textContent = `Loaded: ${file.name}`;
     }
@@ -662,10 +680,42 @@
           audioSource.disconnect();
         } catch (e) {}
       }
+      if (currentFileUrl) {
+        URL.revokeObjectURL(currentFileUrl);
+        currentFileUrl = null;
+      }
+      currentFile = null;
       audioElement = null;
       isPlaying = false;
       stopVisualizer();
       resetUIToEmpty();
+    });
+
+    // הורדת האודיו
+    downloadAudioBtn.addEventListener("click", () => {
+      if (!currentFile || !currentFileUrl) return;
+      const a = document.createElement("a");
+      a.href = currentFileUrl;
+      a.download = currentFile.name || "track.wav";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    // הורדת פריים הוויזואלייזר כ-PNG
+    downloadFrameBtn.addEventListener("click", () => {
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const ts = new Date().toISOString().replace(/[:.]/g, "-");
+        a.href = url;
+        a.download = `visualizer-${ts}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, "image/png");
     });
 
     // Fullscreen
@@ -687,16 +737,14 @@
       resizeCanvas();
     });
 
-    // Keyboard shortcuts: P = performance, SPACE = play/pause
+    // Keyboard shortcuts: SPACE = play/pause, P = performance mode
     document.addEventListener("keydown", async (e) => {
-      // SPACE → Play/Pause
       if (e.code === "Space") {
         e.preventDefault();
         await togglePlayPause();
         return;
       }
 
-      // P → Performance mode
       if (e.key === "p" || e.key === "P") {
         document.body.classList.toggle("perform-mode");
         resizeCanvas();

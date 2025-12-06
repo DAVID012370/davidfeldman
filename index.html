@@ -494,7 +494,8 @@
         <span class="select-label">FX</span>
         <select id="fxSelect" class="select-control">
           <option value="none">Clean</option>
-          <option value="vhs">VHS / CRT</option>
+          <option value="crt">CRT Background</option>
+          <option value="glitch">Logo Glitch</option>
         </select>
       </div>
 
@@ -702,10 +703,16 @@
       return "Idle";
     }
 
+    function getFxLabel() {
+      if (currentFx === "crt") return " · CRT";
+      if (currentFx === "glitch") return " · GLITCH";
+      return "";
+    }
+
     function updateWatermark() {
       const theme = themes[currentThemeKey] || themes.neon;
       const viewLabel = getViewLabel();
-      const fxLabel = currentFx === "vhs" ? " · CRT" : "";
+      const fxLabel = getFxLabel();
       const recLabel = isRecording ? " · REC" : "";
       watermarkText.textContent =
         `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${fxLabel}${recLabel}`;
@@ -1288,7 +1295,8 @@
           drawLogoCenter(width, height, logoLevel);
         }
 
-        if (currentFx === "vhs" && (visualEnabled || logoEnabled)) {
+        // CRT FX only if fx == crt
+        if (currentFx === "crt" && (visualEnabled || logoEnabled)) {
           applyVhsFx(width, height);
         }
       }
@@ -1484,7 +1492,7 @@
       ctx.restore();
     }
 
-    // 🔥 LOGO GLITCH STYLE (Boris FX vibe, more shards + more jitter)
+    // LOGO: clean or glitch (Logo Only)
     function drawLogoCenter(width, height, level) {
       if (!logoImage) return;
 
@@ -1492,12 +1500,13 @@
       const energy = Math.max(0, Math.min(1, avg / 200)); // 0-1
       const pulse = 1 + energy * 0.18;
 
-      const jitterAmount = 4 + energy * 26;
+      const glitchActive = currentFx === "glitch";
+
+      const jitterAmount = glitchActive ? 4 + energy * 26 : 2 + energy * 6;
       let jitterX = (Math.random() - 0.5) * jitterAmount;
       let jitterY = (Math.random() - 0.5) * jitterAmount;
 
-      // occasional big jump when energy is high
-      if (energy > 0.7 && Math.random() < 0.25) {
+      if (glitchActive && energy > 0.7 && Math.random() < 0.25) {
         jitterX += (Math.random() - 0.5) * jitterAmount * 1.8;
         jitterY += (Math.random() - 0.5) * jitterAmount * 1.8;
       }
@@ -1514,12 +1523,12 @@
       const ly = centerY - logoH / 2;
 
       ctx.save();
-      ctx.translate(centerX + jitterX, centerY + jitterY);
+      ctx.translate(centerX + (glitchActive ? jitterX : 0), centerY + (glitchActive ? jitterY : 0));
       ctx.scale(pulse, pulse);
       ctx.translate(-centerX, -centerY);
 
-      if (currentFx === "vhs") {
-        // BIG GLOW behind logo
+      if (glitchActive) {
+        // BIG GLOW behind logo (glitch mood)
         const glowGrad = ctx.createRadialGradient(
           centerX,
           centerY,
@@ -1556,7 +1565,7 @@
         ctx.globalAlpha = 1;
         ctx.drawImage(logoImage, lx, ly, logoW, logoH);
 
-        // GLITCH SLICES (more shards + deeper shifts)
+        // GLITCH SLICES
         const baseCount = 6;
         const extraCount = Math.round(energy * 18);
         const glitchCount = baseCount + extraCount;
@@ -1568,9 +1577,9 @@
 
           const shiftX =
             (Math.random() - 0.5) *
-            (20 + energy * 80); // deeper horizontal glitch
+            (20 + energy * 80);
           const shiftY =
-            (Math.random() - 0.5) * (energy * 10); // slight vertical warp
+            (Math.random() - 0.5) * (energy * 10);
 
           ctx.save();
           ctx.beginPath();
@@ -1617,6 +1626,7 @@
           logoH + 6
         );
         ctx.restore();
+
       } else {
         // CLEAN LOGO MODE
         const glowGrad = ctx.createRadialGradient(

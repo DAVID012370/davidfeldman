@@ -622,12 +622,20 @@
   let logoEnabled = false;
   let lastEnergy = 0;
 
+  // logical (CSS) canvas size – fixes scaling issues
+  let canvasDisplayWidth = 0;
+  let canvasDisplayHeight = 440;
+
   function resizeCanvas() {
     const rect = dropZone.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = 440 * dpr; // fixed height
-    canvas.style.height = "440px";
+
+    canvasDisplayWidth = rect.width;
+    canvasDisplayHeight = 440;
+
+    canvas.width = canvasDisplayWidth * dpr;
+    canvas.height = canvasDisplayHeight * dpr;
+    canvas.style.height = canvasDisplayHeight + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
@@ -635,8 +643,8 @@
   resizeCanvas();
 
   function drawBackground() {
-    const w = canvas.width;
-    const h = canvas.height;
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
     const g = ctx.createRadialGradient(
       w / 2,
       h * 0.1,
@@ -662,14 +670,14 @@
     }
 
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, w, h);
 
     // subtle overlay lines
     ctx.globalAlpha = 0.06;
     ctx.fillStyle = "#ffffff";
     const stripeH = 2;
-    for (let y = 0; y < canvas.height; y += 20) {
-      ctx.fillRect(0, y, canvas.width, stripeH);
+    for (let y = 0; y < h; y += 20) {
+      ctx.fillRect(0, y, w, stripeH);
     }
     ctx.globalAlpha = 1;
   }
@@ -687,9 +695,9 @@
   function drawBars() {
     if (!analyser || !dataArray) return;
 
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
     const energy = computeEnergy();
-    const w = canvas.width;
-    const h = canvas.height;
     const barCount = 120;
     const barWidth = w / barCount;
 
@@ -713,7 +721,6 @@
       ctx.restore();
     }
 
-    // center line
     ctx.globalAlpha = 0.3;
     ctx.fillStyle = "#f5f5f5";
     ctx.fillRect(0, h / 2, w, 1);
@@ -722,15 +729,14 @@
 
   function drawCircle() {
     if (!analyser || !dataArray) return;
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
     const energy = computeEnergy();
-    const w = canvas.width;
-    const h = canvas.height;
     const cx = w / 2;
     const cy = h / 2;
     const baseRadius = Math.min(w, h) * 0.18;
     const innerRadius = baseRadius * (1 - 0.12 * (energy + 0.2));
 
-    // outer glow
     const glow = ctx.createRadialGradient(
       cx,
       cy,
@@ -746,14 +752,12 @@
     ctx.arc(cx, cy, baseRadius * 1.6, 0, Math.PI * 2);
     ctx.fill();
 
-    // base circle
     ctx.strokeStyle = "rgba(255,255,255,0.75)";
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
     ctx.stroke();
 
-    // spectrum ticks
     const tickCount = 160;
     for (let i = 0; i < tickCount; i++) {
       const idx = Math.floor((i / tickCount) * dataArray.length);
@@ -777,10 +781,10 @@
 
   function drawWaveform() {
     if (!analyser || !dataArray) return;
-    const w = canvas.width;
-    const h = canvas.height;
-    analyser.getByteTimeDomainData(dataArray);
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
 
+    analyser.getByteTimeDomainData(dataArray);
     ctx.lineWidth = 3;
     const grad = ctx.createLinearGradient(0, 0, w, 0);
     grad.addColorStop(0, "#4fc3ff");
@@ -814,7 +818,6 @@
   let logoImage = null;
   let logoLoaded = false;
 
-  // offscreen buffer
   const logoBuffer = document.createElement("canvas");
   const logoBufferCtx = logoBuffer.getContext("2d");
 
@@ -830,13 +833,12 @@
     }
   }
 
-  function renderLogoFrame(mainCtx, canvasEl) {
+  function renderLogoFrame(mainCtx) {
     if (!logoLoaded || !logoImage) return;
 
-    const w = canvasEl.width;
-    const h = canvasEl.height;
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
 
-    // 1) draw clean logo into buffer
     logoBuffer.width = w;
     logoBuffer.height = h;
     logoBufferCtx.clearRect(0, 0, w, h);
@@ -855,10 +857,8 @@
 
     logoBufferCtx.drawImage(logoImage, dx, dy, drawW, drawH);
 
-    // 2) draw clean to main canvas
     mainCtx.drawImage(logoBuffer, 0, 0);
 
-    // 3) apply glitch puzzle if needed
     if (fxMode === "glitch") {
       const energy = Math.min(lastEnergy * 1.4 + 0.15, 1);
       const strength = getGlitchStrengthFactor() * energy;
@@ -886,7 +886,6 @@
       const sw = tileSize;
       const sh = tileSize;
 
-      // Skip mostly dark tiles (background only)
       const sample = logoBufferCtx.getImageData(sx, sy, sw, sh);
       let sum = 0;
       for (let j = 0; j < sample.data.length; j += 4) {
@@ -950,7 +949,6 @@
     logoImage = null;
   });
 
-  // Drag & drop for audio / logo
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
   });
@@ -1084,7 +1082,6 @@
   // ==========
   function render() {
     requestAnimationFrame(render);
-    resizeCanvas();
     drawBackground();
 
     if (visualizerEnabled && analyser && dataArray) {
@@ -1096,17 +1093,17 @@
         drawWaveform();
       }
     } else {
-      // even if no analyser, still computeEnergy resets
       if (analyser && dataArray) computeEnergy();
     }
 
     if (logoEnabled) {
-      renderLogoFrame(ctx, canvas);
+      renderLogoFrame(ctx);
     }
 
     updateFooterTag();
   }
 
+  resizeCanvas();
   render();
 </script>
 </body>

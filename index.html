@@ -234,6 +234,47 @@
       display: none;
     }
 
+    /* light toggle chips */
+    .chip-toggle {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.6;
+      cursor: pointer;
+      user-select: none;
+      gap: 0.35rem;
+      background: rgba(5, 5, 12, 0.75);
+    }
+
+    .chip-toggle input {
+      display: none;
+    }
+
+    .chip-toggle-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: transparent;
+    }
+
+    .chip-toggle.active {
+      opacity: 1;
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .chip-toggle.active .chip-toggle-dot {
+      background: #4cc9f0;
+      box-shadow: 0 0 6px #4cc9f0;
+      border-color: transparent;
+    }
+
     .visualizer-wrapper {
       flex: 1;
       border-radius: 1.5rem;
@@ -460,6 +501,19 @@
         </select>
       </div>
 
+      <!-- tiny behaviour chips -->
+      <label class="chip-toggle active" id="stopAudioChip" title="If ON, audio stops when switching to Logo view">
+        <input type="checkbox" id="stopAudioOnLogo" checked />
+        <span class="chip-toggle-dot"></span>
+        Stop audio on Logo
+      </label>
+
+      <label class="chip-toggle" id="clearLogoChip" title="If ON, logo is cleared when switching back to Visualizer">
+        <input type="checkbox" id="clearLogoOnVisualizer" />
+        <span class="chip-toggle-dot"></span>
+        Clear logo on Visualizer
+      </label>
+
       <!-- logo controls ONLY in logo view -->
       <div class="logo-controls hidden" id="logoControls">
         <label class="file-input-label">
@@ -487,7 +541,7 @@
       <div class="watermark" id="watermarkText">Spectrum · Visualizer</div>
     </section>
 
-    <!-- TIMELINE + STATUS (ABOVE BUTTONS) -->
+    <!-- TIMELINE + STATUS -->
     <div class="status-row">
       <div class="seek-container">
         <span class="seek-time" id="currentTime">0:00</span>
@@ -578,6 +632,11 @@
     const viewTabs = document.querySelectorAll(".view-tab");
     const logoControls = document.getElementById("logoControls");
 
+    const stopAudioChip = document.getElementById("stopAudioChip");
+    const clearLogoChip = document.getElementById("clearLogoChip");
+    const stopAudioOnLogoInput = document.getElementById("stopAudioOnLogo");
+    const clearLogoOnVisualizerInput = document.getElementById("clearLogoOnVisualizer");
+
     let audioContext;
     let audioSource;
     let analyser;
@@ -629,7 +688,7 @@
     let currentThemeKey = "neon";
     let currentVisualizer = "bars";
     let currentFx = "none";
-    let currentView = "visualizer"; // "visualizer" or "logo"
+    let currentView = "visualizer";
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -662,44 +721,57 @@
       updateWatermark();
     });
 
-    /* VIEW SWITCH WITH CONFIRM LOGIC */
+    /* chip behaviour toggles */
+    function syncChipVisual(labelEl, inputEl) {
+      labelEl.classList.toggle("active", inputEl.checked);
+    }
+
+    stopAudioChip.addEventListener("click", (e) => {
+      if (e.target.tagName !== "INPUT") {
+        stopAudioOnLogoInput.checked = !stopAudioOnLogoInput.checked;
+      }
+      syncChipVisual(stopAudioChip, stopAudioOnLogoInput);
+    });
+
+    clearLogoChip.addEventListener("click", (e) => {
+      if (e.target.tagName !== "INPUT") {
+        clearLogoOnVisualizerInput.checked = !clearLogoOnVisualizerInput.checked;
+      }
+      syncChipVisual(clearLogoChip, clearLogoOnVisualizerInput);
+    });
+
+    syncChipVisual(stopAudioChip, stopAudioOnLogoInput);
+    syncChipVisual(clearLogoChip, clearLogoOnVisualizerInput);
+
+    /* VIEW SWITCH – no prompts, uses toggles */
     viewTabs.forEach((btn) => {
       btn.addEventListener("click", () => {
         const targetView = btn.dataset.view || "visualizer";
         if (targetView === currentView) return;
 
-        // Leaving VISUALIZER → going to LOGO
-        if (currentView === "visualizer" && targetView === "logo") {
-          if (audioElement && isPlaying) {
-            const keepPlaying = window.confirm(
-              "You are switching to Logo view.\nDo you want the music to KEEP playing?"
-            );
-            if (!keepPlaying) {
-              audioElement.pause();
-              isPlaying = false;
-              playPauseBtn.textContent = "Play";
-              statusText.textContent =
-                "Paused (stopped when switching to Logo view).";
-            }
-          }
+        // leaving Visualizer → Logo
+        if (currentView === "visualizer" &&
+            targetView === "logo" &&
+            stopAudioOnLogoInput.checked &&
+            audioElement &&
+            isPlaying) {
+          audioElement.pause();
+          isPlaying = false;
+          playPauseBtn.textContent = "Play";
+          statusText.textContent = "Paused (auto stop when switching to Logo).";
         }
 
-        // Leaving LOGO → going to VISUALIZER
-        if (currentView === "logo" && targetView === "visualizer") {
-          if (logoImage) {
-            const keepLogo = window.confirm(
-              "You are switching to Visualizer view.\nDo you want to KEEP the current logo?"
-            );
-            if (!keepLogo) {
-              logoImage = null;
-              if (logoUrl) {
-                URL.revokeObjectURL(logoUrl);
-                logoUrl = null;
-              }
-              statusText.textContent =
-                "Logo cleared when switching to Visualizer view.";
-            }
+        // leaving Logo → Visualizer
+        if (currentView === "logo" &&
+            targetView === "visualizer" &&
+            clearLogoOnVisualizerInput.checked &&
+            logoImage) {
+          logoImage = null;
+          if (logoUrl) {
+            URL.revokeObjectURL(logoUrl);
+            logoUrl = null;
           }
+          statusText.textContent = "Logo cleared (auto clear when switching to Visualizer).";
         }
 
         currentView = targetView;
@@ -1028,7 +1100,9 @@
         visualizer: currentVisualizer,
         fx: currentFx,
         volume: volumeSlider.value,
-        view: currentView
+        view: currentView,
+        stopAudioOnLogo: stopAudioOnLogoInput.checked,
+        clearLogoOnVisualizer: clearLogoOnVisualizerInput.checked
       };
       try {
         localStorage.setItem("djvizPreset", JSON.stringify(preset));
@@ -1063,6 +1137,14 @@
           if (audioElement) {
             audioElement.volume = Number(preset.volume);
           }
+        }
+        if (typeof preset.stopAudioOnLogo === "boolean") {
+          stopAudioOnLogoInput.checked = preset.stopAudioOnLogo;
+          syncChipVisual(stopAudioChip, stopAudioOnLogoInput);
+        }
+        if (typeof preset.clearLogoOnVisualizer === "boolean") {
+          clearLogoOnVisualizerInput.checked = preset.clearLogoOnVisualizer;
+          syncChipVisual(clearLogoChip, clearLogoOnVisualizerInput);
         }
         if (preset.view) {
           currentView = preset.view;

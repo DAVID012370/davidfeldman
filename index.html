@@ -17,1891 +17,1097 @@
       color: #f5f5f5;
       min-height: 100vh;
       display: flex;
-      align-items: stretch;
       justify-content: center;
-    }
-
-    body.drag-over .visualizer-wrapper {
-      outline: 2px dashed rgba(255, 255, 255, 0.4);
-      background: radial-gradient(circle at center, #181b33, #020307 75%);
+      align-items: stretch;
     }
 
     .app {
       width: 100%;
       max-width: 1200px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.1rem;
+      padding: 1.5rem 1.75rem 2rem;
     }
 
     header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
+      align-items: baseline;
+      margin-bottom: 1.25rem;
     }
 
-    .brand {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-    }
-
-    .brand-title {
-      font-size: 1.4rem;
-      letter-spacing: 0.1em;
+    .title-block h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
-    .brand-sub {
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-
-    .view-tabs {
-      margin-left: auto;
-      display: flex;
-      gap: 0.4rem;
-    }
-
-    .view-tab {
-      padding: 0.35rem 0.9rem;
-      font-size: 0.8rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(6, 6, 15, 0.9);
-      color: #f5f5f5;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.7;
-      transition:
-        background 0.15s,
-        opacity 0.15s,
-        border-color 0.15s,
-        box-shadow 0.15s;
-    }
-
-    .view-tab.active {
-      background: linear-gradient(135deg, #f72585, #7209b7);
-      border-color: transparent;
-      opacity: 1;
-      box-shadow: 0 0 16px rgba(247, 37, 133, 0.6);
-    }
-
-    .file-input-label {
-      position: relative;
-      overflow: hidden;
-      border-radius: 999px;
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(12px);
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s, border-color 0.2s;
-      white-space: nowrap;
-    }
-
-    .file-input-label:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.4);
-    }
-
-    .file-input-label:active {
-      transform: scale(0.97);
-    }
-
-    .file-input-label input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    button {
-      border-radius: 999px;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-      background: linear-gradient(135deg, #f72585, #7209b7);
-      color: white;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      box-shadow: 0 0 18px rgba(247, 37, 133, 0.4);
-      opacity: 0.85;
-      transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
-      white-space: nowrap;
-    }
-
-    button:hover {
-      opacity: 1;
-      box-shadow: 0 0 26px rgba(247, 37, 133, 0.7);
-    }
-
-    button:active {
-      transform: scale(0.97);
-    }
-
-    button:disabled {
-      opacity: 0.3;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    #clearLogo,
-    #clearTrack {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      box-shadow: none;
-      color: #f5f5f5;
-      font-weight: 500;
-      padding: 0.4rem 0.8rem;
-      opacity: 0.65;
-    }
-
-    #clearLogo:hover,
-    #clearTrack:hover {
-      opacity: 1;
-      border-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
-    }
-
-    #recordBtn {
-      background: linear-gradient(135deg, #ff0033, #b3001f);
-      box-shadow: 0 0 16px rgba(255, 0, 51, 0.5);
-    }
-
-    #recordBtn.recording {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      box-shadow: 0 0 16px rgba(34, 197, 94, 0.7);
-    }
-
-    .select-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .select-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.7;
-    }
-
-    .select-control {
-      font-size: 0.8rem;
-      padding: 0.45rem 0.8rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(4, 4, 10, 0.8);
-      color: #f5f5f5;
-      outline: none;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-    }
-
-    .select-control:focus {
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-
-    .video-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 0.5rem;
-      margin-top: 0.4rem;
-    }
-
-    .video-controls-right {
-      margin-left: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      align-items: center;
-    }
-
-    .logo-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .logo-controls.hidden {
-      display: none;
-    }
-
-    .visualizer-wrapper {
-      flex: 1;
-      border-radius: 1.5rem;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: radial-gradient(circle at center, #111322, #020307 70%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      height: 62vh;
-      margin-top: 0.5rem;
-    }
-
-    .visualizer-inner {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #visualizer {
-      display: block;
-    }
-
-    .watermark {
-      position: absolute;
-      bottom: 0.8rem;
-      right: 1.3rem;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      opacity: 0.45;
-    }
-
-    .audio-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.6rem;
-    }
-
-    .audio-controls-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .volume-wrapper {
-      display: flex;
-      align-items: center;
-      padding: 0 0.3rem;
-    }
-
-    .volume-slider {
-      width: 70px;
-      height: 4px;
-      cursor: pointer;
-      -webkit-appearance: none;
-      appearance: none;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 999px;
-      outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #4cc9f0;
-      box-shadow: 0 0 8px #4cc9f0;
-    }
-
-    .volume-slider::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #4cc9f0;
-      box-shadow: 0 0 8px #4cc9f0;
-      border: none;
-    }
-
-    .status-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      margin-top: 0.4rem;
-    }
-
-    .status {
-      font-size: 0.78rem;
-      opacity: 0.7;
-    }
-
-    .seek-container {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-top: 0.1rem;
-    }
-
-    .seek-time {
-      font-size: 0.72rem;
-      opacity: 0.7;
-      min-width: 3.3rem;
-      text-align: center;
-      direction: ltr;
-    }
-
-    .seek-bar {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.15);
-      outline: none;
-      cursor: pointer;
-    }
-
-    .seek-bar:disabled {
-      opacity: 0.35;
-      cursor: default;
-    }
-
-    .seek-bar::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #f72585;
-      box-shadow: 0 0 8px rgba(247, 37, 133, 0.7);
-      border: none;
-      margin-top: -4px;
-    }
-
-    .seek-bar::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #f72585;
-      box-shadow: 0 0 8px rgba(247, 37, 133, 0.7);
-      border: none;
-    }
-
-    .seek-bar::-moz-range-track {
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .fx-strength-row {
+    .title-block p {
+      font-size: 0.82rem;
       margin-top: 0.15rem;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      max-width: 220px;
-    }
-
-    .glitch-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
       opacity: 0.75;
     }
 
-    body.perform-mode header {
-      display: none;
+    .view-toggle {
+      display: flex;
+      gap: 0.5rem;
     }
 
-    body.perform-mode .app {
-      max-width: 100%;
-      padding: 0;
+    .pill-toggle {
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: radial-gradient(circle at top, #25223a, #11111a);
+      color: #f5f5f5;
+      cursor: pointer;
+      transition: all 0.18s ease-out;
+      box-shadow: 0 0 0 rgba(255,0,150,0.0);
+    }
+
+    .pill-toggle.active {
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 18px rgba(255, 61, 160, 0.55);
+      border-color: transparent;
+    }
+
+    .pill-toggle:focus-visible {
+      outline: 2px solid #4fc3ff;
+      outline-offset: 2px;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .left-controls,
+    .right-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    label.control-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      opacity: 0.75;
+    }
+
+    select,
+    button.chip-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(5, 5, 10, 0.85);
+      color: #f5f5f5;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.16s ease-out;
+    }
+
+    select {
+      padding-right: 1.8rem;
+      background-image: linear-gradient(45deg, transparent 50%, #f5f5f5 50%), linear-gradient(135deg, #f5f5f5 50%, transparent 50%);
+      background-position: calc(100% - 13px) calc(50% - 3px), calc(100% - 8px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      appearance: none;
+    }
+
+    select:focus-visible,
+    .chip-btn:focus-visible {
+      outline: 2px solid #4fc3ff;
+      outline-offset: 2px;
+    }
+
+    button.chip-btn {
+      border-radius: 999px;
+      padding: 0.4rem 1.1rem;
+      border: none;
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 15px rgba(255, 61, 160, 0.5);
+    }
+
+    button.chip-btn.secondary {
+      background: radial-gradient(circle at top, #262337, #14121e);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.23);
+    }
+
+    button.chip-btn.ghost {
+      background: transparent;
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: none;
+    }
+
+    button.chip-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-0.5px);
+    }
+
+    /* Main visual area */
+    .visual-wrapper {
+      margin-top: 0.5rem;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #141927, #050609 60%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(255,255,255,0.02);
+      padding: 0.9rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #dropZone {
+      position: relative;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    #visualCanvas {
+      display: block;
+      width: 100%;
+      height: 440px;
+    }
+
+    .drop-hint {
+      position: absolute;
+      left: 1.25rem;
+      top: 1rem;
+      font-size: 0.76rem;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .footer-tag {
+      position: absolute;
+      right: 1.25rem;
+      bottom: 0.9rem;
+      font-size: 0.7rem;
+      opacity: 0.7;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* Timeline row */
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+      font-size: 0.78rem;
+    }
+
+    .time-label {
+      width: 2.8rem;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    input[type="range"].timeline {
+      flex: 1;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      outline: none;
+    }
+
+    input[type="range"].timeline::-webkit-slider-thumb {
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #ff3da0;
+      box-shadow: 0 0 12px rgba(255,61,160,0.7);
+      cursor: pointer;
+      margin-top: -4px;
+    }
+
+    /* Audio controls */
+    .audio-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+    }
+
+    .audio-buttons {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .audio-buttons button {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(10,10,18,0.92);
+      color: #f5f5f5;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+
+    .audio-buttons button.primary {
+      border: none;
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 15px rgba(255,61,160,0.45);
+    }
+
+    .audio-buttons button.danger {
+      background: transparent;
+      border-color: rgba(255,130,130,0.7);
+      color: #ff9e9e;
+    }
+
+    .audio-buttons button:hover {
+      filter: brightness(1.08);
+      transform: translateY(-0.5px);
+    }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
       gap: 0.4rem;
     }
 
-    body.perform-mode .visualizer-wrapper {
-      height: 80vh;
-      border-radius: 0;
-      border: none;
+    .volume-wrap span {
+      font-size: 0.78rem;
+      opacity: 0.8;
     }
 
-    body.perform-mode .audio-controls,
-    body.perform-mode .status-row {
-      padding-inline: 1rem;
+    input[type="range"].volume {
+      width: 120px;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      outline: none;
     }
 
-    body.perform-mode .watermark {
-      opacity: 0.3;
-      font-size: 0.65rem;
+    input[type="range"].volume::-webkit-slider-thumb {
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #4fc3ff;
+      box-shadow: 0 0 12px rgba(79,195,255,0.7);
+      cursor: pointer;
+      margin-top: -4px;
+    }
+
+    .audio-note {
+      flex: 1;
+      text-align: right;
+      font-size: 0.76rem;
+      opacity: 0.7;
+    }
+
+    .now-playing {
+      margin-top: 0.45rem;
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .now-playing span {
+      opacity: 0.7;
+    }
+
+    @media (max-width: 800px) {
+      #visualCanvas {
+        height: 320px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .audio-note {
+        text-align: left;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <div class="brand">
-        <div class="brand-title">DJ VISUALIZER</div>
-        <div class="brand-sub">Audio reactive visuals · XP vibes soon</div>
-      </div>
+<div class="app">
+  <header>
+    <div class="title-block">
+      <h1>DJ VISUALIZER</h1>
+      <p>Audio reactive visuals · XP vibes soon</p>
+    </div>
+    <div class="view-toggle">
+      <button class="pill-toggle active" id="visualizerViewBtn">Visualizer</button>
+      <button class="pill-toggle" id="logoViewBtn">Logo</button>
+    </div>
+  </header>
 
-      <div class="view-tabs">
-        <button class="view-tab active" data-view="visualizer">Visualizer</button>
-        <button class="view-tab" data-view="logo">Logo</button>
-      </div>
-    </header>
-
-    <!-- TOP CONTROLS -->
-    <div class="video-controls">
-      <div class="select-wrapper">
-        <span class="select-label">Theme</span>
-        <select id="themeSelect" class="select-control">
+  <div class="controls-row">
+    <div class="left-controls">
+      <div>
+        <label class="control-label" for="themeSelect">Theme</label><br />
+        <select id="themeSelect">
           <option value="neon">Neon</option>
-          <option value="xp">XP Blue</option>
-          <option value="vapor">Vaporwave</option>
-          <option value="minimal">Minimal</option>
+          <option value="midnight">Midnight</option>
+          <option value="sunset">Sunset</option>
         </select>
       </div>
 
-      <div class="select-wrapper">
-        <span class="select-label">Visualizer</span>
-        <select id="visualizerSelect" class="select-control">
+      <div>
+        <label class="control-label" for="visualizerSelect">Visualizer</label><br />
+        <select id="visualizerSelect">
           <option value="bars">Bars</option>
           <option value="circle">Circle</option>
           <option value="wave">Waveform</option>
         </select>
       </div>
 
-      <!-- FX MODES -->
-      <div class="select-wrapper">
-        <span class="select-label">FX</span>
-        <select id="fxSelect" class="select-control">
-          <option value="clean">Clean</option>
+      <div>
+        <label class="control-label" for="fxSelect">FX</label><br />
+        <select id="fxSelect">
+          <option value="none">Clean</option>
           <option value="glitch">Glitch</option>
-          <option value="shake">Shake / Jitter</option>
-          <option value="distort">Distort</option>
-          <option value="glow">Glow / Rays</option>
-          <option value="combo">Combo</option>
         </select>
       </div>
 
-      <!-- Logo controls (only in Logo view) -->
-      <div class="logo-controls hidden" id="logoControls">
-        <label class="file-input-label">
-          Logo
-          <input id="logoFile" type="file" accept="image/*" />
-        </label>
-        <button id="clearLogo" title="Clear logo">Logo ✕</button>
-      </div>
-
-      <div class="video-controls-right">
-        <button id="downloadFrame" title="Download current frame as PNG">DL PNG</button>
-        <button id="recordBtn" title="Record visualizer to WebM" disabled>REC</button>
-        <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
-        <button id="performBtn" title="Toggle performance view">PERF</button>
-        <button id="savePreset" title="Save current preset">SAVE</button>
-        <button id="loadPreset" title="Load preset">LOAD</button>
-      </div>
-    </div>
-
-    <!-- VISUALIZER AREA -->
-    <section class="visualizer-wrapper">
-      <div class="visualizer-inner">
-        <canvas id="visualizer"></canvas>
-      </div>
-      <div class="watermark" id="watermarkText">Spectrum · Visualizer</div>
-    </section>
-
-    <!-- HIDDEN PICKER FOR CENTER CLICK (audio + image) -->
-    <input id="centerFile" type="file" accept="audio/*,image/*" style="display:none" />
-
-    <!-- TIMELINE + STATUS + FX STRENGTH -->
-    <div class="status-row">
-      <div class="seek-container">
-        <span class="seek-time" id="currentTime">0:00</span>
-        <input
-          type="range"
-          id="seekBar"
-          class="seek-bar"
-          min="0"
-          value="0"
-          step="0.01"
-          disabled
-        />
-        <span class="seek-time" id="durationTime">0:00</span>
-      </div>
-      <div class="status" id="statusText">
-        Load an audio file to start. You can also drag & drop an MP3/WAV here.  
-        Space = Play/Pause · P = Performance · R/REC = Record WebM
-      </div>
-      <div class="fx-strength-row">
-        <span class="glitch-label">FX Strength</span>
-        <select id="fxStrengthSelect" class="select-control">
+      <div>
+        <label class="control-label" for="fxStrengthSelect">FX Strength</label><br />
+        <select id="fxStrengthSelect">
           <option value="soft">Soft</option>
-          <option value="medium" selected>Medium</option>
+          <option value="medium">Medium</option>
           <option value="hardcore">Hardcore</option>
         </select>
       </div>
-    </div>
 
-    <!-- AUDIO CONTROLS -->
-    <div class="audio-controls">
-      <label class="file-input-label">
-        Load Track
-        <input id="audioFile" type="file" accept="audio/*" />
-      </label>
-
-      <button id="playPause" disabled>Play</button>
-
-      <div class="volume-wrapper">
-        <input
-          id="volumeSlider"
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value="1"
-          class="volume-slider"
-        />
-      </div>
-
-      <button id="clearTrack" title="Clear current track">Clear</button>
-
-      <div class="audio-controls-right">
-        <button id="downloadAudio" title="Download audio file" disabled>DL Audio</button>
+      <div>
+        <label class="control-label">Logo</label><br />
+        <button class="chip-btn secondary" id="logoUploadBtn">Logo</button>
+        <button class="chip-btn ghost" id="logoClearBtn">Logo X</button>
       </div>
     </div>
 
-    <div
-      id="nowPlaying"
-      style="
-        text-align: left;
-        font-size: 0.85rem;
-        letter-spacing: 0.04em;
-        opacity: 0.9;
-        margin-top: 0.25rem;
-        text-transform: uppercase;
-        display: none;
-      "
-    ></div>
-  </main>
+    <div class="right-controls">
+      <button class="chip-btn" id="downloadPngBtn">DL PNG</button>
+      <button class="chip-btn secondary" id="recordBtn">REC</button>
+      <button class="chip-btn secondary" id="savePresetBtn">SAVE</button>
+      <button class="chip-btn secondary" id="loadPresetBtn">LOAD</button>
+    </div>
+  </div>
 
-  <script>
-    const fileInput = document.getElementById("audioFile");
-    const centerFileInput = document.getElementById("centerFile");
-    const logoFileInput = document.getElementById("logoFile");
-    const clearLogoBtn = document.getElementById("clearLogo");
-    const playPauseBtn = document.getElementById("playPause");
-    const statusText = document.getElementById("statusText");
-    const canvas = document.getElementById("visualizer");
-    const ctx = canvas.getContext("2d");
-    const visualizerWrapper = document.querySelector(".visualizer-wrapper");
+  <div class="visual-wrapper">
+    <div id="dropZone">
+      <canvas id="visualCanvas"></canvas>
+      <div class="drop-hint">
+        Drag & drop audio (MP3/WAV) or logo (PNG/JPG) here · Space = Play/Pause
+      </div>
+      <div class="footer-tag" id="footerTag">
+        SPECTRUM · NEON · BARS · CLEAN
+      </div>
+    </div>
+  </div>
 
-    const seekBar = document.getElementById("seekBar");
-    const currentTimeLabel = document.getElementById("currentTime");
-    const durationTimeLabel = document.getElementById("durationTime");
-    const volumeSlider = document.getElementById("volumeSlider");
-    const clearTrackBtn = document.getElementById("clearTrack");
-    const fullscreenBtn = document.getElementById("fullscreenBtn");
-    const performBtn = document.getElementById("performBtn");
-    const themeSelect = document.getElementById("themeSelect");
-    const visualizerSelect = document.getElementById("visualizerSelect");
-    const fxSelect = document.getElementById("fxSelect");
-    const fxStrengthSelect = document.getElementById("fxStrengthSelect");
-    const watermarkText = document.getElementById("watermarkText");
-    const downloadAudioBtn = document.getElementById("downloadAudio");
-    const downloadFrameBtn = document.getElementById("downloadFrame");
-    const recordBtn = document.getElementById("recordBtn");
-    const nowPlayingText = document.getElementById("nowPlaying");
-    const savePresetBtn = document.getElementById("savePreset");
-    const loadPresetBtn = document.getElementById("loadPreset");
-    const viewTabs = document.querySelectorAll(".view-tab");
-    const logoControls = document.getElementById("logoControls");
+  <div class="timeline-row">
+    <div class="time-label" id="currentTimeLabel">0:00</div>
+    <input type="range" min="0" max="100" value="0" class="timeline" id="timelineRange" />
+    <div class="time-label" id="durationLabel">0:00</div>
+  </div>
 
-    let audioContext;
-    let audioSource;
-    let analyser;
-    let dataArray;
-    let waveArray;
-    let audioElement = null;
-    let isPlaying = false;
-    let animationId;
-    let isSeeking = false;
+  <div class="audio-row">
+    <div class="audio-buttons">
+      <button id="loadTrackBtn">Load Track</button>
+      <button class="primary" id="playPauseBtn">Play</button>
+      <button id="clearAudioBtn" class="danger">Clear</button>
+      <div class="volume-wrap">
+        <span>Vol</span>
+        <input type="range" min="0" max="1" step="0.01" value="0.9" class="volume" id="volumeRange" />
+      </div>
+      <button id="downloadAudioBtn">DL Audio</button>
+    </div>
+    <div class="audio-note">
+      Load an audio file to start. You can drag & drop MP3/WAV here. P = Performance mode.
+    </div>
+  </div>
 
-    let currentFile = null;
-    let currentFileUrl = null;
+  <div class="now-playing" id="nowPlaying">
+    <span>Now Playing:</span> — none —
+  </div>
 
-    let logoImage = null;
-    let logoUrl = null;
+  <!-- Hidden inputs -->
+  <input type="file" id="audioInput" accept="audio/*" style="display:none" />
+  <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg" style="display:none" />
+  <audio id="audioElement" crossorigin="anonymous"></audio>
+</div>
 
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let isRecording = false;
-    let audioDestForRecording = null;
+<script>
+  // ==========
+  // Audio setup
+  // ==========
+  const audioEl = document.getElementById("audioElement");
+  const loadTrackBtn = document.getElementById("loadTrackBtn");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const audioInput = document.getElementById("audioInput");
+  const volumeRange = document.getElementById("volumeRange");
+  const clearAudioBtn = document.getElementById("clearAudioBtn");
+  const downloadAudioBtn = document.getElementById("downloadAudioBtn");
+  const nowPlayingEl = document.getElementById("nowPlaying");
 
-    // View state
-    let visualEnabled = true;
-    let logoEnabled = false;
+  const timelineRange = document.getElementById("timelineRange");
+  const currentTimeLabel = document.getElementById("currentTimeLabel");
+  const durationLabel = document.getElementById("durationLabel");
 
-    // FX mode and strength
-    let currentFxMode = "clean";
-    let fxStrength = "medium";
+  let audioCtx;
+  let analyser;
+  let dataArray;
+  let sourceNode;
+  let gainNode;
+  let isPlaying = false;
+  let audioLoaded = false;
+  let lastAudioFile = null;
+  let lastAudioFileName = "";
 
-    // Strength map (already tamed – even Hardcore is pretty gentle)
-    const strengthMap = {
-      soft: 0.02,
-      medium: 0.04,
-      hardcore: 0.06,
-    };
-    let glitchAmount = strengthMap[fxStrength];
+  function initAudioContext() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      dataArray = new Uint8Array(bufferLength);
 
-    const themes = {
-      neon: {
-        bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
-        visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
-        barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        label: "Neon",
-      },
-      xp: {
-        bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
-        visBg: "radial-gradient(circle at center, #0b2c6a, #020716 75%)",
-        barColors: ["#8fd3ff", "#ffffff", "#4a90e2"],
-        label: "XP",
-      },
-      vapor: {
-        bodyBg:
-          "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a1c4fd 100%)",
-        visBg:
-          "radial-gradient(circle at center, rgba(10,10,25,0.95), rgba(4,4,12,0.98))",
-        barColors: ["#ff9a9e", "#fecdff", "#a1c4fd"],
-        label: "Vaporwave",
-      },
-      minimal: {
-        bodyBg: "linear-gradient(135deg, #111111, #222222)",
-        visBg: "radial-gradient(circle at center, #050505, #101010 80%)",
-        barColors: ["#ffffff", "#cccccc", "#999999"],
-        label: "Minimal",
-      },
-    };
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = parseFloat(volumeRange.value);
 
-    let currentThemeKey = "neon";
-    let currentVisualizer = "bars";
-
-    function applyTheme(themeKey) {
-      const theme = themes[themeKey] || themes.neon;
-      currentThemeKey = themeKey;
-      document.body.style.background = theme.bodyBg;
-      visualizerWrapper.style.background = theme.visBg;
-      updateWatermark();
+      sourceNode = audioCtx.createMediaElementSource(audioEl);
+      sourceNode.connect(gainNode);
+      gainNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
     }
+  }
 
-    function getViewLabel() {
-      if (visualEnabled && logoEnabled) return "Visual + Logo";
-      if (visualEnabled) return "Visualizer";
-      if (logoEnabled) return "Logo";
-      return "Idle";
-    }
+  function formatTime(sec) {
+    if (!isFinite(sec)) return "0:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return m + ":" + (s < 10 ? "0" + s : s);
+  }
 
-    function updateWatermark() {
-      const theme = themes[currentThemeKey] || themes.neon;
-      const viewLabel = getViewLabel();
-      const fxLabel =
-        currentFxMode && currentFxMode !== "clean"
-          ? " · FX " + currentFxMode.toUpperCase()
-          : "";
-      const strengthLabel =
-        currentFxMode !== "clean" ? " · " + fxStrength.toUpperCase() : "";
-      const recLabel = isRecording ? " · REC" : "";
-      watermarkText.textContent =
-        `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${fxLabel}${strengthLabel}${recLabel}`;
-    }
+  function updateNowPlaying(name) {
+    nowPlayingEl.innerHTML = '<span>Now Playing:</span> ' + (name || "— none —");
+  }
 
-    themeSelect.addEventListener("change", (e) => {
-      applyTheme(e.target.value);
-    });
+  function loadAudioFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    audioEl.src = url;
+    audioEl.load();
+    audioLoaded = true;
+    lastAudioFile = file;
+    lastAudioFileName = file.name || "track";
+    updateNowPlaying(lastAudioFileName);
+    playPauseBtn.textContent = "Play";
+  }
 
-    visualizerSelect.addEventListener("change", (e) => {
-      currentVisualizer = e.target.value;
-      updateWatermark();
-    });
+  loadTrackBtn.addEventListener("click", () => {
+    audioInput.click();
+  });
 
-    fxSelect.addEventListener("change", (e) => {
-      currentFxMode = e.target.value;
-      updateWatermark();
-    });
-
-    fxStrengthSelect.addEventListener("change", (e) => {
-      fxStrength = e.target.value;
-      glitchAmount = strengthMap[fxStrength] || 0.04;
-      updateWatermark();
-    });
-
-    function updateViewTabsUI() {
-      viewTabs.forEach((btn) => {
-        const view = btn.dataset.view;
-        if (view === "visualizer") {
-          btn.classList.toggle("active", visualEnabled);
-        } else if (view === "logo") {
-          btn.classList.toggle("active", logoEnabled);
-        }
-      });
-      if (logoEnabled) {
-        logoControls.classList.remove("hidden");
-      } else {
-        logoControls.classList.add("hidden");
-      }
-      updateWatermark();
-    }
-
-    viewTabs.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const view = btn.dataset.view;
-        if (view === "visualizer") {
-          visualEnabled = !visualEnabled;
-        } else if (view === "logo") {
-          logoEnabled = !logoEnabled;
-        }
-
-        if (!visualEnabled && !logoEnabled) {
-          if (view === "visualizer") visualEnabled = true;
-          else logoEnabled = true;
-        }
-
-        updateViewTabsUI();
-      });
-    });
-
-    function resizeCanvas() {
-      const rect = visualizerWrapper.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-
-      canvas.style.width = rect.width + "px";
-      canvas.style.height = rect.height + "px";
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-
-    function initAudioContext() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        const bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        waveArray = new Uint8Array(bufferLength);
-      }
-    }
-
-    function formatTime(sec) {
-      if (!isFinite(sec)) return "0:00";
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60).toString().padStart(2, "0");
-      return `${m}:${s}`;
-    }
-
-    function resetUIToEmpty() {
-      playPauseBtn.disabled = true;
-      playPauseBtn.textContent = "Play";
-      seekBar.disabled = true;
-      seekBar.value = 0;
-      currentTimeLabel.textContent = "0:00";
-      durationTimeLabel.textContent = "0:00";
-      downloadAudioBtn.disabled = true;
-      recordBtn.disabled = true;
-      recordBtn.classList.remove("recording");
-      recordBtn.textContent = "REC";
-      nowPlayingText.style.display = "none";
-      nowPlayingText.textContent = "";
-      statusText.textContent =
-        "Load an audio file to start. You can also drag & drop an MP3/WAV here. Space = Play/Pause · P = Performance · R/REC = Record WebM";
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (isRecording && mediaRecorder) {
-        mediaRecorder.stop();
-      }
-      isRecording = false;
-      mediaRecorder = null;
-      recordedChunks = [];
-      updateWatermark();
-    }
-
-    function loadAudioFile(file) {
-      if (!file) return;
-      if (!file.type.startsWith("audio/")) {
-        statusText.textContent =
-          "This file is not an audio file. Please use an MP3 or WAV track.";
-        return;
-      }
-
-      if (audioElement) audioElement.pause();
-      if (audioSource) {
-        try {
-          audioSource.disconnect();
-        } catch (e) {}
-      }
-
-      if (currentFileUrl) {
-        URL.revokeObjectURL(currentFileUrl);
-      }
-      currentFile = file;
-      currentFileUrl = URL.createObjectURL(file);
-
-      initAudioContext();
-
-      audioElement = new Audio(currentFileUrl);
-      audioElement.crossOrigin = "anonymous";
-      audioElement.loop = true;
-      audioElement.volume = Number(volumeSlider.value || 1);
-
-      audioSource = audioContext.createMediaElementSource(audioElement);
-      audioSource.connect(analyser);
-      analyser.connect(audioContext.destination);
-
-      seekBar.disabled = true;
-      seekBar.value = 0;
-      currentTimeLabel.textContent = "0:00";
-      durationTimeLabel.textContent = "0:00";
-
-      audioElement.addEventListener("loadedmetadata", () => {
-        seekBar.max = audioElement.duration || 0;
-        seekBar.disabled = false;
-        durationTimeLabel.textContent = formatTime(audioElement.duration);
-      });
-
-      audioElement.addEventListener("timeupdate", () => {
-        if (!isSeeking) {
-          seekBar.value = audioElement.currentTime || 0;
-          currentTimeLabel.textContent = formatTime(audioElement.currentTime);
-        }
-      });
-
-      playPauseBtn.disabled = false;
-      playPauseBtn.textContent = "Play";
-      downloadAudioBtn.disabled = false;
-      recordBtn.disabled = false;
-      isPlaying = false;
-      statusText.textContent = `Loaded: ${file.name}`;
-
-      nowPlayingText.textContent = "Now Playing: " + file.name;
-      nowPlayingText.style.display = "block";
-    }
-
-    function loadLogoFileFromFile(file) {
-      if (!file) return;
-      if (!file.type.startsWith("image/")) {
-        statusText.textContent = "This file is not an image. Please use PNG/JPG.";
-        return;
-      }
-      if (logoUrl) URL.revokeObjectURL(logoUrl);
-      logoUrl = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        logoImage = img;
-        statusText.textContent = `Logo loaded: ${file.name}`;
-      };
-      img.src = logoUrl;
-    }
-
-    fileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
+  audioInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
       loadAudioFile(file);
-      event.target.value = "";
-    });
-
-    logoFileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      loadLogoFileFromFile(file);
-      event.target.value = "";
-    });
-
-    // center click picker: audio OR image
-    centerFileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (file.type.startsWith("audio/")) {
-        loadAudioFile(file);
-      } else if (file.type.startsWith("image/")) {
-        loadLogoFileFromFile(file);
-      } else {
-        statusText.textContent =
-          "Unsupported file type. Use MP3/WAV for audio or PNG/JPG for logo.";
-      }
-      centerFileInput.value = "";
-    });
-
-    clearLogoBtn.addEventListener("click", () => {
-      logoImage = null;
-      if (logoUrl) {
-        URL.revokeObjectURL(logoUrl);
-        logoUrl = null;
-      }
-      statusText.textContent = "Logo cleared.";
-    });
-
-    async function togglePlayPause() {
-      if (!audioElement) return;
-
-      if (!isPlaying) {
-        if (audioContext && audioContext.state === "suspended") {
-          await audioContext.resume();
-        }
-        await audioElement.play();
-        isPlaying = true;
-        playPauseBtn.textContent = "Pause";
-        statusText.textContent = "Playing · Visualizer active";
-      } else {
-        audioElement.pause();
-        isPlaying = false;
-        playPauseBtn.textContent = "Play";
-        statusText.textContent = "Paused";
-      }
     }
+  });
 
-    playPauseBtn.addEventListener("click", async () => {
-      await togglePlayPause();
-    });
+  playPauseBtn.addEventListener("click", () => {
+    togglePlayPause();
+  });
 
-    volumeSlider.addEventListener("input", () => {
-      if (audioElement) {
-        audioElement.volume = Number(volumeSlider.value);
-      }
-    });
-
-    clearTrackBtn.addEventListener("click", () => {
-      if (audioElement) audioElement.pause();
-      if (audioSource) {
-        try {
-          audioSource.disconnect();
-        } catch (e) {}
-      }
-      if (currentFileUrl) {
-        URL.revokeObjectURL(currentFileUrl);
-        currentFileUrl = null;
-      }
-      currentFile = null;
-      audioElement = null;
+  function togglePlayPause() {
+    if (!audioLoaded) return;
+    initAudioContext();
+    if (!isPlaying) {
+      audioEl.play();
+      isPlaying = true;
+      playPauseBtn.textContent = "Pause";
+    } else {
+      audioEl.pause();
       isPlaying = false;
-      resetUIToEmpty();
-    });
+      playPauseBtn.textContent = "Play";
+    }
+  }
 
-    downloadAudioBtn.addEventListener("click", () => {
-      if (!currentFile || !currentFileUrl) return;
-      const a = document.createElement("a");
-      a.href = currentFileUrl;
-      a.download = currentFile.name || "track.wav";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
+  clearAudioBtn.addEventListener("click", () => {
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    isPlaying = false;
+    playPauseBtn.textContent = "Play";
+    audioLoaded = false;
+    lastAudioFile = null;
+    lastAudioFileName = "";
+    updateNowPlaying("— none —");
+  });
 
-    downloadFrameBtn.addEventListener("click", () => {
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        const ts = new Date().toISOString().replace(/[:.]/g, "-");
-        a.href = url;
-        a.download = `visualizer-${ts}.png`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      }, "image/png");
-    });
+  volumeRange.addEventListener("input", () => {
+    if (gainNode) {
+      gainNode.gain.value = parseFloat(volumeRange.value);
+    }
+  });
 
-    function startRecording() {
-      if (!canvas.captureStream) {
-        statusText.textContent = "Recording not supported in this browser.";
-        return;
-      }
+  downloadAudioBtn.addEventListener("click", () => {
+    if (!lastAudioFile) {
+      alert("No local audio file loaded.");
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(lastAudioFile);
+    a.download = lastAudioFileName || "audio";
+    a.click();
+  });
 
-      const fps = 60;
-      const canvasStream = canvas.captureStream(fps);
-      let combinedStream = canvasStream;
+  audioEl.addEventListener("timeupdate", () => {
+    if (!audioEl.duration || isNaN(audioEl.duration)) return;
+    const progress = (audioEl.currentTime / audioEl.duration) * 100;
+    timelineRange.value = progress;
+    currentTimeLabel.textContent = formatTime(audioEl.currentTime);
+    durationLabel.textContent = formatTime(audioEl.duration);
+  });
 
-      if (audioContext && analyser) {
-        audioDestForRecording = audioContext.createMediaStreamDestination();
-        analyser.connect(audioDestForRecording);
-        combinedStream = new MediaStream([
-          ...canvasStream.getVideoTracks(),
-          ...audioDestForRecording.stream.getAudioTracks(),
-        ]);
-      }
+  timelineRange.addEventListener("input", () => {
+    if (!audioEl.duration || isNaN(audioEl.duration)) return;
+    const pct = parseFloat(timelineRange.value) / 100;
+    audioEl.currentTime = audioEl.duration * pct;
+  });
 
-      recordedChunks = [];
-      try {
-        mediaRecorder = new MediaRecorder(combinedStream, {
-          mimeType: "video/webm;codecs=vp9,opus",
-        });
-      } catch (e) {
-        try {
-          mediaRecorder = new MediaRecorder(combinedStream, {
-            mimeType: "video/webm",
-          });
-        } catch (err) {
-          statusText.textContent =
-            "Recording is not supported in this browser.";
-          return;
-        }
-      }
+  // Spacebar = play / pause
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !e.target.matches("input, textarea, select")) {
+      e.preventDefault();
+      if (audioLoaded) togglePlayPause();
+    }
+  });
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          recordedChunks.push(event.data);
-        }
-      };
+  // ==========
+  // Visualizer
+  // ==========
+  const canvas = document.getElementById("visualCanvas");
+  const ctx = canvas.getContext("2d");
+  const dropZone = document.getElementById("dropZone");
+  const footerTag = document.getElementById("footerTag");
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: "video/webm" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        const ts = new Date().toISOString().replace(/[:.]/g, "-");
-        a.href = url;
-        a.download = `visualizer-recording-${ts}.webm`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        recordedChunks = [];
-        mediaRecorder = null;
-        isRecording = false;
-        recordBtn.classList.remove("recording");
-        recordBtn.textContent = "REC";
-        statusText.textContent = "Recording finished. File downloaded.";
-        updateWatermark();
-      };
+  const themeSelect = document.getElementById("themeSelect");
+  const visualizerSelect = document.getElementById("visualizerSelect");
+  const fxSelect = document.getElementById("fxSelect");
+  const fxStrengthSelect = document.getElementById("fxStrengthSelect");
 
-      mediaRecorder.start();
-      isRecording = true;
-      recordBtn.classList.add("recording");
-      recordBtn.textContent = "STOP";
-      statusText.textContent = "Recording in progress...";
-      updateWatermark();
+  const visualizerViewBtn = document.getElementById("visualizerViewBtn");
+  const logoViewBtn = document.getElementById("logoViewBtn");
+
+  let theme = themeSelect.value;
+  let visualizerType = visualizerSelect.value;
+  let fxMode = "none"; // "none" | "glitch"
+  let fxStrength = "soft"; // "soft" | "medium" | "hardcore"
+  let visualizerEnabled = true;
+  let logoEnabled = false;
+  let lastEnergy = 0;
+
+  function resizeCanvas() {
+    const rect = dropZone.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = 440 * dpr; // fixed height
+    canvas.style.height = "440px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  function drawBackground() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const g = ctx.createRadialGradient(
+      w / 2,
+      h * 0.1,
+      0,
+      w / 2,
+      h / 2,
+      Math.max(w, h)
+    );
+
+    if (theme === "neon") {
+      g.addColorStop(0, "#1b2145");
+      g.addColorStop(0.5, "#060712");
+      g.addColorStop(1, "#020308");
+    } else if (theme === "midnight") {
+      g.addColorStop(0, "#101826");
+      g.addColorStop(0.5, "#05060b");
+      g.addColorStop(1, "#000000");
+    } else {
+      // sunset
+      g.addColorStop(0, "#ff7a88");
+      g.addColorStop(0.45, "#251432");
+      g.addColorStop(1, "#050408");
     }
 
-    function stopRecording() {
-      if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-      }
-      if (audioDestForRecording && analyser) {
-        try {
-          analyser.disconnect(audioDestForRecording);
-        } catch (e) {}
-      }
-      audioDestForRecording = null;
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // subtle overlay lines
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = "#ffffff";
+    const stripeH = 2;
+    for (let y = 0; y < canvas.height; y += 20) {
+      ctx.fillRect(0, y, canvas.width, stripeH);
     }
+    ctx.globalAlpha = 1;
+  }
 
-    recordBtn.addEventListener("click", () => {
-      if (recordBtn.disabled) return;
-      if (isRecording) {
-        stopRecording();
-      } else {
-        startRecording();
-      }
-    });
+  function computeEnergy() {
+    if (!analyser || !dataArray) return 0;
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+    const avg = sum / dataArray.length / 255;
+    lastEnergy = avg;
+    return avg;
+  }
 
-    function savePresetToStorage() {
-      const preset = {
-        theme: currentThemeKey,
-        visualizer: currentVisualizer,
-        volume: volumeSlider.value,
-        visualEnabled,
-        logoEnabled,
-        fx: currentFxMode,
-        fxStrength,
-      };
-      try {
-        localStorage.setItem("djvizPreset", JSON.stringify(preset));
-        statusText.textContent = "Preset saved.";
-      } catch (e) {
-        statusText.textContent = "Could not save preset (storage blocked).";
-      }
-    }
+  function drawBars() {
+    if (!analyser || !dataArray) return;
 
-    function loadPresetFromStorage(showMessage = true) {
-      try {
-        const raw = localStorage.getItem("djvizPreset");
-        if (!raw) {
-          if (showMessage) statusText.textContent = "No preset saved yet.";
-          return;
-        }
-        const preset = JSON.parse(raw);
-        if (preset.theme && themes[preset.theme]) {
-          themeSelect.value = preset.theme;
-          applyTheme(preset.theme);
-        }
-        if (preset.visualizer) {
-          currentVisualizer = preset.visualizer;
-          visualizerSelect.value = preset.visualizer;
-        }
-        if (preset.volume != null) {
-          volumeSlider.value = preset.volume;
-          if (audioElement) {
-            audioElement.volume = Number(preset.volume);
-          }
-        }
-        if (typeof preset.visualEnabled === "boolean") {
-          visualEnabled = preset.visualEnabled;
-        }
-        if (typeof preset.logoEnabled === "boolean") {
-          logoEnabled = preset.logoEnabled;
-        }
-        if (preset.fx) {
-          currentFxMode = preset.fx;
-          fxSelect.value = preset.fx;
-        }
-        if (preset.fxStrength && strengthMap[preset.fxStrength]) {
-          fxStrength = preset.fxStrength;
-          fxStrengthSelect.value = fxStrength;
-          glitchAmount = strengthMap[fxStrength];
-        }
-        if (!visualEnabled && !logoEnabled) visualEnabled = true;
+    const energy = computeEnergy();
+    const w = canvas.width;
+    const h = canvas.height;
+    const barCount = 120;
+    const barWidth = w / barCount;
 
-        updateViewTabsUI();
-        if (showMessage) statusText.textContent = "Preset loaded.";
-      } catch (e) {
-        if (showMessage) statusText.textContent = "Error loading preset.";
-      }
-    }
+    for (let i = 0; i < barCount; i++) {
+      const idx = Math.floor((i / barCount) * dataArray.length);
+      const v = dataArray[idx] / 255;
+      const barH = v * h * 0.48;
+      const x = i * barWidth;
+      const y = h / 2;
 
-    savePresetBtn.addEventListener("click", () => {
-      savePresetToStorage();
-    });
-
-    loadPresetBtn.addEventListener("click", () => {
-      loadPresetFromStorage(true);
-    });
-
-    fullscreenBtn.addEventListener("click", () => {
-      if (!document.fullscreenElement) {
-        if (visualizerWrapper.requestFullscreen) {
-          visualizerWrapper.requestFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    });
-
-    document.addEventListener("fullscreenchange", () => {
-      const isFullscreen = !!document.fullscreenElement;
-      fullscreenBtn.textContent = isFullscreen ? "⤢" : "⛶";
-      resizeCanvas();
-    });
-
-    document.addEventListener("keydown", async (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        await togglePlayPause();
-        return;
-      }
-
-      if (e.key === "p" || e.key === "P") {
-        document.body.classList.toggle("perform-mode");
-        resizeCanvas();
-      }
-
-      if ((e.key === "r" || e.key === "R") && !recordBtn.disabled) {
-        e.preventDefault();
-        if (isRecording) {
-          stopRecording();
-        } else {
-          startRecording();
-        }
-      }
-    });
-
-    seekBar.addEventListener("input", () => {
-      if (!audioElement) return;
-      isSeeking = true;
-      currentTimeLabel.textContent = formatTime(seekBar.value);
-    });
-
-    seekBar.addEventListener("change", () => {
-      if (!audioElement) return;
-      audioElement.currentTime = Number(seekBar.value) || 0;
-      isSeeking = false;
-    });
-
-    function computeLevelFromFreq(arr) {
-      if (!arr || !arr.length) return 0;
-      let sum = 0;
-      for (let i = 0; i < arr.length; i++) sum += arr[i];
-      return sum / arr.length;
-    }
-
-    function computeLevelFromWave(arr) {
-      if (!arr || !arr.length) return 0;
-      let sum = 0;
-      for (let i = 0; i < arr.length; i++) {
-        const diff = Math.abs(arr[i] - 128);
-        sum += diff;
-      }
-      return (sum / arr.length) * 2;
-    }
-
-    function startVisualizer() {
-      if (animationId) return;
-
-      function draw() {
-        animationId = requestAnimationFrame(draw);
-
-        const width = canvas.width / (window.devicePixelRatio || 1);
-        const height = canvas.height / (window.devicePixelRatio || 1);
-
-        ctx.fillStyle = "rgba(3, 4, 9, 0.5)";
-        ctx.fillRect(0, 0, width, height);
-
-        const theme = themes[currentThemeKey] || themes.neon;
-        const [c1, c2, c3] = theme.barColors;
-
-        let logoLevel = 0;
-
-        if (analyser && (visualEnabled || logoEnabled)) {
-          if (currentVisualizer === "wave" && visualEnabled) {
-            analyser.getByteTimeDomainData(waveArray);
-            logoLevel = computeLevelFromWave(waveArray);
-          } else {
-            analyser.getByteFrequencyData(dataArray);
-            logoLevel = computeLevelFromFreq(dataArray);
-          }
-        }
-
-        const rawEnergy = Math.max(0, Math.min(1, logoLevel / 190));
-
-        if (visualEnabled) {
-          if (currentVisualizer === "wave") {
-            if (analyser && waveArray) {
-              analyser.getByteTimeDomainData(waveArray);
-            }
-            drawWaveform(width, height, c1, c2, c3);
-          } else if (currentVisualizer === "circle") {
-            if (analyser && dataArray) {
-              analyser.getByteFrequencyData(dataArray);
-            }
-            drawCircle(width, height, c1, c2, c3);
-          } else {
-            if (analyser && dataArray) {
-              analyser.getByteFrequencyData(dataArray);
-            }
-            drawBars(width, height, c1, c2, c3);
-          }
-        }
-
-        if (logoEnabled && logoImage) {
-          drawLogoCenter(width, height, rawEnergy);
-        }
-      }
-
-      draw();
-    }
-
-    function drawBars(width, height, c1, c2, c3) {
-      if (!analyser || !dataArray) return;
-      analyser.getByteFrequencyData(dataArray);
-
-      const barCount = 96;
-      const step = Math.floor(dataArray.length / barCount);
-      const barWidth = (width / barCount) * 0.9;
-      const gap = (width / barCount) * 0.1;
-      const midY = height / 2;
-
-      const grad = ctx.createLinearGradient(0, 0, width, 0);
-      grad.addColorStop(0, c1);
-      grad.addColorStop(0.5, c2);
-      grad.addColorStop(1, c3);
-
-      for (let i = 0; i < barCount; i++) {
-        const amplitude = dataArray[i * step] / 255;
-        const barHeight = amplitude * (height * 0.9) * 0.5;
-        const x = i * (barWidth + gap);
-        const yTop = midY - barHeight;
-
-        ctx.fillStyle = grad;
-        drawRoundRect(x, yTop, barWidth, barHeight, 5);
-        ctx.fill();
-        drawRoundRect(x, midY, barWidth, barHeight, 5);
-        ctx.fill();
-      }
-
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, midY);
-      ctx.lineTo(width, midY);
-      ctx.stroke();
-    }
-
-    function drawCircle(width, height, c1, c2, c3) {
-      if (!analyser || !dataArray) return;
-      analyser.getByteFrequencyData(dataArray);
-
-      const radius = Math.min(width, height) * 0.3;
-      const centerX = width / 2;
-      const centerY = height / 2;
-
-      const grad = ctx.createLinearGradient(
-        centerX - radius,
-        centerY,
-        centerX + radius,
-        centerY
-      );
-      grad.addColorStop(0, c1);
-      grad.addColorStop(0.5, c2);
-      grad.addColorStop(1, c3);
-
-      const barCount = 96;
-      const step = Math.floor(dataArray.length / barCount);
-      const maxBarLength = Math.min(width, height) * 0.4;
+      const grad = ctx.createLinearGradient(x, y - barH, x, y + barH);
+      grad.addColorStop(0, "#4fc3ff");
+      grad.addColorStop(0.5, "#b326ff");
+      grad.addColorStop(1, "#ff3da0");
 
       ctx.save();
-      ctx.translate(centerX, centerY);
-
-      for (let i = 0; i < barCount; i++) {
-        const amplitude = dataArray[i * step] / 255;
-        const barLength = amplitude * maxBarLength;
-
-        const angle = (i / barCount) * Math.PI * 2;
-        ctx.save();
-        ctx.rotate(angle);
-
-        ctx.beginPath();
-        ctx.moveTo(0, radius);
-        ctx.lineTo(0, radius + barLength);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = Math.max(2, (Math.PI * radius) / barCount / 1.3);
-        ctx.lineCap = "round";
-        ctx.stroke();
-
-        ctx.restore();
-      }
-
-      ctx.restore();
-
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius * 0.92, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
+      ctx.roundRect(x + 1, y - barH, barWidth - 2, barH * 2, 999);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
     }
 
-    function drawWaveform(width, height, c1, c2, c3) {
-      if (!analyser || !waveArray) return;
-      analyser.getByteTimeDomainData(waveArray);
+    // center line
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = "#f5f5f5";
+    ctx.fillRect(0, h / 2, w, 1);
+    ctx.globalAlpha = 1;
+  }
 
-      const grad = ctx.createLinearGradient(0, 0, width, 0);
-      grad.addColorStop(0, c1);
-      grad.addColorStop(0.5, c2);
-      grad.addColorStop(1, c3);
+  function drawCircle() {
+    if (!analyser || !dataArray) return;
+    const energy = computeEnergy();
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const baseRadius = Math.min(w, h) * 0.18;
+    const innerRadius = baseRadius * (1 - 0.12 * (energy + 0.2));
 
+    // outer glow
+    const glow = ctx.createRadialGradient(
+      cx,
+      cy,
+      innerRadius * 0.6,
+      cx,
+      cy,
+      baseRadius * 1.6
+    );
+    glow.addColorStop(0, "rgba(79,195,255,0.45)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, baseRadius * 1.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // base circle
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // spectrum ticks
+    const tickCount = 160;
+    for (let i = 0; i < tickCount; i++) {
+      const idx = Math.floor((i / tickCount) * dataArray.length);
+      const v = dataArray[idx] / 255;
+      const amp = v * 40 * (0.8 + energy);
+      const a = (i / tickCount) * Math.PI * 2;
+
+      const x1 = cx + Math.cos(a) * innerRadius;
+      const y1 = cy + Math.sin(a) * innerRadius;
+      const x2 = cx + Math.cos(a) * (innerRadius + amp);
+      const y2 = cy + Math.sin(a) * (innerRadius + amp);
+
+      ctx.strokeStyle = `rgba(79,195,255,${0.3 + v * 0.7})`;
       ctx.lineWidth = 2;
-      ctx.strokeStyle = grad;
       ctx.beginPath();
-
-      const sliceWidth = width / waveArray.length;
-      let x = 0;
-      const midY = height / 2;
-
-      for (let i = 0; i < waveArray.length; i++) {
-        const v = waveArray[i] / 255;
-        const y = midY + (v - 0.5) * height * 0.6;
-
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-
-        x += sliceWidth;
-      }
-
-      ctx.stroke();
-
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, midY);
-      ctx.lineTo(width, midY);
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
       ctx.stroke();
     }
+  }
 
-    function drawRoundRect(x, y, width, height, radius) {
-      const r = Math.min(radius, width / 2, height / 2);
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + width - r, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-      ctx.lineTo(x + width, y + height - r);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-      ctx.lineTo(x + r, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
+  function drawWaveform() {
+    if (!analyser || !dataArray) return;
+    const w = canvas.width;
+    const h = canvas.height;
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.lineWidth = 3;
+    const grad = ctx.createLinearGradient(0, 0, w, 0);
+    grad.addColorStop(0, "#4fc3ff");
+    grad.addColorStop(0.5, "#b326ff");
+    grad.addColorStop(1, "#ff3da0");
+    ctx.strokeStyle = grad;
+
+    ctx.beginPath();
+    const slice = w / dataArray.length;
+    for (let i = 0; i < dataArray.length; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * h) / 2;
+      const x = i * slice;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     }
+    ctx.stroke();
+  }
 
-    // GLITCH / FX HELPERS
-    function applyGlitchSlices(lx, ly, logoW, logoH, energy) {
-      const baseBands = 1 + Math.round(glitchAmount * 20);
-      const extraBands = Math.round(energy * 2);
-      const bandCount = baseBands + extraBands;
+  // ==========
+  // Logo + Glitch
+  // ==========
+  const logoInput = document.getElementById("logoInput");
+  const logoUploadBtn = document.getElementById("logoUploadBtn");
+  const logoClearBtn = document.getElementById("logoClearBtn");
+  const downloadPngBtn = document.getElementById("downloadPngBtn");
+  const recordBtn = document.getElementById("recordBtn");
+  const savePresetBtn = document.getElementById("savePresetBtn");
+  const loadPresetBtn = document.getElementById("loadPresetBtn");
 
-      for (let i = 0; i < bandCount; i++) {
-        const bandHeight =
-          logoH / 8 +
-          Math.random() * (logoH / 5) * (0.4 + glitchAmount * 4);
-        const bandY = ly + Math.random() * (logoH - bandHeight);
+  let logoImage = null;
+  let logoLoaded = false;
 
-        const shiftX =
-          (Math.random() < 0.5 ? -1 : 1) *
-          (2 + glitchAmount * 60 + energy * 20);
+  // offscreen buffer
+  const logoBuffer = document.createElement("canvas");
+  const logoBufferCtx = logoBuffer.getContext("2d");
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(lx - 20, bandY, logoW + 40, bandHeight);
-        ctx.clip();
-
-        ctx.drawImage(
-          logoImage,
-          lx + shiftX,
-          ly,
-          logoW,
-          logoH
-        );
-
-        const tintAlpha = 0.08 + glitchAmount * 0.2;
-        const hueNoise = Math.random();
-        if (hueNoise < 0.33) {
-          ctx.fillStyle = `rgba(0,255,255,${tintAlpha})`;
-        } else if (hueNoise < 0.66) {
-          ctx.fillStyle = `rgba(255,0,180,${tintAlpha})`;
-        } else {
-          ctx.fillStyle = `rgba(0,120,255,${tintAlpha})`;
-        }
-        ctx.fillRect(
-          lx - 20,
-          bandY,
-          logoW + 40,
-          bandHeight
-        );
-        ctx.restore();
-      }
-
-      const fineBase = 2 + Math.round(glitchAmount * 10);
-      const fineExtra = Math.round(energy * 15 * glitchAmount * 4);
-      const sliceCount = fineBase + fineExtra;
-
-      for (let i = 0; i < sliceCount; i++) {
-        const sliceHeight =
-          (logoH / 60) +
-          Math.random() * (logoH / 40) * (0.8 + glitchAmount * 4);
-        const sliceY = ly + Math.random() * (logoH - sliceHeight);
-
-        const shiftX =
-          (Math.random() - 0.5) *
-          (5 + glitchAmount * 70 + energy * 30);
-        const shiftY =
-          (Math.random() - 0.5) *
-          (glitchAmount * 15 + energy * 10);
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(lx - 15, sliceY, logoW + 30, sliceHeight);
-        ctx.clip();
-
-        ctx.drawImage(
-          logoImage,
-          lx + shiftX,
-          ly + shiftY,
-          logoW,
-          logoH
-        );
-        ctx.restore();
-      }
-
-      const blockBase = 2 + Math.round(glitchAmount * 15);
-      const blockExtra = Math.round(energy * 25 * glitchAmount * 4);
-      const blockCount = blockBase + blockExtra;
-
-      for (let i = 0; i < blockCount; i++) {
-        const bw = (logoW / 10) * (0.4 + Math.random() * 1.5);
-        const bh = (logoH / 10) * (0.4 + Math.random() * 1.5);
-        const bx = lx + Math.random() * (logoW - bw);
-        const by = ly + Math.random() * (logoH - bh);
-
-        const shiftX =
-          (Math.random() - 0.5) *
-          (8 + glitchAmount * 90 + energy * 40);
-        const shiftY =
-          (Math.random() - 0.5) *
-          (5 + glitchAmount * 40 + energy * 25);
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(bx, by, bw, bh);
-        ctx.clip();
-
-        ctx.drawImage(
-          logoImage,
-          lx + shiftX,
-          ly + shiftY,
-          logoW,
-          logoH
-        );
-
-        const blockAlpha = 0.08 + glitchAmount * 0.22;
-        const rnd = Math.random();
-        if (rnd < 0.33) {
-          ctx.fillStyle = `rgba(255,255,255,${blockAlpha})`;
-        } else if (rnd < 0.66) {
-          ctx.fillStyle = `rgba(0,255,200,${blockAlpha})`;
-        } else {
-          ctx.fillStyle = `rgba(255,0,150,${blockAlpha})`;
-        }
-        ctx.fillRect(bx, by, bw, bh);
-        ctx.restore();
-      }
-
-      ctx.save();
-      ctx.globalAlpha = 0.08 + glitchAmount * 0.12;
-      ctx.strokeStyle = "rgba(255,255,255,0.18)";
-      ctx.lineWidth = 1;
-      const lineStep = 3;
-      for (let y = Math.floor(ly); y < ly + logoH; y += lineStep) {
-        ctx.beginPath();
-        ctx.moveTo(lx - 8, y);
-        ctx.lineTo(lx + logoW + 8, y);
-        ctx.stroke();
-      }
-      ctx.restore();
+  function getGlitchStrengthFactor() {
+    switch (fxStrength) {
+      case "hardcore":
+        return 1.0;
+      case "medium":
+        return 0.55;
+      case "soft":
+      default:
+        return 0.3;
     }
+  }
 
-    function applyShakeJitter(lx, ly, logoW, logoH, energy) {
-      const jitterX =
-        (Math.random() - 0.5) *
-        (1.5 + glitchAmount * 25 + energy * 10);
-      const jitterY =
-        (Math.random() - 0.5) *
-        (1.5 + glitchAmount * 18 + energy * 8);
+  function renderLogoFrame(mainCtx, canvasEl) {
+    if (!logoLoaded || !logoImage) return;
 
-      const wobble =
-        (Math.random() - 0.5) * (0.004 + glitchAmount * 0.025);
+    const w = canvasEl.width;
+    const h = canvasEl.height;
 
-      ctx.save();
-      ctx.translate(lx + logoW / 2, ly + logoH / 2);
-      ctx.rotate(wobble);
-      ctx.translate(-logoW / 2, -logoH / 2);
+    // 1) draw clean logo into buffer
+    logoBuffer.width = w;
+    logoBuffer.height = h;
+    logoBufferCtx.clearRect(0, 0, w, h);
 
-      ctx.globalAlpha = 0.95;
-      ctx.drawImage(logoImage, jitterX, jitterY, logoW, logoH);
+    const maxW = w * 0.55;
+    const maxH = h * 0.55;
+    const ratio = logoImage.width / logoImage.height;
+    let drawW = maxW;
+    let drawH = drawW / ratio;
+    if (drawH > maxH) {
+      drawH = maxH;
+      drawW = drawH * ratio;
+    }
+    const dx = (w - drawW) / 2;
+    const dy = (h - drawH) / 2;
 
-      ctx.globalAlpha = 0.35;
-      ctx.drawImage(
-        logoImage,
-        jitterX + 2,
-        jitterY - 1,
-        logoW * 1.01,
-        logoH * 1.01
+    logoBufferCtx.drawImage(logoImage, dx, dy, drawW, drawH);
+
+    // 2) draw clean to main canvas
+    mainCtx.drawImage(logoBuffer, 0, 0);
+
+    // 3) apply glitch puzzle if needed
+    if (fxMode === "glitch") {
+      const energy = Math.min(lastEnergy * 1.4 + 0.15, 1);
+      const strength = getGlitchStrengthFactor() * energy;
+      drawLogoGlitchPieces(mainCtx, strength);
+    }
+  }
+
+  function drawLogoGlitchPieces(mainCtx, strength) {
+    const w = logoBuffer.width;
+    const h = logoBuffer.height;
+    if (!w || !h || strength <= 0.01) return;
+
+    const tileSize = Math.round(w / 14);
+    const tilesX = Math.ceil(w / tileSize);
+    const tilesY = Math.ceil(h / tileSize);
+    const totalTiles = tilesX * tilesY;
+    const glitchCount = Math.round(totalTiles * (0.08 + 0.25 * strength));
+
+    for (let i = 0; i < glitchCount; i++) {
+      const sxIndex = Math.floor(Math.random() * tilesX);
+      const syIndex = Math.floor(Math.random() * tilesY);
+
+      const sx = sxIndex * tileSize;
+      const sy = syIndex * tileSize;
+      const sw = tileSize;
+      const sh = tileSize;
+
+      // Skip mostly dark tiles (background only)
+      const sample = logoBufferCtx.getImageData(sx, sy, sw, sh);
+      let sum = 0;
+      for (let j = 0; j < sample.data.length; j += 4) {
+        sum += sample.data[j] + sample.data[j + 1] + sample.data[j + 2];
+      }
+      const avg = sum / (sample.data.length / 4) / 255;
+      if (avg < 0.05) continue;
+
+      const maxOffset = tileSize * (0.18 + 0.35 * strength);
+      const offsetX = (Math.random() - 0.5) * maxOffset;
+      const offsetY = (Math.random() - 0.5) * maxOffset;
+
+      const maxAngle = (6 + 6 * strength) * (Math.PI / 180);
+      const angle = (Math.random() - 0.5) * maxAngle;
+
+      const dx = sx + offsetX;
+      const dy = sy + offsetY;
+
+      mainCtx.save();
+      mainCtx.translate(dx + sw / 2, dy + sh / 2);
+      mainCtx.rotate(angle);
+
+      mainCtx.drawImage(
+        logoBuffer,
+        sx,
+        sy,
+        sw,
+        sh,
+        -sw / 2,
+        -sh / 2,
+        sw,
+        sh
       );
 
-      ctx.restore();
+      mainCtx.restore();
     }
+  }
 
-    function applyDistort(lx, ly, logoW, logoH, energy) {
-      const cols = 16;
-      const colW = logoW / cols;
+  logoUploadBtn.addEventListener("click", () => {
+    logoInput.click();
+  });
 
-      for (let i = 0; i < cols; i++) {
-        const sliceX = lx + i * colW;
-        const wobbleY =
-          (Math.sin((i / cols) * Math.PI * 2 + energy * 6) *
-            logoH *
-            0.03 *
-            glitchAmount * 4) +
-          (Math.random() - 0.5) *
-            logoH *
-            0.02 *
-            glitchAmount * 4;
+  logoInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) loadLogoFile(file);
+  });
 
-        const scaleY =
-          1 +
-          (Math.sin((i / cols) * Math.PI * 3 + energy * 8) *
-            0.05 *
-            glitchAmount * 4);
+  function loadLogoFile(file) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      logoImage = img;
+      logoLoaded = true;
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
 
-        const srcX = i * (logoImage.width / cols);
-        const srcW = logoImage.width / cols;
+  logoClearBtn.addEventListener("click", () => {
+    logoLoaded = false;
+    logoImage = null;
+  });
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(sliceX, ly, colW + 1, logoH);
-        ctx.clip();
+  // Drag & drop for audio / logo
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+  });
 
-        ctx.setTransform(
-          1,
-          0,
-          0,
-          scaleY,
-          0,
-          wobbleY
-        );
-        ctx.drawImage(
-          logoImage,
-          srcX,
-          0,
-          srcW,
-          logoImage.height,
-          sliceX,
-          ly,
-          colW + 1,
-          logoH
-        );
-        ctx.restore();
-        ctx.setTransform(
-          window.devicePixelRatio || 1,
-          0,
-          0,
-          window.devicePixelRatio || 1,
-          0,
-          0
-        );
-      }
-    }
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (!files || !files.length) return;
+    const file = files[0];
 
-    function applyGlowRays(centerX, centerY, radius, energy) {
-      const rayCount = 18 + Math.round(glitchAmount * 50);
-      const maxRayLen = radius * (1.2 + glitchAmount * 4);
-
-      ctx.save();
-      ctx.globalAlpha = 0.16 + 0.3 * glitchAmount * 4 * energy;
-      ctx.strokeStyle = "rgba(255,255,255,0.8)";
-      ctx.lineWidth = 1;
-
-      for (let i = 0; i < rayCount; i++) {
-        const angle = (i / rayCount) * Math.PI * 2;
-        const len =
-          maxRayLen *
-          (0.4 +
-            Math.random() * 0.6 * (0.5 + glitchAmount * 4) *
-              (0.4 + energy));
-        const jitter =
-          (Math.random() - 0.5) * 0.1 * Math.PI * glitchAmount * 4;
-
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.lineTo(
-          centerX + Math.cos(angle + jitter) * len,
-          centerY + Math.sin(angle + jitter) * len
-        );
-        ctx.stroke();
-      }
-
-      ctx.restore();
-    }
-
-    // NEW: glyph/letter jumping – slices logo into vertical columns
-    function applyGlyphJumps(lx, ly, logoW, logoH, energy) {
-      const colCount = 12 + Math.round(glitchAmount * 20);
-      const srcColW = logoImage.width / colCount;
-      const dstColW = logoW / colCount;
-
-      const baseOffset =
-        1.5 +
-        glitchAmount * 25 +
-        energy * 18;
-
-      ctx.save();
-      ctx.globalAlpha = 0.95;
-
-      for (let i = 0; i < colCount; i++) {
-        const dx = lx + i * dstColW;
-        const sx = i * srcColW;
-        const jitterY =
-          (Math.random() - 0.5) *
-          baseOffset;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(dx, ly, dstColW + 1, logoH);
-        ctx.clip();
-
-        ctx.drawImage(
-          logoImage,
-          sx,
-          0,
-          srcColW,
-          logoImage.height,
-          dx,
-          ly + jitterY,
-          dstColW + 1,
-          logoH
-        );
-
-        ctx.restore();
-      }
-
-      ctx.restore();
-    }
-
-    // MAIN LOGO RENDER
-    function drawLogoCenter(width, height, rawEnergy) {
-      if (!logoImage) return;
-
-      const energy = Math.max(
-        0,
-        Math.min(1, rawEnergy * (0.2 + glitchAmount * 8))
-      );
-
-      const centerX = width / 2;
-      const centerY = height / 2;
-
-      const maxWidth = width * 0.45;
-      const baseScale = Math.min(maxWidth / logoImage.width, 1);
-      const logoW = logoImage.width * baseScale;
-      const logoH = logoImage.height * baseScale;
-
-      const pulse = 1 + energy * 0.05 * (0.3 + glitchAmount * 8);
-
-      const lxBase = centerX - logoW / 2;
-      const lyBase = centerY - logoH / 2;
-
-      let jitterOffsetX = 0;
-      let jitterOffsetY = 0;
-
-      if (currentFxMode === "shake" || currentFxMode === "combo") {
-        jitterOffsetX =
-          (Math.random() - 0.5) *
-          (1 + glitchAmount * 40 + energy * 10);
-        jitterOffsetY =
-          (Math.random() - 0.5) *
-          (1 + glitchAmount * 30 + energy * 8);
-      }
-
-      const lx = lxBase + jitterOffsetX;
-      const ly = lyBase + jitterOffsetY;
-
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.scale(pulse, pulse);
-      ctx.translate(-centerX, -centerY);
-
-      const glowRadius = Math.max(logoW, logoH) * (0.9 + glitchAmount * 6);
-      const glowGrad = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        0,
-        centerX,
-        centerY,
-        glowRadius
-      );
-
-      if (
-        currentFxMode === "glow" ||
-        currentFxMode === "combo" ||
-        currentFxMode === "glitch"
-      ) {
-        glowGrad.addColorStop(0, "rgba(255,255,255,0.45)");
-        glowGrad.addColorStop(0.25, "rgba(0,255,210,0.35)");
-        glowGrad.addColorStop(0.55, "rgba(0,90,255,0.25)");
-      } else {
-        glowGrad.addColorStop(0, "rgba(255,255,255,0.25)");
-        glowGrad.addColorStop(0.5, "rgba(255,255,255,0.06)");
-      }
-      glowGrad.addColorStop(1, "rgba(0,0,0,0)");
-
-      ctx.globalAlpha = 0.85;
-      ctx.fillStyle = glowGrad;
-      ctx.fillRect(
-        lx - logoW * 0.6,
-        ly - logoH * 0.6,
-        logoW * 2.2,
-        logoH * 2.2
-      );
-
-      if (currentFxMode === "glow" || currentFxMode === "combo") {
-        applyGlowRays(centerX, centerY, Math.max(logoW, logoH) * 0.6, energy);
-      }
-
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = "source-over";
-      ctx.filter = "none";
-      ctx.drawImage(logoImage, lx, ly, logoW, logoH);
-
-      if (currentFxMode === "glitch" || currentFxMode === "combo") {
-        applyGlitchSlices(lx, ly, logoW, logoH, energy);
-        // NEW: per-letter / per-word jumping
-        applyGlyphJumps(lx, ly, logoW, logoH, energy);
-      }
-
-      if (currentFxMode === "shake") {
-        applyShakeJitter(lx, ly, logoW, logoH, energy);
-      }
-
-      if (currentFxMode === "distort") {
-        applyDistort(lx, ly, logoW, logoH, energy);
-      }
-
-      ctx.save();
-      ctx.globalAlpha = 0.7;
-      ctx.strokeStyle =
-        currentFxMode === "clean"
-          ? "rgba(255,255,255,0.5)"
-          : "rgba(0,255,210,0.95)";
-      ctx.lineWidth = 1.6;
-      ctx.strokeRect(
-        lx - 2,
-        ly - 2,
-        logoW + 4,
-        logoH + 4
-      );
-      ctx.restore();
-
-      ctx.restore();
-    }
-
-    visualizerWrapper.addEventListener("click", (e) => {
-      if (e.target === visualizerWrapper || e.target === canvas) {
-        centerFileInput.click();
-      }
-    });
-
-    function handleDragOver(e) {
-      e.preventDefault();
-      document.body.classList.add("drag-over");
-    }
-
-    function handleDragLeave(e) {
-      e.preventDefault();
-      if (
-        e.target === document.body ||
-        e.clientX <= 0 ||
-        e.clientY <= 0
-      ) {
-        document.body.classList.remove("drag-over");
-      }
-    }
-
-    function handleDrop(e) {
-      e.preventDefault();
-      document.body.classList.remove("drag-over");
-      const files = e.dataTransfer.files;
-      if (!files || !files.length) return;
-      const file = files[0];
+    if (file.type.startsWith("audio")) {
       loadAudioFile(file);
+    } else if (file.type.startsWith("image")) {
+      loadLogoFile(file);
+    }
+  });
+
+  // ==========
+  // View toggles / FX / Theme
+  // ==========
+  visualizerViewBtn.addEventListener("click", () => {
+    visualizerEnabled = !visualizerEnabled;
+    visualizerViewBtn.classList.toggle("active", visualizerEnabled);
+  });
+
+  logoViewBtn.addEventListener("click", () => {
+    logoEnabled = !logoEnabled;
+    logoViewBtn.classList.toggle("active", logoEnabled);
+  });
+
+  themeSelect.addEventListener("change", () => {
+    theme = themeSelect.value;
+  });
+
+  visualizerSelect.addEventListener("change", () => {
+    visualizerType = visualizerSelect.value;
+  });
+
+  fxSelect.addEventListener("change", () => {
+    fxMode = fxSelect.value === "glitch" ? "glitch" : "none";
+  });
+
+  fxStrengthSelect.addEventListener("change", () => {
+    fxStrength = fxStrengthSelect.value;
+  });
+
+  function updateFooterTag() {
+    const modeLabel = visualizerEnabled && logoEnabled
+      ? "VISUAL + LOGO"
+      : visualizerEnabled
+      ? "VISUAL"
+      : logoEnabled
+      ? "LOGO"
+      : "IDLE";
+
+    const fxLabel = fxMode === "glitch" ? "GLITCH" : "CLEAN";
+
+    footerTag.textContent =
+      "SPECTRUM · " +
+      theme.toUpperCase() +
+      " · " +
+      modeLabel +
+      " · " +
+      visualizerType.toUpperCase() +
+      " · FX " +
+      fxLabel +
+      " · " +
+      fxStrength.toUpperCase();
+  }
+
+  // ==========
+  // PNG download + presets + (simple) recording stub
+  // ==========
+  downloadPngBtn.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "visualizer.png";
+    link.click();
+  });
+
+  recordBtn.addEventListener("click", () => {
+    alert("Recording to MP4/WebM is not fully implemented in this version yet.");
+  });
+
+  const PRESET_KEY = "dj_visualizer_preset_v1";
+
+  savePresetBtn.addEventListener("click", () => {
+    const preset = {
+      theme,
+      visualizerType,
+      fxMode,
+      fxStrength,
+      visualizerEnabled,
+      logoEnabled
+    };
+    localStorage.setItem(PRESET_KEY, JSON.stringify(preset));
+    alert("Preset saved!");
+  });
+
+  loadPresetBtn.addEventListener("click", () => {
+    const raw = localStorage.getItem(PRESET_KEY);
+    if (!raw) {
+      alert("No preset saved yet.");
+      return;
+    }
+    try {
+      const preset = JSON.parse(raw);
+      theme = preset.theme || "neon";
+      visualizerType = preset.visualizerType || "bars";
+      fxMode = preset.fxMode || "none";
+      fxStrength = preset.fxStrength || "soft";
+      visualizerEnabled = !!preset.visualizerEnabled;
+      logoEnabled = !!preset.logoEnabled;
+
+      themeSelect.value = theme;
+      visualizerSelect.value = visualizerType;
+      fxSelect.value = fxMode === "glitch" ? "glitch" : "none";
+      fxStrengthSelect.value = fxStrength;
+      visualizerViewBtn.classList.toggle("active", visualizerEnabled);
+      logoViewBtn.classList.toggle("active", logoEnabled);
+
+      alert("Preset loaded.");
+    } catch (err) {
+      console.error(err);
+      alert("Could not load preset.");
+    }
+  });
+
+  // ==========
+  // Main render loop
+  // ==========
+  function render() {
+    requestAnimationFrame(render);
+    resizeCanvas();
+    drawBackground();
+
+    if (visualizerEnabled && analyser && dataArray) {
+      if (visualizerType === "bars") {
+        drawBars();
+      } else if (visualizerType === "circle") {
+        drawCircle();
+      } else {
+        drawWaveform();
+      }
+    } else {
+      // even if no analyser, still computeEnergy resets
+      if (analyser && dataArray) computeEnergy();
     }
 
-    window.addEventListener("dragover", handleDragOver);
-    window.addEventListener("dragleave", handleDragLeave);
-    window.addEventListener("drop", handleDrop);
+    if (logoEnabled) {
+      renderLogoFrame(ctx, canvas);
+    }
 
-    applyTheme(currentThemeKey);
-    resizeCanvas();
-    resetUIToEmpty();
-    updateViewTabsUI();
-    loadPresetFromStorage(false);
-    startVisualizer();
-  </script>
+    updateFooterTag();
+  }
+
+  render();
+</script>
 </body>
 </html>

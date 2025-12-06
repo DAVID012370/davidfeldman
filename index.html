@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DJ Visualizer</title>
+  <title>DJ Visualizer – Visual + Logo Views</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -60,20 +60,41 @@
       opacity: 0.7;
     }
 
-    .controls {
+    .view-tabs {
+      margin-left: auto;
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+      gap: 0.4rem;
     }
+
+    .view-tab {
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(6, 6, 15, 0.9);
+      color: #f5f5f5;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.7;
+      transition: background 0.15s, opacity 0.15s, border-color 0.15s;
+    }
+
+    .view-tab.active {
+      background: linear-gradient(135deg, #f72585, #7209b7);
+      border-color: transparent;
+      opacity: 1;
+      box-shadow: 0 0 16px rgba(247, 37, 133, 0.6);
+    }
+
+    /* generic buttons / inputs */
 
     .file-input-label {
       position: relative;
       overflow: hidden;
       border-radius: 999px;
-      padding: 0.6rem 1.2rem;
-      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
       border: 1px solid rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(12px);
@@ -101,15 +122,15 @@
     button {
       border-radius: 999px;
       border: none;
-      padding: 0.6rem 1.1rem;
-      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
       cursor: pointer;
       background: linear-gradient(135deg, #f72585, #7209b7);
       color: white;
       font-weight: 600;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      box-shadow: 0 0 20px rgba(247, 37, 133, 0.4);
+      box-shadow: 0 0 18px rgba(247, 37, 133, 0.4);
       opacity: 0.85;
       transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
       white-space: nowrap;
@@ -117,7 +138,7 @@
 
     button:hover {
       opacity: 1;
-      box-shadow: 0 0 30px rgba(247, 37, 133, 0.7);
+      box-shadow: 0 0 26px rgba(247, 37, 133, 0.7);
     }
 
     button:active {
@@ -130,42 +151,22 @@
       box-shadow: none;
     }
 
+    #clearLogo,
     #clearTrack {
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.35);
-      padding: 0.45rem 0.8rem;
-      color: #fff;
-      opacity: 0.6;
       box-shadow: none;
+      color: #f5f5f5;
       font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      opacity: 0.65;
     }
 
+    #clearLogo:hover,
     #clearTrack:hover {
       opacity: 1;
-      border-color: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.8);
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
-    }
-
-    #clearLogo {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      padding: 0.45rem 0.8rem;
-      color: #fff;
-      opacity: 0.6;
-      box-shadow: none;
-      font-weight: 500;
-    }
-
-    #clearLogo:hover {
-      opacity: 1;
-      border-color: rgba(255, 255, 255, 0.7);
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
-    }
-
-    #fullscreenBtn,
-    #performBtn {
-      padding: 0.45rem 0.8rem;
-      font-size: 0.8rem;
     }
 
     #recordBtn {
@@ -178,10 +179,154 @@
       box-shadow: 0 0 16px rgba(34, 197, 94, 0.7);
     }
 
+    /* selects */
+
+    .select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .select-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.7;
+    }
+
+    .select-control {
+      font-size: 0.8rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(4, 4, 10, 0.8);
+      color: #f5f5f5;
+      outline: none;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .select-control:focus {
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* VIDEO / VISUAL CONTROLS (TOP ROW) */
+
+    .video-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .video-controls-right {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    /* VISUALIZER AREA */
+
+    .visualizer-wrapper {
+      flex: 1;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: radial-gradient(circle at center, #111322, #020307 70%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      height: 62vh;
+      margin-top: 0.5rem;
+    }
+
+    .visualizer-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #visualizer {
+      display: block;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 0.8rem;
+      right: 1.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      opacity: 0.45;
+    }
+
+    /* AUDIO CONTROLS (BOTTOM) */
+
+    .audio-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+
+    .audio-controls-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .volume-wrapper {
+      display: flex;
+      align-items: center;
+      padding: 0 0.3rem;
+    }
+
+    .volume-slider {
+      width: 70px;
+      height: 4px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4cc9f0;
+      box-shadow: 0 0 8px #4cc9f0;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4cc9f0;
+      box-shadow: 0 0 8px #4cc9f0;
+      border: none;
+    }
+
+    /* STATUS + SEEK */
+
     .status-row {
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 0.3rem;
+      margin-top: 0.4rem;
     }
 
     .status {
@@ -247,126 +392,32 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    .volume-wrapper {
-      display: flex;
-      align-items: center;
-      padding: 0 0.3rem;
-    }
+    /* PERFORMANCE MODE */
 
-    .volume-slider {
-      width: 70px;
-      height: 4px;
-      cursor: pointer;
-      -webkit-appearance: none;
-      appearance: none;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 999px;
-      outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #4cc9f0;
-      box-shadow: 0 0 8px #4cc9f0;
-    }
-
-    .volume-slider::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #4cc9f0;
-      box-shadow: 0 0 8px #4cc9f0;
-      border: none;
-    }
-
-    .select-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .select-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.7;
-    }
-
-    .select-control {
-      font-size: 0.8rem;
-      padding: 0.45rem 0.8rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(4, 4, 10, 0.8);
-      color: #f5f5f5;
-      outline: none;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-    }
-
-    .select-control:focus {
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-
-    .visualizer-wrapper {
-      flex: 1;
-      border-radius: 1.5rem;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: radial-gradient(circle at center, #111322, #020307 70%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      height: 65vh;
-    }
-
-    .visualizer-inner {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #visualizer {
-      display: block;
-    }
-
-    .watermark {
-      position: absolute;
-      bottom: 0.9rem;
-      right: 1.3rem;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      opacity: 0.45;
-    }
-
-    body.perform-mode header,
-    body.perform-mode .status-row {
+    body.perform-mode header {
       display: none;
     }
 
     body.perform-mode .app {
       max-width: 100%;
       padding: 0;
-      gap: 0;
+      gap: 0.4rem;
     }
 
     body.perform-mode .visualizer-wrapper {
-      height: 100vh;
+      height: 80vh;
       border-radius: 0;
       border: none;
     }
 
+    body.perform-mode .audio-controls,
+    body.perform-mode .status-row {
+      padding-inline: 1rem;
+    }
+
     body.perform-mode .watermark {
-      opacity: 0.25;
-      font-size: 0.6rem;
+      opacity: 0.3;
+      font-size: 0.65rem;
     }
   </style>
 </head>
@@ -378,76 +429,105 @@
         <div class="brand-sub">Audio reactive visuals · XP vibes soon</div>
       </div>
 
-      <div class="controls">
-        <div class="select-wrapper">
-          <span class="select-label">Theme</span>
-          <select id="themeSelect" class="select-control">
-            <option value="neon">Neon</option>
-            <option value="xp">XP Blue</option>
-            <option value="vapor">Vaporwave</option>
-            <option value="minimal">Minimal</option>
-          </select>
-        </div>
-
-        <div class="select-wrapper">
-          <span class="select-label">Visualizer</span>
-          <select id="visualizerSelect" class="select-control">
-            <option value="bars">Bars</option>
-            <option value="circle">Circle</option>
-            <option value="wave">Waveform</option>
-            <option value="logo">Logo Only</option>
-          </select>
-        </div>
-
-        <div class="select-wrapper">
-          <span class="select-label">FX</span>
-          <select id="fxSelect" class="select-control">
-            <option value="none">Clean</option>
-            <option value="vhs">VHS / CRT</option>
-          </select>
-        </div>
-
-        <label class="file-input-label">
-          Load Track
-          <input id="audioFile" type="file" accept="audio/*" />
-        </label>
-
-        <label class="file-input-label">
-          Logo
-          <input id="logoFile" type="file" accept="image/*" />
-        </label>
-
-        <button id="clearLogo" title="Clear logo">Logo ✕</button>
-
-        <button id="playPause" disabled>Play</button>
-
-        <div class="volume-wrapper">
-          <input
-            id="volumeSlider"
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value="1"
-            class="volume-slider"
-          />
-        </div>
-
-        <button id="clearTrack" title="Clear current track">✕</button>
-        <button id="downloadAudio" title="Download audio file" disabled>DL Audio</button>
-        <button id="downloadFrame" title="Download visualizer frame">DL PNG</button>
-        <button id="recordBtn" title="Record visualizer to WebM" disabled>REC</button>
-        <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
-        <button id="performBtn" title="Toggle clean performance view">PERF</button>
-        <button id="savePreset" title="Save current preset">Save</button>
-        <button id="loadPreset" title="Load preset">Load</button>
+      <div class="view-tabs">
+        <button class="view-tab active" data-view="visualizer">Visualizer</button>
+        <button class="view-tab" data-view="logo">Logo</button>
       </div>
     </header>
 
-    <div class="status-row">
-      <div class="status" id="statusText">
-        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.
+    <!-- TOP: VIDEO / VISUAL CONTROLS -->
+    <div class="video-controls">
+      <div class="select-wrapper">
+        <span class="select-label">Theme</span>
+        <select id="themeSelect" class="select-control">
+          <option value="neon">Neon</option>
+          <option value="xp">XP Blue</option>
+          <option value="vapor">Vaporwave</option>
+          <option value="minimal">Minimal</option>
+        </select>
       </div>
+
+      <div class="select-wrapper">
+        <span class="select-label">Visualizer</span>
+        <select id="visualizerSelect" class="select-control">
+          <option value="bars">Bars</option>
+          <option value="circle">Circle</option>
+          <option value="wave">Waveform</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <span class="select-label">FX</span>
+        <select id="fxSelect" class="select-control">
+          <option value="none">Clean</option>
+          <option value="vhs">VHS / CRT</option>
+        </select>
+      </div>
+
+      <label class="file-input-label">
+        Logo
+        <input id="logoFile" type="file" accept="image/*" />
+      </label>
+
+      <button id="clearLogo" title="Clear logo">Logo ✕</button>
+
+      <div class="video-controls-right">
+        <button id="downloadFrame" title="Download current frame as PNG">DL PNG</button>
+        <button id="recordBtn" title="Record visualizer to WebM" disabled>REC</button>
+        <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
+        <button id="performBtn" title="Toggle performance view">PERF</button>
+        <button id="savePreset" title="Save current preset">Save</button>
+        <button id="loadPreset" title="Load preset">Load</button>
+      </div>
+    </div>
+
+    <!-- CENTER: VISUALIZER -->
+    <section class="visualizer-wrapper">
+      <div class="visualizer-inner">
+        <canvas id="visualizer"></canvas>
+      </div>
+      <div class="watermark" id="watermarkText">Spectrum · Visualizer</div>
+    </section>
+
+    <!-- BOTTOM: AUDIO CONTROLS -->
+    <div class="audio-controls">
+      <label class="file-input-label">
+        Load Track
+        <input id="audioFile" type="file" accept="audio/*" />
+      </label>
+
+      <button id="playPause" disabled>Play</button>
+
+      <div class="volume-wrapper">
+        <input
+          id="volumeSlider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+          class="volume-slider"
+        />
+      </div>
+
+      <button id="clearTrack" title="Clear current track">Clear</button>
+
+      <div class="audio-controls-right">
+        <button id="downloadAudio" title="Download audio file" disabled>DL Audio</button>
+      </div>
+    </div>
+
+    <div id="nowPlaying" style="
+      text-align:left;
+      font-size:0.85rem;
+      letter-spacing:0.04em;
+      opacity:0.9;
+      margin-top:0.25rem;
+      text-transform:uppercase;
+      display:none;">
+    </div>
+
+    <div class="status-row">
       <div class="seek-container">
         <span class="seek-time" id="currentTime">0:00</span>
         <input
@@ -461,27 +541,11 @@
         />
         <span class="seek-time" id="durationTime">0:00</span>
       </div>
-      <div class="status">
-        💡 Drag &amp; drop audio · Space = Play/Pause · P = Performance · R/REC = Record WebM
+      <div class="status" id="statusText">
+        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.  
+        Space = Play/Pause · P = Performance · R/REC = Record WebM
       </div>
     </div>
-
-    <div id="nowPlaying" style="
-      text-align:center;
-      font-size:0.9rem;
-      letter-spacing:0.05em;
-      opacity:0.85;
-      margin-top:0.3rem;
-      text-transform:uppercase;
-      display:none;">
-    </div>
-
-    <section class="visualizer-wrapper">
-      <div class="visualizer-inner">
-        <canvas id="visualizer"></canvas>
-      </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.9 · Logo / CRT / Logo Only</div>
-    </section>
   </main>
 
   <script>
@@ -511,6 +575,7 @@
     const nowPlayingText = document.getElementById("nowPlaying");
     const savePresetBtn = document.getElementById("savePreset");
     const loadPresetBtn = document.getElementById("loadPreset");
+    const viewTabs = document.querySelectorAll(".view-tab");
 
     let audioContext;
     let audioSource;
@@ -538,31 +603,32 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · Neon"
+        label: "Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
         visBg: "radial-gradient(circle at center, #0b2c6a, #020716 75%)",
         barColors: ["#8fd3ff", "#ffffff", "#4a90e2"],
-        watermark: "Spectrum · XP mode"
+        label: "XP"
       },
       vapor: {
         bodyBg: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a1c4fd 100%)",
         visBg: "radial-gradient(circle at center, rgba(10,10,25,0.95), rgba(4,4,12,0.98))",
         barColors: ["#ff9a9e", "#fecdff", "#a1c4fd"],
-        watermark: "Spectrum · Vaporwave"
+        label: "Vaporwave"
       },
       minimal: {
         bodyBg: "linear-gradient(135deg, #111111, #222222)",
         visBg: "radial-gradient(circle at center, #050505, #101010 80%)",
         barColors: ["#ffffff", "#cccccc", "#999999"],
-        watermark: "Spectrum · Minimal"
+        label: "Minimal"
       }
     };
 
     let currentThemeKey = "neon";
     let currentVisualizer = "bars";
     let currentFx = "none";
+    let currentView = "visualizer"; // "visualizer" or "logo"
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -574,12 +640,11 @@
 
     function updateWatermark() {
       const theme = themes[currentThemeKey] || themes.neon;
-      if (watermarkText) {
-        let recLabel = isRecording ? " · REC" : "";
-        let fxLabel = currentFx === "vhs" ? " · CRT" : "";
-        watermarkText.textContent =
-          theme.watermark + " · " + currentVisualizer.toUpperCase() + fxLabel + recLabel;
-      }
+      const viewLabel = currentView === "logo" ? "Logo View" : "Visualizer";
+      const fxLabel = currentFx === "vhs" ? " · CRT" : "";
+      const recLabel = isRecording ? " · REC" : "";
+      watermarkText.textContent =
+        `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${fxLabel}${recLabel}`;
     }
 
     themeSelect.addEventListener("change", (e) => {
@@ -594,6 +659,15 @@
     fxSelect.addEventListener("change", (e) => {
       currentFx = e.target.value;
       updateWatermark();
+    });
+
+    viewTabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        viewTabs.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentView = btn.dataset.view || "visualizer";
+        updateWatermark();
+      });
     });
 
     function resizeCanvas() {
@@ -648,7 +722,7 @@
       nowPlayingText.style.display = "none";
       nowPlayingText.textContent = "";
       statusText.textContent =
-        "Load an audio file to start. You can also drag & drop an MP3/WAV here.";
+        "Load an audio file to start. You can also drag & drop an MP3/WAV here. Space = Play/Pause · P = Performance · R/REC = Record WebM";
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (isRecording && mediaRecorder) {
         mediaRecorder.stop();
@@ -903,6 +977,7 @@
     }
 
     recordBtn.addEventListener("click", () => {
+      if (recordBtn.disabled) return;
       if (isRecording) {
         stopRecording();
       } else {
@@ -915,7 +990,8 @@
         theme: currentThemeKey,
         visualizer: currentVisualizer,
         fx: currentFx,
-        volume: volumeSlider.value
+        volume: volumeSlider.value,
+        view: currentView
       };
       try {
         localStorage.setItem("djvizPreset", JSON.stringify(preset));
@@ -950,6 +1026,12 @@
           if (audioElement) {
             audioElement.volume = Number(preset.volume);
           }
+        }
+        if (preset.view) {
+          currentView = preset.view;
+          viewTabs.forEach((b) =>
+            b.classList.toggle("active", b.dataset.view === currentView)
+          );
         }
         updateWatermark();
         if (showMessage) statusText.textContent = "Preset loaded.";
@@ -1032,25 +1114,27 @@
         const theme = themes[currentThemeKey] || themes.neon;
         const [c1, c2, c3] = theme.barColors;
 
-        const logoOnlyMode = currentVisualizer === "logo" && !!logoImage;
-        const logoCrtMode = logoOnlyMode && currentFx === "vhs";
-
-        if (!logoOnlyMode) {
+        if (currentView === "visualizer") {
           if (currentVisualizer === "wave") {
             drawWaveform(width, height, c1, c2, c3);
           } else if (currentVisualizer === "circle") {
             drawCircle(width, height, c1, c2, c3);
-          } else if (currentVisualizer === "bars") {
+          } else {
             drawBars(width, height, c1, c2, c3);
           }
-        }
 
-        if (currentFx === "vhs") {
-          applyVhsFx(width, height);
-        }
+          if (currentFx === "vhs") {
+            applyVhsFx(width, height);
+          }
 
-        if (logoImage) {
-          drawLogoOverlay(width, height, logoOnlyMode, logoCrtMode);
+          if (logoImage) {
+            drawLogoCorner(width, height);
+          }
+        } else {
+          drawLogoCenter(width, height);
+          if (currentFx === "vhs") {
+            applyVhsFx(width, height);
+          }
         }
       }
 
@@ -1236,27 +1320,25 @@
       ctx.restore();
     }
 
-    function drawLogoOverlay(width, height, logoOnlyMode, logoCrtMode) {
+    function drawLogoCorner(width, height) {
+      if (!logoImage) return;
+      const margin = 16;
+      const maxWidth = width * 0.18;
+      const scale = Math.min(maxWidth / logoImage.width, 1);
+      const logoW = logoImage.width * scale;
+      const logoH = logoImage.height * scale;
+      const x = margin;
+      const y = height - logoH - margin;
+
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(logoImage, x, y, logoW, logoH);
+      ctx.restore();
+    }
+
+    function drawLogoCenter(width, height) {
       if (!logoImage) return;
 
-      // Corner logo (any visualizer that is not "logo")
-      if (!logoOnlyMode && !logoCrtMode) {
-        const margin = 16;
-        const maxWidth = width * 0.2;
-        const scale = Math.min(maxWidth / logoImage.width, 1);
-        const logoW = logoImage.width * scale;
-        const logoH = logoImage.height * scale;
-        const x = margin;
-        const y = height - logoH - margin;
-
-        ctx.save();
-        ctx.globalAlpha = 0.9;
-        ctx.drawImage(logoImage, x, y, logoW, logoH);
-        ctx.restore();
-        return;
-      }
-
-      // Logo Only mode (center) – clean or CRT
       analyser.getByteFrequencyData(dataArray);
       let avg = 0;
       for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
@@ -1279,7 +1361,7 @@
       ctx.scale(pulse, pulse);
       ctx.translate(-centerX, -centerY);
 
-      if (logoCrtMode) {
+      if (currentFx === "vhs") {
         const glowGrad = ctx.createRadialGradient(
           centerX,
           centerY,
@@ -1304,7 +1386,6 @@
         ctx.globalAlpha = 1;
         ctx.drawImage(logoImage, lx, ly, logoW, logoH);
       } else {
-        // Clean logo-only (no CRT, just soft glow)
         const glowGrad = ctx.createRadialGradient(
           centerX,
           centerY,

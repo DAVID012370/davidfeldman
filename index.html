@@ -152,6 +152,16 @@
       font-size: 0.8rem;
     }
 
+    #recordBtn {
+      background: linear-gradient(135deg, #ff0033, #b3001f);
+      box-shadow: 0 0 16px rgba(255, 0, 51, 0.5);
+    }
+
+    #recordBtn.recording {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.7);
+    }
+
     .status-row {
       display: flex;
       flex-direction: column;
@@ -395,6 +405,7 @@
         <button id="clearTrack" title="Clear current track">✕</button>
         <button id="downloadAudio" title="Download audio file" disabled>DL Audio</button>
         <button id="downloadFrame" title="Download visualizer frame">DL PNG</button>
+        <button id="recordBtn" title="Record visualizer to WebM" disabled>REC</button>
         <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
         <button id="performBtn" title="Toggle clean performance view">PERF</button>
       </div>
@@ -418,8 +429,7 @@
         <span class="seek-time" id="durationTime">0:00</span>
       </div>
       <div class="status">
-        💡 Tip: You can drag a music file from anywhere onto the visualizer area.  
-        Space = Play/Pause · P = Performance
+        💡 Drag &amp; drop audio · Space = Play/Pause · P = Performance · REC = Record WebM
       </div>
     </div>
 
@@ -427,7 +437,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.4 · Download Ready</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.5 · Recording Ready</div>
     </section>
   </main>
 
@@ -451,6 +461,7 @@
     const watermarkText = document.getElementById("watermarkText");
     const downloadAudioBtn = document.getElementById("downloadAudio");
     const downloadFrameBtn = document.getElementById("downloadFrame");
+    const recordBtn = document.getElementById("recordBtn");
 
     let audioContext;
     let audioSource;
@@ -465,12 +476,18 @@
     let currentFile = null;
     let currentFileUrl = null;
 
+    // Recording
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let audioDestForRecording = null;
+
     const themes = {
       neon: {
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.4 · Neon"
+        watermark: "Spectrum · v1.5 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -506,8 +523,9 @@
     function updateWatermark() {
       const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
+        let recLabel = isRecording ? " · REC" : "";
         watermarkText.textContent =
-          theme.watermark + " · " + currentVisualizer.toUpperCase();
+          theme.watermark + " · " + currentVisualizer.toUpperCase() + recLabel;
       }
     }
 
@@ -568,9 +586,19 @@
       currentTimeLabel.textContent = "0:00";
       durationTimeLabel.textContent = "0:00";
       downloadAudioBtn.disabled = true;
+      recordBtn.disabled = true;
+      recordBtn.classList.remove("recording");
+      recordBtn.textContent = "REC";
       statusText.textContent =
         "Load an audio file to start. You can also drag & drop an MP3/WAV here.";
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (isRecording && mediaRecorder) {
+        mediaRecorder.stop();
+      }
+      isRecording = false;
+      mediaRecorder = null;
+      recordedChunks = [];
+      updateWatermark();
     }
 
     function loadAudioFile(file) {
@@ -591,7 +619,6 @@
       }
       stopVisualizer();
 
-      // ניהול ה-blob של הקובץ בשביל הורדה
       if (currentFileUrl) {
         URL.revokeObjectURL(currentFileUrl);
       }
@@ -630,6 +657,7 @@
       playPauseBtn.disabled = false;
       playPauseBtn.textContent = "Play";
       downloadAudioBtn.disabled = false;
+      recordBtn.disabled = false;
       isPlaying = false;
       statusText.textContent = `Loaded: ${file.name}`;
     }
@@ -691,7 +719,7 @@
       resetUIToEmpty();
     });
 
-    // הורדת האודיו
+    // Download audio
     downloadAudioBtn.addEventListener("click", () => {
       if (!currentFile || !currentFileUrl) return;
       const a = document.createElement("a");
@@ -702,7 +730,7 @@
       a.remove();
     });
 
-    // הורדת פריים הוויזואלייזר כ-PNG
+    // Download visualizer frame as PNG
     downloadFrameBtn.addEventListener("click", () => {
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -716,6 +744,98 @@
         a.remove();
         URL.revokeObjectURL(url);
       }, "image/png");
+    });
+
+    // Start recording (video + audio)
+    function startRecording() {
+      if (!canvas.captureStream) {
+        statusText.textContent = "Recording not supported in this browser.";
+        return;
+      }
+
+      const fps = 60;
+      const canvasStream = canvas.captureStream(fps);
+
+      let combinedStream = canvasStream;
+
+      if (audioContext && analyser) {
+        audioDestForRecording = audioContext.createMediaStreamDestination();
+        // שולחים את האודיו גם ליעד ההקלטה
+        analyser.connect(audioDestForRecording);
+        combinedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...audioDestForRecording.stream.getAudioTracks()
+        ]);
+      }
+
+      recordedChunks = [];
+      try {
+        mediaRecorder = new MediaRecorder(combinedStream, {
+          mimeType: "video/webm;codecs=vp9,opus"
+        });
+      } catch (e) {
+        try {
+          mediaRecorder = new MediaRecorder(combinedStream, {
+            mimeType: "video/webm"
+          });
+        } catch (err) {
+          statusText.textContent = "Recording is not supported in this browser.";
+          return;
+        }
+      }
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const ts = new Date().toISOString().replace(/[:.]/g, "-");
+        a.href = url;
+        a.download = `visualizer-recording-${ts}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        recordedChunks = [];
+        mediaRecorder = null;
+        isRecording = false;
+        recordBtn.classList.remove("recording");
+        recordBtn.textContent = "REC";
+        statusText.textContent = "Recording finished. File downloaded.";
+        updateWatermark();
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      recordBtn.classList.add("recording");
+      recordBtn.textContent = "STOP";
+      statusText.textContent = "Recording in progress...";
+      updateWatermark();
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+      }
+      if (audioDestForRecording && analyser) {
+        try {
+          analyser.disconnect(audioDestForRecording);
+        } catch (e) {}
+      }
+      audioDestForRecording = null;
+    }
+
+    recordBtn.addEventListener("click", () => {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
     });
 
     // Fullscreen
@@ -737,7 +857,7 @@
       resizeCanvas();
     });
 
-    // Keyboard shortcuts: SPACE = play/pause, P = performance mode
+    // Keyboard shortcuts: SPACE = play/pause, P = performance, R = record
     document.addEventListener("keydown", async (e) => {
       if (e.code === "Space") {
         e.preventDefault();
@@ -748,6 +868,15 @@
       if (e.key === "p" || e.key === "P") {
         document.body.classList.toggle("perform-mode");
         resizeCanvas();
+      }
+
+      if ((e.key === "r" || e.key === "R") && !recordBtn.disabled) {
+        e.preventDefault();
+        if (isRecording) {
+          stopRecording();
+        } else {
+          startRecording();
+        }
       }
     });
 

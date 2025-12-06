@@ -230,6 +230,18 @@
       align-items: center;
     }
 
+    /* logo controls only for Logo tab */
+
+    .logo-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .logo-controls.hidden {
+      display: none;
+    }
+
     /* VISUALIZER AREA */
 
     .visualizer-wrapper {
@@ -464,12 +476,15 @@
         </select>
       </div>
 
-      <label class="file-input-label">
-        Logo
-        <input id="logoFile" type="file" accept="image/*" />
-      </label>
+      <!-- logo controls ONLY visible in Logo view -->
+      <div class="logo-controls hidden" id="logoControls">
+        <label class="file-input-label">
+          Logo
+          <input id="logoFile" type="file" accept="image/*" />
+        </label>
 
-      <button id="clearLogo" title="Clear logo">Logo ✕</button>
+        <button id="clearLogo" title="Clear logo">Logo ✕</button>
+      </div>
 
       <div class="video-controls-right">
         <button id="downloadFrame" title="Download current frame as PNG">DL PNG</button>
@@ -576,6 +591,7 @@
     const savePresetBtn = document.getElementById("savePreset");
     const loadPresetBtn = document.getElementById("loadPreset");
     const viewTabs = document.querySelectorAll(".view-tab");
+    const logoControls = document.getElementById("logoControls");
 
     let audioContext;
     let audioSource;
@@ -666,6 +682,14 @@
         viewTabs.forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         currentView = btn.dataset.view || "visualizer";
+
+        // Show logo controls only in Logo view
+        if (currentView === "logo") {
+          logoControls.classList.remove("hidden");
+        } else {
+          logoControls.classList.add("hidden");
+        }
+
         updateWatermark();
       });
     });
@@ -1021,6 +1045,11 @@
           viewTabs.forEach((b) =>
             b.classList.toggle("active", b.dataset.view === currentView)
           );
+          if (currentView === "logo") {
+            logoControls.classList.remove("hidden");
+          } else {
+            logoControls.classList.add("hidden");
+          }
         }
         updateWatermark();
         if (showMessage) statusText.textContent = "Preset loaded.";

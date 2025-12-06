@@ -146,6 +146,22 @@
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
     }
 
+    #clearLogo {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.45rem 0.8rem;
+      color: #fff;
+      opacity: 0.6;
+      box-shadow: none;
+      font-weight: 500;
+    }
+
+    #clearLogo:hover {
+      opacity: 1;
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+
     #fullscreenBtn,
     #performBtn {
       padding: 0.45rem 0.8rem;
@@ -331,7 +347,7 @@
       opacity: 0.45;
     }
 
-    /* ---------- PERFORMANCE MODE ---------- */
+    /* Performance mode */
 
     body.perform-mode header,
     body.perform-mode .status-row {
@@ -384,10 +400,26 @@
           </select>
         </div>
 
+        <div class="select-wrapper">
+          <span class="select-label">FX</span>
+          <select id="fxSelect" class="select-control">
+            <option value="none">Clean</option>
+            <option value="vhs">VHS / CRT</option>
+          </select>
+        </div>
+
         <label class="file-input-label">
           Load Track
           <input id="audioFile" type="file" accept="audio/*" />
         </label>
+
+        <label class="file-input-label">
+          Logo
+          <input id="logoFile" type="file" accept="image/*" />
+        </label>
+
+        <button id="clearLogo" title="Clear logo">Logo ✕</button>
+
         <button id="playPause" disabled>Play</button>
 
         <div class="volume-wrapper">
@@ -408,6 +440,8 @@
         <button id="recordBtn" title="Record visualizer to WebM" disabled>REC</button>
         <button id="fullscreenBtn" title="Toggle fullscreen">⛶</button>
         <button id="performBtn" title="Toggle clean performance view">PERF</button>
+        <button id="savePreset" title="Save current preset">Save</button>
+        <button id="loadPreset" title="Load preset">Load</button>
       </div>
     </header>
 
@@ -433,7 +467,6 @@
       </div>
     </div>
 
-    <!-- Now Playing text -->
     <div id="nowPlaying" style="
       text-align:center;
       font-size:0.9rem;
@@ -448,12 +481,14 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.5 · Recording Ready</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.6 · Logo / Presets / VHS</div>
     </section>
   </main>
 
   <script>
     const fileInput = document.getElementById("audioFile");
+    const logoFileInput = document.getElementById("logoFile");
+    const clearLogoBtn = document.getElementById("clearLogo");
     const playPauseBtn = document.getElementById("playPause");
     const statusText = document.getElementById("statusText");
     const canvas = document.getElementById("visualizer");
@@ -469,11 +504,14 @@
     const performBtn = document.getElementById("performBtn");
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
+    const fxSelect = document.getElementById("fxSelect");
     const watermarkText = document.getElementById("watermarkText");
     const downloadAudioBtn = document.getElementById("downloadAudio");
     const downloadFrameBtn = document.getElementById("downloadFrame");
     const recordBtn = document.getElementById("recordBtn");
     const nowPlayingText = document.getElementById("nowPlaying");
+    const savePresetBtn = document.getElementById("savePreset");
+    const loadPresetBtn = document.getElementById("loadPreset");
 
     let audioContext;
     let audioSource;
@@ -488,6 +526,10 @@
     let currentFile = null;
     let currentFileUrl = null;
 
+    // Logo
+    let logoImage = null;
+    let logoUrl = null;
+
     // Recording
     let mediaRecorder = null;
     let recordedChunks = [];
@@ -499,7 +541,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.5 · Neon"
+        watermark: "Spectrum · v1.6 · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -523,6 +565,7 @@
 
     let currentThemeKey = "neon";
     let currentVisualizer = "bars";
+    let currentFx = "none";
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -536,8 +579,9 @@
       const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
         let recLabel = isRecording ? " · REC" : "";
+        let fxLabel = currentFx === "vhs" ? " · VHS" : "";
         watermarkText.textContent =
-          theme.watermark + " · " + currentVisualizer.toUpperCase() + recLabel;
+          theme.watermark + " · " + currentVisualizer.toUpperCase() + fxLabel + recLabel;
       }
     }
 
@@ -547,6 +591,11 @@
 
     visualizerSelect.addEventListener("change", (e) => {
       currentVisualizer = e.target.value;
+      updateWatermark();
+    });
+
+    fxSelect.addEventListener("change", (e) => {
+      currentFx = e.target.value;
       updateWatermark();
     });
 
@@ -675,7 +724,6 @@
       isPlaying = false;
       statusText.textContent = `Loaded: ${file.name}`;
 
-      // Now Playing
       nowPlayingText.textContent = "Now Playing: " + file.name;
       nowPlayingText.style.display = "block";
     }
@@ -684,6 +732,36 @@
       const file = event.target.files[0];
       loadAudioFile(file);
       event.target.value = "";
+    });
+
+    // Logo upload
+    logoFileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        statusText.textContent = "This file is not an image. Please use PNG/JPG.";
+        return;
+      }
+      if (logoUrl) {
+        URL.revokeObjectURL(logoUrl);
+      }
+      logoUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        logoImage = img;
+        statusText.textContent = `Logo loaded: ${file.name}`;
+        logoFileInput.value = "";
+      };
+      img.src = logoUrl;
+    });
+
+    clearLogoBtn.addEventListener("click", () => {
+      logoImage = null;
+      if (logoUrl) {
+        URL.revokeObjectURL(logoUrl);
+        logoUrl = null;
+      }
+      statusText.textContent = "Logo cleared.";
     });
 
     async function togglePlayPause() {
@@ -855,6 +933,63 @@
       }
     });
 
+    // Presets (save/load to localStorage)
+    function savePresetToStorage() {
+      const preset = {
+        theme: currentThemeKey,
+        visualizer: currentVisualizer,
+        fx: currentFx,
+        volume: volumeSlider.value
+      };
+      try {
+        localStorage.setItem("djvizPreset", JSON.stringify(preset));
+        statusText.textContent = "Preset saved.";
+      } catch (e) {
+        statusText.textContent = "Could not save preset (storage blocked).";
+      }
+    }
+
+    function loadPresetFromStorage(showMessage = true) {
+      try {
+        const raw = localStorage.getItem("djvizPreset");
+        if (!raw) {
+          if (showMessage) statusText.textContent = "No preset saved yet.";
+          return;
+        }
+        const preset = JSON.parse(raw);
+        if (preset.theme && themes[preset.theme]) {
+          themeSelect.value = preset.theme;
+          applyTheme(preset.theme);
+        }
+        if (preset.visualizer) {
+          currentVisualizer = preset.visualizer;
+          visualizerSelect.value = preset.visualizer;
+        }
+        if (preset.fx) {
+          currentFx = preset.fx;
+          fxSelect.value = preset.fx;
+        }
+        if (preset.volume != null) {
+          volumeSlider.value = preset.volume;
+          if (audioElement) {
+            audioElement.volume = Number(preset.volume);
+          }
+        }
+        updateWatermark();
+        if (showMessage) statusText.textContent = "Preset loaded.";
+      } catch (e) {
+        if (showMessage) statusText.textContent = "Error loading preset.";
+      }
+    }
+
+    savePresetBtn.addEventListener("click", () => {
+      savePresetToStorage();
+    });
+
+    loadPresetBtn.addEventListener("click", () => {
+      loadPresetFromStorage(true);
+    });
+
     // Fullscreen
     fullscreenBtn.addEventListener("click", () => {
       if (!document.fullscreenElement) {
@@ -929,6 +1064,14 @@
           drawCircle(width, height, c1, c2, c3);
         } else {
           drawBars(width, height, c1, c2, c3);
+        }
+
+        if (currentFx === "vhs") {
+          applyVhsFx(width, height);
+        }
+
+        if (logoImage) {
+          drawLogoOverlay(width, height);
         }
       }
 
@@ -1071,6 +1214,50 @@
       ctx.closePath();
     }
 
+    function applyVhsFx(width, height) {
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = "#000000";
+      for (let y = 0; y < height; y += 3) {
+        ctx.fillRect(0, y, width, 1);
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = 0.09;
+      for (let i = 0; i < 35; i++) {
+        const w = 2 + Math.random() * 8;
+        const h = 1 + Math.random() * 5;
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        ctx.fillStyle = i % 2 === 0 ? "#ffffff" : "#00ffe0";
+        ctx.fillRect(x, y, w, h);
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.13)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(4, 4, width - 8, height - 8);
+      ctx.restore();
+    }
+
+    function drawLogoOverlay(width, height) {
+      if (!logoImage) return;
+      const margin = 16;
+      const maxWidth = width * 0.2;
+      const scale = Math.min(maxWidth / logoImage.width, 1);
+      const logoW = logoImage.width * scale;
+      const logoH = logoImage.height * scale;
+      const x = margin;
+      const y = height - logoH - margin;
+
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(logoImage, x, y, logoW, logoH);
+      ctx.restore();
+    }
+
     visualizerWrapper.addEventListener("click", (e) => {
       if (e.target === visualizerWrapper || e.target === canvas) {
         fileInput.click();
@@ -1106,6 +1293,7 @@
     applyTheme(currentThemeKey);
     resizeCanvas();
     resetUIToEmpty();
+    loadPresetFromStorage(false);
   </script>
 </body>
 </html>

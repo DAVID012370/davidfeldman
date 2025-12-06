@@ -414,7 +414,7 @@
       flex: 1;
       height: 6px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.16);
+      background: rgba(255, 255, 255, 0.16);
       overflow: hidden;
       position: relative;
     }
@@ -424,7 +424,7 @@
       width: 6%;
       border-radius: 999px;
       background: linear-gradient(90deg, #22c1c3, #f72585);
-      box-shadow: 0 0 14px rgba(247,37,133,0.7);
+      box-shadow: 0 0 14px rgba(247, 37, 133, 0.7);
       transition: width 0.08s ease-out;
     }
 
@@ -441,7 +441,7 @@
       height: 4px;
       -webkit-appearance: none;
       appearance: none;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 999px;
       outline: none;
       cursor: pointer;
@@ -453,7 +453,7 @@
       height: 12px;
       border-radius: 50%;
       background: #f97316;
-      box-shadow: 0 0 8px rgba(249,115,22,0.8);
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.8);
     }
 
     .glitch-slider::-moz-range-thumb {
@@ -461,7 +461,7 @@
       height: 12px;
       border-radius: 50%;
       background: #f97316;
-      box-shadow: 0 0 8px rgba(249,115,22,0.8);
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.8);
       border: none;
     }
 
@@ -527,7 +527,20 @@
         </select>
       </div>
 
-      <!-- logo controls ONLY when logo view enabled -->
+      <!-- FX MODES -->
+      <div class="select-wrapper">
+        <span class="select-label">FX</span>
+        <select id="fxSelect" class="select-control">
+          <option value="clean">Clean</option>
+          <option value="glitch">Glitch</option>
+          <option value="shake">Shake / Jitter</option>
+          <option value="distort">Distort</option>
+          <option value="glow">Glow / Rays</option>
+          <option value="combo">Combo</option>
+        </select>
+      </div>
+
+      <!-- Logo controls (only in Logo view) -->
       <div class="logo-controls hidden" id="logoControls">
         <label class="file-input-label">
           Logo
@@ -573,7 +586,7 @@
         <span class="seek-time" id="durationTime">0:00</span>
       </div>
       <div class="status" id="statusText">
-        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.  
+        Load an audio file to start. You can also drag & drop an MP3/WAV here.  
         Space = Play/Pause · P = Performance · R/REC = Record WebM
       </div>
       <div class="glitch-meter">
@@ -658,6 +671,7 @@
     const performBtn = document.getElementById("performBtn");
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
+    const fxSelect = document.getElementById("fxSelect");
     const watermarkText = document.getElementById("watermarkText");
     const downloadAudioBtn = document.getElementById("downloadAudio");
     const downloadFrameBtn = document.getElementById("downloadFrame");
@@ -691,12 +705,15 @@
     let isRecording = false;
     let audioDestForRecording = null;
 
-    // view state
+    // View state
     let visualEnabled = true;
     let logoEnabled = false;
 
-    // glitch intensity (0–1)
+    // Glitch intensity (0–1)
     let glitchAmount = 0.5;
+
+    // FX mode
+    let currentFxMode = "clean";
 
     const themes = {
       neon: {
@@ -749,9 +766,13 @@
       const theme = themes[currentThemeKey] || themes.neon;
       const viewLabel = getViewLabel();
       const glitchLabel = glitchAmount > 0.1 ? " · GLITCH" : "";
+      const fxLabel =
+        currentFxMode && currentFxMode !== "clean"
+          ? " · FX " + currentFxMode.toUpperCase()
+          : "";
       const recLabel = isRecording ? " · REC" : "";
       watermarkText.textContent =
-        `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${glitchLabel}${recLabel}`;
+        `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${glitchLabel}${fxLabel}${recLabel}`;
     }
 
     themeSelect.addEventListener("change", (e) => {
@@ -760,6 +781,11 @@
 
     visualizerSelect.addEventListener("change", (e) => {
       currentVisualizer = e.target.value;
+      updateWatermark();
+    });
+
+    fxSelect.addEventListener("change", (e) => {
+      currentFxMode = e.target.value;
       updateWatermark();
     });
 
@@ -817,8 +843,7 @@
 
     function initAudioContext() {
       if (!audioContext) {
-        audioContext = new (window.AudioContext ||
-          window.webkitAudioContext)();
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 2048;
         const bufferLength = analyser.frequencyBinCount;
@@ -1145,6 +1170,7 @@
         visualEnabled,
         logoEnabled,
         glitchAmount,
+        fx: currentFxMode,
       };
       try {
         localStorage.setItem("djvizPreset", JSON.stringify(preset));
@@ -1185,6 +1211,10 @@
         if (typeof preset.glitchAmount === "number") {
           glitchAmount = preset.glitchAmount;
           glitchSlider.value = preset.glitchAmount;
+        }
+        if (preset.fx) {
+          currentFxMode = preset.fx;
+          fxSelect.value = preset.fx;
         }
         if (!visualEnabled && !logoEnabled) visualEnabled = true;
 
@@ -1477,7 +1507,266 @@
       ctx.closePath();
     }
 
-    // LOGO glitch clean remix
+    // LOGO FX HELPERS
+    function applyGlitchSlices(lx, ly, logoW, logoH, energy) {
+      const baseBands = 2 + Math.round(glitchAmount * 3);
+      const extraBands = Math.round(energy * 4);
+      const bandCount = baseBands + extraBands;
+
+      for (let i = 0; i < bandCount; i++) {
+        const bandHeight =
+          logoH / 6 +
+          Math.random() * (logoH / 3) * (0.4 + glitchAmount);
+        const bandY = ly + Math.random() * (logoH - bandHeight);
+
+        const shiftX =
+          (Math.random() < 0.5 ? -1 : 1) *
+          (5 + glitchAmount * 45 + energy * 30);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(lx - 40, bandY, logoW + 80, bandHeight);
+        ctx.clip();
+
+        ctx.drawImage(
+          logoImage,
+          lx + shiftX,
+          ly,
+          logoW,
+          logoH
+        );
+
+        const tintAlpha = 0.12 + glitchAmount * 0.12;
+        const hueNoise = Math.random();
+        if (hueNoise < 0.33) {
+          ctx.fillStyle = `rgba(0,255,255,${tintAlpha})`;
+        } else if (hueNoise < 0.66) {
+          ctx.fillStyle = `rgba(255,0,180,${tintAlpha})`;
+        } else {
+          ctx.fillStyle = `rgba(0,120,255,${tintAlpha})`;
+        }
+        ctx.fillRect(
+          lx - 40,
+          bandY,
+          logoW + 80,
+          bandHeight
+        );
+        ctx.restore();
+      }
+
+      const fineBase = 5 + Math.round(glitchAmount * 15);
+      const fineExtra = Math.round(energy * 25 * glitchAmount);
+      const sliceCount = fineBase + fineExtra;
+
+      for (let i = 0; i < sliceCount; i++) {
+        const sliceHeight =
+          (logoH / 60) +
+          Math.random() * (logoH / 35) * (0.8 + glitchAmount);
+        const sliceY = ly + Math.random() * (logoH - sliceHeight);
+
+        const shiftX =
+          (Math.random() - 0.5) *
+          (12 + glitchAmount * 60 + energy * 40);
+        const shiftY =
+          (Math.random() - 0.5) *
+          (glitchAmount * 10 + energy * 8);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(lx - 25, sliceY, logoW + 50, sliceHeight);
+        ctx.clip();
+
+        ctx.drawImage(
+          logoImage,
+          lx + shiftX,
+          ly + shiftY,
+          logoW,
+          logoH
+        );
+        ctx.restore();
+      }
+
+      const blockBase = 6 + Math.round(glitchAmount * 20);
+      const blockExtra = Math.round(energy * 30 * glitchAmount);
+      const blockCount = blockBase + blockExtra;
+
+      for (let i = 0; i < blockCount; i++) {
+        const bw = (logoW / 12) * (0.4 + Math.random() * 1.8);
+        const bh = (logoH / 12) * (0.4 + Math.random() * 1.8);
+        const bx = lx + Math.random() * (logoW - bw);
+        const by = ly + Math.random() * (logoH - bh);
+
+        const shiftX =
+          (Math.random() - 0.5) *
+          (20 + glitchAmount * 80 + energy * 60);
+        const shiftY =
+          (Math.random() - 0.5) *
+          (10 + glitchAmount * 40 + energy * 30);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(bx, by, bw, bh);
+        ctx.clip();
+
+        ctx.drawImage(
+          logoImage,
+          lx + shiftX,
+          ly + shiftY,
+          logoW,
+          logoH
+        );
+
+        const blockAlpha = 0.12 + glitchAmount * 0.18;
+        const rnd = Math.random();
+        if (rnd < 0.33) {
+          ctx.fillStyle = `rgba(255,255,255,${blockAlpha})`;
+        } else if (rnd < 0.66) {
+          ctx.fillStyle = `rgba(0,255,200,${blockAlpha})`;
+        } else {
+          ctx.fillStyle = `rgba(255,0,150,${blockAlpha})`;
+        }
+        ctx.fillRect(bx, by, bw, bh);
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.globalAlpha = 0.12 + glitchAmount * 0.08;
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 1;
+      const lineStep = 3;
+      for (let y = Math.floor(ly); y < ly + logoH; y += lineStep) {
+        ctx.beginPath();
+        ctx.moveTo(lx - 10, y);
+        ctx.lineTo(lx + logoW + 10, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function applyShakeJitter(lx, ly, logoW, logoH, energy) {
+      const jitterX =
+        (Math.random() - 0.5) *
+        (4 + glitchAmount * 20 + energy * 18);
+      const jitterY =
+        (Math.random() - 0.5) *
+        (3 + glitchAmount * 14 + energy * 12);
+
+      const wobble =
+        (Math.random() - 0.5) * (0.008 + glitchAmount * 0.03);
+
+      ctx.save();
+      ctx.translate(lx + logoW / 2, ly + logoH / 2);
+      ctx.rotate(wobble);
+      ctx.translate(-logoW / 2, -logoH / 2);
+
+      ctx.globalAlpha = 0.95;
+      ctx.drawImage(logoImage, jitterX, jitterY, logoW, logoH);
+
+      ctx.globalAlpha = 0.4;
+      ctx.drawImage(
+        logoImage,
+        jitterX + 3,
+        jitterY - 2,
+        logoW * 1.02,
+        logoH * 1.02
+      );
+
+      ctx.restore();
+    }
+
+    function applyDistort(lx, ly, logoW, logoH, energy) {
+      const cols = 18;
+      const colW = logoW / cols;
+
+      for (let i = 0; i < cols; i++) {
+        const sliceX = lx + i * colW;
+        const wobbleY =
+          (Math.sin((i / cols) * Math.PI * 2 + energy * 8) *
+            logoH *
+            0.04 *
+            glitchAmount) +
+          (Math.random() - 0.5) *
+            logoH *
+            0.03 *
+            glitchAmount;
+
+        const scaleY =
+          1 +
+          (Math.sin((i / cols) * Math.PI * 4 + energy * 10) *
+            0.08 *
+            glitchAmount);
+
+        const srcX = i * (logoImage.width / cols);
+        const srcW = logoImage.width / cols;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(sliceX, ly, colW + 1, logoH);
+        ctx.clip();
+
+        ctx.setTransform(
+          1,
+          0,
+          0,
+          scaleY,
+          0,
+          wobbleY
+        );
+        ctx.drawImage(
+          logoImage,
+          srcX,
+          0,
+          srcW,
+          logoImage.height,
+          sliceX,
+          ly,
+          colW + 1,
+          logoH
+        );
+        ctx.restore();
+        ctx.setTransform(
+          window.devicePixelRatio || 1,
+          0,
+          0,
+          window.devicePixelRatio || 1,
+          0,
+          0
+        );
+      }
+    }
+
+    function applyGlowRays(centerX, centerY, radius, energy) {
+      const rayCount = 28 + Math.round(glitchAmount * 30);
+      const maxRayLen = radius * (1.4 + glitchAmount * 0.6);
+
+      ctx.save();
+      ctx.globalAlpha = 0.22 + 0.4 * glitchAmount * energy;
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < rayCount; i++) {
+        const angle = (i / rayCount) * Math.PI * 2;
+        const len =
+          maxRayLen *
+          (0.4 +
+            Math.random() * 0.6 * (0.5 + glitchAmount) *
+              (0.4 + energy));
+        const jitter =
+          (Math.random() - 0.5) * 0.12 * Math.PI * glitchAmount;
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(
+          centerX + Math.cos(angle + jitter) * len,
+          centerY + Math.sin(angle + jitter) * len
+        );
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // MAIN LOGO RENDER
     function drawLogoCenter(width, height, rawEnergy) {
       if (!logoImage) return;
 
@@ -1485,17 +1774,6 @@
         0,
         Math.min(1, rawEnergy * (0.2 + glitchAmount * 1.2))
       );
-
-      const glitchActive = glitchAmount > 0.02;
-
-      const pulse = 1 + energy * 0.15 * (0.3 + glitchAmount * 0.7);
-
-      const jitterAmount = glitchActive
-        ? 2 + glitchAmount * 18 + energy * 10
-        : 1 + energy * 4;
-
-      let jitterX = (Math.random() - 0.5) * jitterAmount;
-      let jitterY = (Math.random() - 0.5) * jitterAmount;
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -1505,117 +1783,99 @@
       const logoW = logoImage.width * baseScale;
       const logoH = logoImage.height * baseScale;
 
-      const lx = centerX - logoW / 2;
-      const ly = centerY - logoH / 2;
+      const pulse = 1 + energy * 0.08 * (0.3 + glitchAmount * 0.7);
+
+      const lxBase = centerX - logoW / 2;
+      const lyBase = centerY - logoH / 2;
+
+      let jitterOffsetX = 0;
+      let jitterOffsetY = 0;
+
+      if (currentFxMode === "shake" || currentFxMode === "combo") {
+        jitterOffsetX =
+          (Math.random() - 0.5) *
+          (2 + glitchAmount * 10 + energy * 8);
+        jitterOffsetY =
+          (Math.random() - 0.5) *
+          (2 + glitchAmount * 8 + energy * 6);
+      }
+
+      const lx = lxBase + jitterOffsetX;
+      const ly = lyBase + jitterOffsetY;
 
       ctx.save();
-      ctx.translate(centerX + (glitchActive ? jitterX : 0), centerY + (glitchActive ? jitterY : 0));
+      ctx.translate(centerX, centerY);
       ctx.scale(pulse, pulse);
       ctx.translate(-centerX, -centerY);
 
-      if (glitchActive && energy > 0.02) {
-        const glowGrad = ctx.createRadialGradient(
-          centerX,
-          centerY,
-          0,
-          centerX,
-          centerY,
-          Math.max(logoW, logoH) * (0.9 + glitchAmount * 0.5)
-        );
-        glowGrad.addColorStop(0, "rgba(0,255,180,0.55)");
-        glowGrad.addColorStop(0.45, "rgba(0,120,255,0.35)");
-        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.globalAlpha = 0.9;
-        ctx.fillStyle = glowGrad;
-        ctx.fillRect(
-          lx - logoW * 0.4,
-          ly - logoH * 0.4,
-          logoW * 1.8,
-          logoH * 1.8
-        );
+      const glowRadius = Math.max(logoW, logoH) * (0.9 + glitchAmount * 0.4);
+      const glowGrad = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        0,
+        centerX,
+        centerY,
+        glowRadius
+      );
 
-        ctx.globalCompositeOperation = "screen";
-
-        ctx.globalAlpha = 0.9;
-        ctx.drawImage(logoImage, lx - 3, ly, logoW, logoH);
-
-        ctx.globalAlpha = 0.8;
-        ctx.drawImage(logoImage, lx + 3, ly + 1.5, logoW, logoH);
-
-        ctx.globalAlpha = 0.8;
-        ctx.drawImage(logoImage, lx + 1.5, ly - 2, logoW, logoH);
-
-        ctx.globalCompositeOperation = "source-over";
-        ctx.globalAlpha = 1;
-        ctx.drawImage(logoImage, lx, ly, logoW, logoH);
-
-        const baseCount = Math.round(2 + glitchAmount * 4);
-        const extraCount = Math.round(energy * 10 * glitchAmount * 1.5);
-        const glitchCount = baseCount + extraCount;
-
-        for (let i = 0; i < glitchCount; i++) {
-          const sliceHeight =
-            (logoH / 40) +
-            Math.random() * (logoH / 18) * (0.5 + glitchAmount);
-          const sliceY = ly + Math.random() * (logoH - sliceHeight);
-
-          const shiftX =
-            (Math.random() - 0.5) *
-            (10 + glitchAmount * 50 + energy * 40);
-          const shiftY =
-            (Math.random() - 0.5) *
-            (glitchAmount * 8 + energy * 6);
-
-          ctx.save();
-          ctx.beginPath();
-          ctx.rect(lx - 20, sliceY, logoW + 40, sliceHeight);
-          ctx.clip();
-
-          ctx.globalAlpha = 1;
-          ctx.drawImage(
-            logoImage,
-            lx + shiftX,
-            ly + shiftY,
-            logoW,
-            logoH
-          );
-          ctx.restore();
-        }
-
-        ctx.save();
-        ctx.globalAlpha = 0.55;
-        ctx.strokeStyle = "rgba(0,255,200,0.9)";
-        ctx.lineWidth = 1.8;
-        ctx.strokeRect(
-          lx - 2,
-          ly - 2,
-          logoW + 4,
-          logoH + 4
-        );
-        ctx.restore();
+      if (
+        currentFxMode === "glow" ||
+        currentFxMode === "combo" ||
+        currentFxMode === "glitch"
+      ) {
+        glowGrad.addColorStop(0, "rgba(255,255,255,0.5)");
+        glowGrad.addColorStop(0.25, "rgba(0,255,210,0.4)");
+        glowGrad.addColorStop(0.55, "rgba(0,90,255,0.3)");
       } else {
-        const glowGrad = ctx.createRadialGradient(
-          centerX,
-          centerY,
-          0,
-          centerX,
-          centerY,
-          Math.max(logoW, logoH) * 0.9
-        );
-        glowGrad.addColorStop(0, "rgba(255,255,255,0.35)");
-        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.globalAlpha = 0.9;
-        ctx.fillStyle = glowGrad;
-        ctx.fillRect(
-          lx - logoW * 0.4,
-          ly - logoH * 0.4,
-          logoW * 1.8,
-          logoH * 1.8
-        );
-
-        ctx.globalAlpha = 1;
-        ctx.drawImage(logoImage, lx, ly, logoW, logoH);
+        glowGrad.addColorStop(0, "rgba(255,255,255,0.3)");
+        glowGrad.addColorStop(0.5, "rgba(255,255,255,0.08)");
       }
+      glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(
+        lx - logoW * 0.6,
+        ly - logoH * 0.6,
+        logoW * 2.2,
+        logoH * 2.2
+      );
+
+      if (currentFxMode === "glow" || currentFxMode === "combo") {
+        applyGlowRays(centerX, centerY, Math.max(logoW, logoH) * 0.6, energy);
+      }
+
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.filter = "none";
+      ctx.drawImage(logoImage, lx, ly, logoW, logoH);
+
+      if (currentFxMode === "glitch" || currentFxMode === "combo") {
+        applyGlitchSlices(lx, ly, logoW, logoH, energy);
+      }
+
+      if (currentFxMode === "shake") {
+        applyShakeJitter(lx, ly, logoW, logoH, energy);
+      }
+
+      if (currentFxMode === "distort") {
+        applyDistort(lx, ly, logoW, logoH, energy);
+      }
+
+      ctx.save();
+      ctx.globalAlpha = 0.7;
+      ctx.strokeStyle =
+        currentFxMode === "clean"
+          ? "rgba(255,255,255,0.5)"
+          : "rgba(0,255,210,0.95)";
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(
+        lx - 2,
+        ly - 2,
+        logoW + 4,
+        logoH + 4
+      );
+      ctx.restore();
 
       ctx.restore();
     }

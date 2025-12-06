@@ -395,6 +395,7 @@
             <option value="bars">Bars</option>
             <option value="circle">Circle</option>
             <option value="wave">Waveform</option>
+            <option value="logo">Logo Only</option>
           </select>
         </div>
 
@@ -479,7 +480,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.8 · Logo CRT mode</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.9 · Logo / CRT / Logo Only</div>
     </section>
   </main>
 
@@ -575,7 +576,7 @@
       const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
         let recLabel = isRecording ? " · REC" : "";
-        let fxLabel = currentFx === "vhs" ? " · CRT LOGO" : "";
+        let fxLabel = currentFx === "vhs" ? " · CRT" : "";
         watermarkText.textContent =
           theme.watermark + " · " + currentVisualizer.toUpperCase() + fxLabel + recLabel;
       }
@@ -1031,14 +1032,15 @@
         const theme = themes[currentThemeKey] || themes.neon;
         const [c1, c2, c3] = theme.barColors;
 
-        const logoCrtMode = currentFx === "vhs" && logoImage;
+        const logoOnlyMode = currentVisualizer === "logo" && !!logoImage;
+        const logoCrtMode = logoOnlyMode && currentFx === "vhs";
 
-        if (!logoCrtMode) {
+        if (!logoOnlyMode) {
           if (currentVisualizer === "wave") {
             drawWaveform(width, height, c1, c2, c3);
           } else if (currentVisualizer === "circle") {
             drawCircle(width, height, c1, c2, c3);
-          } else {
+          } else if (currentVisualizer === "bars") {
             drawBars(width, height, c1, c2, c3);
           }
         }
@@ -1048,7 +1050,7 @@
         }
 
         if (logoImage) {
-          drawLogoOverlay(width, height, logoCrtMode);
+          drawLogoOverlay(width, height, logoOnlyMode, logoCrtMode);
         }
       }
 
@@ -1234,10 +1236,11 @@
       ctx.restore();
     }
 
-    function drawLogoOverlay(width, height, crtMode) {
+    function drawLogoOverlay(width, height, logoOnlyMode, logoCrtMode) {
       if (!logoImage) return;
 
-      if (!crtMode) {
+      // Corner logo (any visualizer that is not "logo")
+      if (!logoOnlyMode && !logoCrtMode) {
         const margin = 16;
         const maxWidth = width * 0.2;
         const scale = Math.min(maxWidth / logoImage.width, 1);
@@ -1253,6 +1256,7 @@
         return;
       }
 
+      // Logo Only mode (center) – clean or CRT
       analyser.getByteFrequencyData(dataArray);
       let avg = 0;
       for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
@@ -1275,29 +1279,49 @@
       ctx.scale(pulse, pulse);
       ctx.translate(-centerX, -centerY);
 
-      const glowGrad = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        0,
-        centerX,
-        centerY,
-        Math.max(logoW, logoH)
-      );
-      glowGrad.addColorStop(0, "rgba(0,255,180,0.45)");
-      glowGrad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = glowGrad;
-      ctx.fillRect(lx - logoW * 0.3, ly - logoH * 0.3, logoW * 1.6, logoH * 1.6);
+      if (logoCrtMode) {
+        const glowGrad = ctx.createRadialGradient(
+          centerX,
+          centerY,
+          0,
+          centerX,
+          centerY,
+          Math.max(logoW, logoH)
+        );
+        glowGrad.addColorStop(0, "rgba(0,255,180,0.45)");
+        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = glowGrad;
+        ctx.fillRect(lx - logoW * 0.3, ly - logoH * 0.3, logoW * 1.6, logoH * 1.6);
 
-      ctx.globalCompositeOperation = "screen";
-      ctx.globalAlpha = 0.7;
-      ctx.drawImage(logoImage, lx - 2, ly, logoW, logoH);
-      ctx.globalAlpha = 0.7;
-      ctx.drawImage(logoImage, lx + 2, ly, logoW, logoH);
+        ctx.globalCompositeOperation = "screen";
+        ctx.globalAlpha = 0.7;
+        ctx.drawImage(logoImage, lx - 2, ly, logoW, logoH);
+        ctx.globalAlpha = 0.7;
+        ctx.drawImage(logoImage, lx + 2, ly, logoW, logoH);
 
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = 1;
-      ctx.drawImage(logoImage, lx, ly, logoW, logoH);
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.drawImage(logoImage, lx, ly, logoW, logoH);
+      } else {
+        // Clean logo-only (no CRT, just soft glow)
+        const glowGrad = ctx.createRadialGradient(
+          centerX,
+          centerY,
+          0,
+          centerX,
+          centerY,
+          Math.max(logoW, logoH) * 0.9
+        );
+        glowGrad.addColorStop(0, "rgba(255,255,255,0.35)");
+        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = glowGrad;
+        ctx.fillRect(lx - logoW * 0.4, ly - logoH * 0.4, logoW * 1.8, logoH * 1.8);
+
+        ctx.globalAlpha = 1;
+        ctx.drawImage(logoImage, lx, ly, logoW, logoH);
+      }
 
       ctx.restore();
     }

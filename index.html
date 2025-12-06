@@ -151,7 +151,6 @@
       transform: translateY(-0.5px);
     }
 
-    /* Main visual area */
     .visual-wrapper {
       margin-top: 0.5rem;
       border-radius: 24px;
@@ -198,7 +197,6 @@
       text-transform: uppercase;
     }
 
-    /* Timeline row */
     .timeline-row {
       display: flex;
       align-items: center;
@@ -233,7 +231,6 @@
       margin-top: -4px;
     }
 
-    /* Audio controls */
     .audio-row {
       display: flex;
       align-items: center;
@@ -411,7 +408,7 @@
     <div id="dropZone">
       <canvas id="visualCanvas"></canvas>
       <div class="drop-hint">
-        Drag & drop audio (MP3/WAV) or logo (PNG/JPG) here · Space = Play/Pause
+        Drag & drop audio or logo here.
       </div>
       <div class="footer-tag" id="footerTag">
         SPECTRUM · NEON · BARS · CLEAN
@@ -437,7 +434,7 @@
       <button id="downloadAudioBtn">DL Audio</button>
     </div>
     <div class="audio-note">
-      Load an audio file to start. You can drag & drop MP3/WAV here. P = Performance mode.
+      Load an audio file to start. You can drag & drop MP3/WAV here. Space = Play/Pause · P = Performance mode.
     </div>
   </div>
 
@@ -452,9 +449,6 @@
 </div>
 
 <script>
-  // ==========
-  // Audio setup
-  // ==========
   const audioEl = document.getElementById("audioElement");
   const loadTrackBtn = document.getElementById("loadTrackBtn");
   const playPauseBtn = document.getElementById("playPauseBtn");
@@ -590,7 +584,6 @@
     audioEl.currentTime = audioEl.duration * pct;
   });
 
-  // Spacebar = play / pause
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" && !e.target.matches("input, textarea, select")) {
       e.preventDefault();
@@ -598,9 +591,6 @@
     }
   });
 
-  // ==========
-  // Visualizer
-  // ==========
   const canvas = document.getElementById("visualCanvas");
   const ctx = canvas.getContext("2d");
   const dropZone = document.getElementById("dropZone");
@@ -616,13 +606,12 @@
 
   let theme = themeSelect.value;
   let visualizerType = visualizerSelect.value;
-  let fxMode = "none"; // "none" | "glitch"
-  let fxStrength = "soft"; // "soft" | "medium" | "hardcore"
+  let fxMode = "none";
+  let fxStrength = "soft";
   let visualizerEnabled = true;
   let logoEnabled = false;
   let lastEnergy = 0;
 
-  // logical (CSS) canvas size – fixes scaling issues
   let canvasDisplayWidth = 0;
   let canvasDisplayHeight = 440;
 
@@ -663,7 +652,6 @@
       g.addColorStop(0.5, "#05060b");
       g.addColorStop(1, "#000000");
     } else {
-      // sunset
       g.addColorStop(0, "#ff7a88");
       g.addColorStop(0.45, "#251432");
       g.addColorStop(1, "#050408");
@@ -672,7 +660,6 @@
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
-    // subtle overlay lines
     ctx.globalAlpha = 0.06;
     ctx.fillStyle = "#ffffff";
     const stripeH = 2;
@@ -697,7 +684,6 @@
 
     const w = canvasDisplayWidth;
     const h = canvasDisplayHeight;
-    const energy = computeEnergy();
     const barCount = 120;
     const barWidth = w / barCount;
 
@@ -804,9 +790,6 @@
     ctx.stroke();
   }
 
-  // ==========
-  // Logo + Glitch
-  // ==========
   const logoInput = document.getElementById("logoInput");
   const logoUploadBtn = document.getElementById("logoUploadBtn");
   const logoClearBtn = document.getElementById("logoClearBtn");
@@ -966,9 +949,6 @@
     }
   });
 
-  // ==========
-  // View toggles / FX / Theme
-  // ==========
   visualizerViewBtn.addEventListener("click", () => {
     visualizerEnabled = !visualizerEnabled;
     visualizerViewBtn.classList.toggle("active", visualizerEnabled);
@@ -1019,9 +999,6 @@
       fxStrength.toUpperCase();
   }
 
-  // ==========
-  // PNG download + presets + (simple) recording stub
-  // ==========
   downloadPngBtn.addEventListener("click", () => {
     const link = document.createElement("a");
     link.href = canvas.toDataURL("image/png");
@@ -1077,9 +1054,6 @@
     }
   });
 
-  // ==========
-  // Main render loop
-  // ==========
   function render() {
     requestAnimationFrame(render);
     drawBackground();

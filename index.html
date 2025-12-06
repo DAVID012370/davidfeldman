@@ -394,7 +394,6 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    /* FX Strength row */
     .fx-strength-row {
       margin-top: 0.15rem;
       display: flex;
@@ -647,14 +646,13 @@
     let currentFxMode = "clean";
     let fxStrength = "medium";
 
-    // This replaces the old "free" glitchAmount slider.
-    // We clamp it VERY low so even Hardcore is gentle.
+    // Strength map (already tamed – even Hardcore is pretty gentle)
     const strengthMap = {
       soft: 0.02,
       medium: 0.04,
       hardcore: 0.06,
     };
-    let glitchAmount = strengthMap[fxStrength]; // 0.04 default
+    let glitchAmount = strengthMap[fxStrength];
 
     const themes = {
       neon: {
@@ -799,9 +797,7 @@
     function formatTime(sec) {
       if (!isFinite(sec)) return "0:00";
       const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60)
-        .toString()
-        .padStart(2, "0");
+      const s = Math.floor(sec % 60).toString().padStart(2, "0");
       return `${m}:${s}`;
     }
 
@@ -1446,7 +1442,7 @@
       ctx.closePath();
     }
 
-    // LOGO FX HELPERS
+    // GLITCH / FX HELPERS
     function applyGlitchSlices(lx, ly, logoW, logoH, energy) {
       const baseBands = 1 + Math.round(glitchAmount * 20);
       const extraBands = Math.round(energy * 2);
@@ -1705,6 +1701,50 @@
       ctx.restore();
     }
 
+    // NEW: glyph/letter jumping – slices logo into vertical columns
+    function applyGlyphJumps(lx, ly, logoW, logoH, energy) {
+      const colCount = 12 + Math.round(glitchAmount * 20);
+      const srcColW = logoImage.width / colCount;
+      const dstColW = logoW / colCount;
+
+      const baseOffset =
+        1.5 +
+        glitchAmount * 25 +
+        energy * 18;
+
+      ctx.save();
+      ctx.globalAlpha = 0.95;
+
+      for (let i = 0; i < colCount; i++) {
+        const dx = lx + i * dstColW;
+        const sx = i * srcColW;
+        const jitterY =
+          (Math.random() - 0.5) *
+          baseOffset;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(dx, ly, dstColW + 1, logoH);
+        ctx.clip();
+
+        ctx.drawImage(
+          logoImage,
+          sx,
+          0,
+          srcColW,
+          logoImage.height,
+          dx,
+          ly + jitterY,
+          dstColW + 1,
+          logoH
+        );
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
     // MAIN LOGO RENDER
     function drawLogoCenter(width, height, rawEnergy) {
       if (!logoImage) return;
@@ -1791,6 +1831,8 @@
 
       if (currentFxMode === "glitch" || currentFxMode === "combo") {
         applyGlitchSlices(lx, ly, logoW, logoH, energy);
+        // NEW: per-letter / per-word jumping
+        applyGlyphJumps(lx, ly, logoW, logoH, energy);
       }
 
       if (currentFxMode === "shake") {

@@ -87,8 +87,6 @@
       box-shadow: 0 0 16px rgba(247, 37, 133, 0.6);
     }
 
-    /* generic buttons / inputs */
-
     .file-input-label {
       position: relative;
       overflow: hidden;
@@ -179,8 +177,6 @@
       box-shadow: 0 0 16px rgba(34, 197, 94, 0.7);
     }
 
-    /* selects */
-
     .select-wrapper {
       position: relative;
       display: flex;
@@ -211,8 +207,6 @@
       border-color: rgba(255, 255, 255, 0.6);
     }
 
-    /* VIDEO / VISUAL CONTROLS (TOP ROW) */
-
     .video-controls {
       display: flex;
       flex-wrap: wrap;
@@ -230,8 +224,6 @@
       align-items: center;
     }
 
-    /* logo controls only for Logo tab */
-
     .logo-controls {
       display: flex;
       align-items: center;
@@ -241,8 +233,6 @@
     .logo-controls.hidden {
       display: none;
     }
-
-    /* VISUALIZER AREA */
 
     .visualizer-wrapper {
       flex: 1;
@@ -279,8 +269,6 @@
       letter-spacing: 0.18em;
       opacity: 0.45;
     }
-
-    /* AUDIO CONTROLS (BOTTOM) */
 
     .audio-controls {
       display: flex;
@@ -331,8 +319,6 @@
       box-shadow: 0 0 8px #4cc9f0;
       border: none;
     }
-
-    /* STATUS + SEEK */
 
     .status-row {
       display: flex;
@@ -403,8 +389,6 @@
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.15);
     }
-
-    /* PERFORMANCE MODE */
 
     body.perform-mode header {
       display: none;
@@ -504,6 +488,27 @@
       <div class="watermark" id="watermarkText">Spectrum · Visualizer</div>
     </section>
 
+    <!-- TIMELINE + STATUS NOW ABOVE BUTTONS -->
+    <div class="status-row">
+      <div class="seek-container">
+        <span class="seek-time" id="currentTime">0:00</span>
+        <input
+          type="range"
+          id="seekBar"
+          class="seek-bar"
+          min="0"
+          value="0"
+          step="0.01"
+          disabled
+        />
+        <span class="seek-time" id="durationTime">0:00</span>
+      </div>
+      <div class="status" id="statusText">
+        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.  
+        Space = Play/Pause · P = Performance · R/REC = Record WebM
+      </div>
+    </div>
+
     <!-- BOTTOM: AUDIO CONTROLS -->
     <div class="audio-controls">
       <label class="file-input-label">
@@ -542,25 +547,6 @@
       display:none;">
     </div>
 
-    <div class="status-row">
-      <div class="seek-container">
-        <span class="seek-time" id="currentTime">0:00</span>
-        <input
-          type="range"
-          id="seekBar"
-          class="seek-bar"
-          min="0"
-          value="0"
-          step="0.01"
-          disabled
-        />
-        <span class="seek-time" id="durationTime">0:00</span>
-      </div>
-      <div class="status" id="statusText">
-        Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.  
-        Space = Play/Pause · P = Performance · R/REC = Record WebM
-      </div>
-    </div>
   </main>
 
   <script>
@@ -683,7 +669,6 @@
         btn.classList.add("active");
         currentView = btn.dataset.view || "visualizer";
 
-        // Show logo controls only in Logo view
         if (currentView === "logo") {
           logoControls.classList.remove("hidden");
         } else {
@@ -1119,7 +1104,7 @@
     });
 
     function startVisualizer() {
-      if (animationId) return; // already running
+      if (animationId) return;
 
       function draw() {
         animationId = requestAnimationFrame(draw);
@@ -1349,7 +1334,7 @@
       if (!logoImage) return;
 
       const avg = level || 0;
-      const pulse = 1 + (avg / 255) * 0.08; // 1 when no audio
+      const pulse = 1 + (avg / 255) * 0.08;
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -1448,7 +1433,7 @@
     resizeCanvas();
     resetUIToEmpty();
     loadPresetFromStorage(false);
-    startVisualizer(); // run loop always so Logo works even without audio
+    startVisualizer();
   </script>
 </body>
 </html>

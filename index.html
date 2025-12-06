@@ -429,8 +429,19 @@
         <span class="seek-time" id="durationTime">0:00</span>
       </div>
       <div class="status">
-        💡 Drag &amp; drop audio · Space = Play/Pause · P = Performance · REC = Record WebM
+        💡 Drag &amp; drop audio · Space = Play/Pause · P = Performance · R/REC = Record WebM
       </div>
+    </div>
+
+    <!-- Now Playing text -->
+    <div id="nowPlaying" style="
+      text-align:center;
+      font-size:0.9rem;
+      letter-spacing:0.05em;
+      opacity:0.85;
+      margin-top:0.3rem;
+      text-transform:uppercase;
+      display:none;">
     </div>
 
     <section class="visualizer-wrapper">
@@ -462,6 +473,7 @@
     const downloadAudioBtn = document.getElementById("downloadAudio");
     const downloadFrameBtn = document.getElementById("downloadFrame");
     const recordBtn = document.getElementById("recordBtn");
+    const nowPlayingText = document.getElementById("nowPlaying");
 
     let audioContext;
     let audioSource;
@@ -589,6 +601,8 @@
       recordBtn.disabled = true;
       recordBtn.classList.remove("recording");
       recordBtn.textContent = "REC";
+      nowPlayingText.style.display = "none";
+      nowPlayingText.textContent = "";
       statusText.textContent =
         "Load an audio file to start. You can also drag & drop an MP3/WAV here.";
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -660,6 +674,10 @@
       recordBtn.disabled = false;
       isPlaying = false;
       statusText.textContent = `Loaded: ${file.name}`;
+
+      // Now Playing
+      nowPlayingText.textContent = "Now Playing: " + file.name;
+      nowPlayingText.style.display = "block";
     }
 
     fileInput.addEventListener("change", (event) => {
@@ -760,7 +778,6 @@
 
       if (audioContext && analyser) {
         audioDestForRecording = audioContext.createMediaStreamDestination();
-        // שולחים את האודיו גם ליעד ההקלטה
         analyser.connect(audioDestForRecording);
         combinedStream = new MediaStream([
           ...canvasStream.getVideoTracks(),

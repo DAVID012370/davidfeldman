@@ -527,15 +527,6 @@
         </select>
       </div>
 
-      <div class="select-wrapper">
-        <span class="select-label">FX</span>
-        <select id="fxSelect" class="select-control">
-          <option value="none">Clean</option>
-          <option value="crt">CRT Background</option>
-          <option value="glitch">Logo Glitch</option>
-        </select>
-      </div>
-
       <!-- logo controls ONLY when logo view enabled -->
       <div class="logo-controls hidden" id="logoControls">
         <label class="file-input-label">
@@ -566,7 +557,7 @@
     <!-- HIDDEN PICKER FOR CENTER CLICK (audio + image) -->
     <input id="centerFile" type="file" accept="audio/*,image/*" style="display:none" />
 
-    <!-- TIMELINE + STATUS -->
+    <!-- TIMELINE + STATUS + GLITCH -->
     <div class="status-row">
       <div class="seek-container">
         <span class="seek-time" id="currentTime">0:00</span>
@@ -599,7 +590,7 @@
           min="0"
           max="1"
           step="0.01"
-          value="0.7"
+          value="0.5"
           class="glitch-slider"
         />
       </div>
@@ -667,7 +658,6 @@
     const performBtn = document.getElementById("performBtn");
     const themeSelect = document.getElementById("themeSelect");
     const visualizerSelect = document.getElementById("visualizerSelect");
-    const fxSelect = document.getElementById("fxSelect");
     const watermarkText = document.getElementById("watermarkText");
     const downloadAudioBtn = document.getElementById("downloadAudio");
     const downloadFrameBtn = document.getElementById("downloadFrame");
@@ -706,7 +696,7 @@
     let logoEnabled = false;
 
     // glitch intensity (0–1)
-    let glitchAmount = 0.7;
+    let glitchAmount = 0.5;
 
     const themes = {
       neon: {
@@ -739,7 +729,6 @@
 
     let currentThemeKey = "neon";
     let currentVisualizer = "bars";
-    let currentFx = "none";
 
     function applyTheme(themeKey) {
       const theme = themes[themeKey] || themes.neon;
@@ -756,19 +745,13 @@
       return "Idle";
     }
 
-    function getFxLabel() {
-      if (currentFx === "crt") return " · CRT";
-      if (currentFx === "glitch") return " · GLITCH";
-      return "";
-    }
-
     function updateWatermark() {
       const theme = themes[currentThemeKey] || themes.neon;
       const viewLabel = getViewLabel();
-      const fxLabel = getFxLabel();
+      const glitchLabel = glitchAmount > 0.1 ? " · GLITCH" : "";
       const recLabel = isRecording ? " · REC" : "";
       watermarkText.textContent =
-        `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${fxLabel}${recLabel}`;
+        `Spectrum · ${theme.label} · ${viewLabel.toUpperCase()} · ${currentVisualizer.toUpperCase()}${glitchLabel}${recLabel}`;
     }
 
     themeSelect.addEventListener("change", (e) => {
@@ -777,11 +760,6 @@
 
     visualizerSelect.addEventListener("change", (e) => {
       currentVisualizer = e.target.value;
-      updateWatermark();
-    });
-
-    fxSelect.addEventListener("change", (e) => {
-      currentFx = e.target.value;
       updateWatermark();
     });
 
@@ -1076,7 +1054,6 @@
 
       const fps = 60;
       const canvasStream = canvas.captureStream(fps);
-
       let combinedStream = canvasStream;
 
       if (audioContext && analyser) {
@@ -1164,7 +1141,6 @@
       const preset = {
         theme: currentThemeKey,
         visualizer: currentVisualizer,
-        fx: currentFx,
         volume: volumeSlider.value,
         visualEnabled,
         logoEnabled,
@@ -1193,10 +1169,6 @@
         if (preset.visualizer) {
           currentVisualizer = preset.visualizer;
           visualizerSelect.value = preset.visualizer;
-        }
-        if (preset.fx) {
-          currentFx = preset.fx;
-          fxSelect.value = preset.fx;
         }
         if (preset.volume != null) {
           volumeSlider.value = preset.volume;
@@ -1327,12 +1299,10 @@
           }
         }
 
-        // raw energy from music
         const rawEnergy = Math.max(0, Math.min(1, logoLevel / 190));
-        // combined with user glitchAmount
         const energyForMeter = rawEnergy * (0.2 + glitchAmount * 0.8);
         if (glitchFill) {
-          const w = 6 + energyForMeter * 94; // 6% - 100%
+          const w = 6 + energyForMeter * 94;
           glitchFill.style.width = w.toFixed(1) + "%";
         }
 
@@ -1357,11 +1327,6 @@
 
         if (logoEnabled && logoImage) {
           drawLogoCenter(width, height, rawEnergy);
-        }
-
-        // CRT FX only if fx == crt
-        if (currentFx === "crt" && (visualEnabled || logoEnabled)) {
-          applyVhsFx(width, height);
         }
       }
 
@@ -1512,71 +1477,25 @@
       ctx.closePath();
     }
 
-    function applyVhsFx(width, height) {
-      const grad = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        Math.min(width, height) * 0.1,
-        width / 2,
-        height / 2,
-        Math.max(width, height) * 0.7
-      );
-      grad.addColorStop(0, "rgba(0,0,0,0)");
-      grad.addColorStop(1, "rgba(0,0,0,0.55)");
-      ctx.save();
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
-      ctx.restore();
-
-      ctx.save();
-      ctx.globalAlpha = 0.28;
-      ctx.fillStyle = "#000000";
-      for (let y = 0; y < height; y += 3) {
-        ctx.fillRect(0, y, width, 1);
-      }
-      ctx.restore();
-
-      ctx.save();
-      ctx.globalAlpha = 0.12;
-      for (let i = 0; i < 40; i++) {
-        const w = 10 + Math.random() * 80;
-        const h = 1 + Math.random() * 3;
-        const x = Math.random() * width;
-        const y = Math.random() * height;
-        ctx.fillStyle =
-          i % 2 === 0 ? "rgba(255,255,255,0.7)" : "rgba(0,255,200,0.7)";
-        ctx.fillRect(x, y, w, h);
-      }
-      ctx.restore();
-
-      ctx.save();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(6, 6, width - 12, height - 12);
-      ctx.restore();
-    }
-
-    // LOGO: clean or glitch (Logo Only)
+    // LOGO glitch clean remix
     function drawLogoCenter(width, height, rawEnergy) {
       if (!logoImage) return;
 
-      // combine music + user slider
       const energy = Math.max(
         0,
-        Math.min(1, rawEnergy * (0.1 + glitchAmount * 1.3))
+        Math.min(1, rawEnergy * (0.2 + glitchAmount * 1.2))
       );
 
-      const pulse = 1 + energy * 0.18;
-      const glitchActive = currentFx === "glitch";
+      const glitchActive = glitchAmount > 0.02;
 
-      const jitterAmount = glitchActive ? 4 + energy * 26 : 2 + energy * 6;
+      const pulse = 1 + energy * 0.15 * (0.3 + glitchAmount * 0.7);
+
+      const jitterAmount = glitchActive
+        ? 2 + glitchAmount * 18 + energy * 10
+        : 1 + energy * 4;
+
       let jitterX = (Math.random() - 0.5) * jitterAmount;
       let jitterY = (Math.random() - 0.5) * jitterAmount;
-
-      if (glitchActive && energy > 0.7 && Math.random() < 0.25) {
-        jitterX += (Math.random() - 0.5) * jitterAmount * 1.8;
-        jitterY += (Math.random() - 0.5) * jitterAmount * 1.8;
-      }
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -1590,10 +1509,7 @@
       const ly = centerY - logoH / 2;
 
       ctx.save();
-      ctx.translate(
-        centerX + (glitchActive ? jitterX : 0),
-        centerY + (glitchActive ? jitterY : 0)
-      );
+      ctx.translate(centerX + (glitchActive ? jitterX : 0), centerY + (glitchActive ? jitterY : 0));
       ctx.scale(pulse, pulse);
       ctx.translate(-centerX, -centerY);
 
@@ -1604,56 +1520,58 @@
           0,
           centerX,
           centerY,
-          Math.max(logoW, logoH) * 1.15
+          Math.max(logoW, logoH) * (0.9 + glitchAmount * 0.5)
         );
-        glowGrad.addColorStop(0, "rgba(0,255,180,0.6)");
-        glowGrad.addColorStop(0.45, "rgba(0,120,255,0.4)");
+        glowGrad.addColorStop(0, "rgba(0,255,180,0.55)");
+        glowGrad.addColorStop(0.45, "rgba(0,120,255,0.35)");
         glowGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.globalAlpha = 0.9;
         ctx.fillStyle = glowGrad;
         ctx.fillRect(
-          lx - logoW * 0.55,
-          ly - logoH * 0.55,
-          logoW * 2.1,
-          logoH * 2.1
+          lx - logoW * 0.4,
+          ly - logoH * 0.4,
+          logoW * 1.8,
+          logoH * 1.8
         );
 
         ctx.globalCompositeOperation = "screen";
 
         ctx.globalAlpha = 0.9;
-        ctx.drawImage(logoImage, lx - 4, ly, logoW, logoH);
-
-        ctx.globalAlpha = 0.85;
-        ctx.drawImage(logoImage, lx + 4, ly + 1.5, logoW, logoH);
+        ctx.drawImage(logoImage, lx - 3, ly, logoW, logoH);
 
         ctx.globalAlpha = 0.8;
-        ctx.drawImage(logoImage, lx + 1.5, ly - 3, logoW, logoH);
+        ctx.drawImage(logoImage, lx + 3, ly + 1.5, logoW, logoH);
+
+        ctx.globalAlpha = 0.8;
+        ctx.drawImage(logoImage, lx + 1.5, ly - 2, logoW, logoH);
 
         ctx.globalCompositeOperation = "source-over";
         ctx.globalAlpha = 1;
         ctx.drawImage(logoImage, lx, ly, logoW, logoH);
 
-        const baseCount = 6;
-        const extraCount = Math.round(energy * 18);
+        const baseCount = Math.round(2 + glitchAmount * 4);
+        const extraCount = Math.round(energy * 10 * glitchAmount * 1.5);
         const glitchCount = baseCount + extraCount;
 
         for (let i = 0; i < glitchCount; i++) {
           const sliceHeight =
-            logoH / 30 + Math.random() * (logoH / 7);
+            (logoH / 40) +
+            Math.random() * (logoH / 18) * (0.5 + glitchAmount);
           const sliceY = ly + Math.random() * (logoH - sliceHeight);
 
           const shiftX =
             (Math.random() - 0.5) *
-            (20 + energy * 80);
+            (10 + glitchAmount * 50 + energy * 40);
           const shiftY =
-            (Math.random() - 0.5) * (energy * 10);
+            (Math.random() - 0.5) *
+            (glitchAmount * 8 + energy * 6);
 
           ctx.save();
           ctx.beginPath();
-          ctx.rect(lx - 30, sliceY, logoW + 60, sliceHeight);
+          ctx.rect(lx - 20, sliceY, logoW + 40, sliceHeight);
           ctx.clip();
 
-          ctx.globalAlpha = 0.95;
+          ctx.globalAlpha = 1;
           ctx.drawImage(
             logoImage,
             lx + shiftX,
@@ -1661,38 +1579,20 @@
             logoW,
             logoH
           );
-
-          ctx.restore();
-
-          ctx.save();
-          ctx.globalAlpha = 0.12 + energy * 0.18;
-          ctx.fillStyle =
-            i % 3 === 0
-              ? "rgba(0,255,200,0.9)"
-              : i % 3 === 1
-              ? "rgba(255,0,120,0.9)"
-              : "rgba(0,180,255,0.9)";
-          ctx.fillRect(
-            lx - 12,
-            sliceY,
-            logoW + 24,
-            sliceHeight
-          );
           ctx.restore();
         }
 
         ctx.save();
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.55;
         ctx.strokeStyle = "rgba(0,255,200,0.9)";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.8;
         ctx.strokeRect(
-          lx - 3,
-          ly - 3,
-          logoW + 6,
-          logoH + 6
+          lx - 2,
+          ly - 2,
+          logoW + 4,
+          logoH + 4
         );
         ctx.restore();
-
       } else {
         const glowGrad = ctx.createRadialGradient(
           centerX,
@@ -1720,7 +1620,6 @@
       ctx.restore();
     }
 
-    // center click => open audio/image picker
     visualizerWrapper.addEventListener("click", (e) => {
       if (e.target === visualizerWrapper || e.target === canvas) {
         centerFileInput.click();

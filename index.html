@@ -394,6 +394,40 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
+    /* Glitch meter */
+    .glitch-meter {
+      margin-top: 0.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      max-width: 220px;
+    }
+
+    .glitch-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      opacity: 0.75;
+    }
+
+    .glitch-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .glitch-fill {
+      height: 100%;
+      width: 6%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c1c3, #f72585);
+      box-shadow: 0 0 14px rgba(247,37,133,0.7);
+      transition: width 0.08s ease-out;
+    }
+
     body.perform-mode header {
       display: none;
     }
@@ -513,6 +547,12 @@
         Load an audio file to start. You can also drag &amp; drop an MP3/WAV here.  
         Space = Play/Pause · P = Performance · R/REC = Record WebM
       </div>
+      <div class="glitch-meter">
+        <span class="glitch-label">Glitch</span>
+        <div class="glitch-bar">
+          <div class="glitch-fill" id="glitchFill"></div>
+        </div>
+      </div>
     </div>
 
     <!-- AUDIO CONTROLS -->
@@ -587,6 +627,7 @@
     const loadPresetBtn = document.getElementById("loadPreset");
     const viewTabs = document.querySelectorAll(".view-tab");
     const logoControls = document.getElementById("logoControls");
+    const glitchFill = document.getElementById("glitchFill");
 
     let audioContext;
     let audioSource;
@@ -775,6 +816,7 @@
       isRecording = false;
       mediaRecorder = null;
       recordedChunks = [];
+      if (glitchFill) glitchFill.style.width = "6%";
       updateWatermark();
     }
 
@@ -1216,6 +1258,13 @@
           }
         }
 
+        // update glitch meter
+        if (glitchFill) {
+          const t = Math.max(0, Math.min(1, logoLevel / 190));
+          const w = 6 + t * 94; // 6% - 100%
+          glitchFill.style.width = w.toFixed(1) + "%";
+        }
+
         if (visualEnabled) {
           if (currentVisualizer === "wave") {
             if (analyser && waveArray) {
@@ -1435,15 +1484,23 @@
       ctx.restore();
     }
 
-    // 🔥 LOGO GLITCH STYLE (Boris FX vibe)
+    // 🔥 LOGO GLITCH STYLE (Boris FX vibe, more shards + more jitter)
     function drawLogoCenter(width, height, level) {
       if (!logoImage) return;
 
       const avg = level || 0;
-      const pulse = 1 + (avg / 255) * 0.12;
-      const jitterAmount = 2 + (avg / 255) * 10;
-      const jitterX = (Math.random() - 0.5) * jitterAmount;
-      const jitterY = (Math.random() - 0.5) * jitterAmount;
+      const energy = Math.max(0, Math.min(1, avg / 200)); // 0-1
+      const pulse = 1 + energy * 0.18;
+
+      const jitterAmount = 4 + energy * 26;
+      let jitterX = (Math.random() - 0.5) * jitterAmount;
+      let jitterY = (Math.random() - 0.5) * jitterAmount;
+
+      // occasional big jump when energy is high
+      if (energy > 0.7 && Math.random() < 0.25) {
+        jitterX += (Math.random() - 0.5) * jitterAmount * 1.8;
+        jitterY += (Math.random() - 0.5) * jitterAmount * 1.8;
+      }
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -1462,60 +1519,69 @@
       ctx.translate(-centerX, -centerY);
 
       if (currentFx === "vhs") {
-        // BIG SOFT GLOW BEHIND LOGO
+        // BIG GLOW behind logo
         const glowGrad = ctx.createRadialGradient(
           centerX,
           centerY,
           0,
           centerX,
           centerY,
-          Math.max(logoW, logoH) * 1.1
+          Math.max(logoW, logoH) * 1.15
         );
-        glowGrad.addColorStop(0, "rgba(0,255,180,0.5)");
-        glowGrad.addColorStop(0.4, "rgba(0,120,255,0.35)");
+        glowGrad.addColorStop(0, "rgba(0,255,180,0.6)");
+        glowGrad.addColorStop(0.45, "rgba(0,120,255,0.4)");
         glowGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.globalAlpha = 0.9;
         ctx.fillStyle = glowGrad;
         ctx.fillRect(
-          lx - logoW * 0.5,
-          ly - logoH * 0.5,
-          logoW * 2,
-          logoH * 2
+          lx - logoW * 0.55,
+          ly - logoH * 0.55,
+          logoW * 2.1,
+          logoH * 2.1
         );
 
-        // RGB SPLIT STYLE
+        // RGB split + offset
         ctx.globalCompositeOperation = "screen";
 
+        ctx.globalAlpha = 0.9;
+        ctx.drawImage(logoImage, lx - 4, ly, logoW, logoH);
+
         ctx.globalAlpha = 0.85;
-        ctx.drawImage(logoImage, lx - 3, ly, logoW, logoH); // left tint
+        ctx.drawImage(logoImage, lx + 4, ly + 1.5, logoW, logoH);
 
-        ctx.globalAlpha = 0.75;
-        ctx.drawImage(logoImage, lx + 3, ly + 1, logoW, logoH); // right tint
-
-        ctx.globalAlpha = 0.7;
-        ctx.drawImage(logoImage, lx + 1, ly - 2, logoW, logoH); // slight up
+        ctx.globalAlpha = 0.8;
+        ctx.drawImage(logoImage, lx + 1.5, ly - 3, logoW, logoH);
 
         ctx.globalCompositeOperation = "source-over";
         ctx.globalAlpha = 1;
-        ctx.drawImage(logoImage, lx, ly, logoW, logoH); // base logo
+        ctx.drawImage(logoImage, lx, ly, logoW, logoH);
 
-        // GLITCH BARS OVER LOGO
-        const glitchCount = 4 + Math.round((avg / 255) * 8);
+        // GLITCH SLICES (more shards + deeper shifts)
+        const baseCount = 6;
+        const extraCount = Math.round(energy * 18);
+        const glitchCount = baseCount + extraCount;
+
         for (let i = 0; i < glitchCount; i++) {
-          const sliceHeight = (logoH / 20) + Math.random() * (logoH / 8);
+          const sliceHeight =
+            logoH / 30 + Math.random() * (logoH / 7);
           const sliceY = ly + Math.random() * (logoH - sliceHeight);
-          const shiftX = (Math.random() - 0.5) * (15 + (avg / 255) * 25);
+
+          const shiftX =
+            (Math.random() - 0.5) *
+            (20 + energy * 80); // deeper horizontal glitch
+          const shiftY =
+            (Math.random() - 0.5) * (energy * 10); // slight vertical warp
 
           ctx.save();
           ctx.beginPath();
-          ctx.rect(lx - 20, sliceY, logoW + 40, sliceHeight);
+          ctx.rect(lx - 30, sliceY, logoW + 60, sliceHeight);
           ctx.clip();
 
-          ctx.globalAlpha = 0.9;
+          ctx.globalAlpha = 0.95;
           ctx.drawImage(
             logoImage,
             lx + shiftX,
-            ly,
+            ly + shiftY,
             logoW,
             logoH
           );
@@ -1523,24 +1589,26 @@
           ctx.restore();
 
           ctx.save();
-          ctx.globalAlpha = 0.08;
+          ctx.globalAlpha = 0.12 + energy * 0.18;
           ctx.fillStyle =
-            i % 2 === 0
-              ? "rgba(0,255,200,0.7)"
-              : "rgba(255,0,120,0.7)";
+            i % 3 === 0
+              ? "rgba(0,255,200,0.9)"
+              : i % 3 === 1
+              ? "rgba(255,0,120,0.9)"
+              : "rgba(0,180,255,0.9)";
           ctx.fillRect(
-            lx - 10,
+            lx - 12,
             sliceY,
-            logoW + 20,
+            logoW + 24,
             sliceHeight
           );
           ctx.restore();
         }
 
-        // subtle outline
+        // subtle frame around logo
         ctx.save();
-        ctx.globalAlpha = 0.5;
-        ctx.strokeStyle = "rgba(0,255,200,0.8)";
+        ctx.globalAlpha = 0.6;
+        ctx.strokeStyle = "rgba(0,255,200,0.9)";
         ctx.lineWidth = 2;
         ctx.strokeRect(
           lx - 3,
@@ -1549,9 +1617,8 @@
           logoH + 6
         );
         ctx.restore();
-
       } else {
-        // CLEAN LOGO MODE (ללא גליץ')
+        // CLEAN LOGO MODE
         const glowGrad = ctx.createRadialGradient(
           centerX,
           centerY,

@@ -77,7 +77,11 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       opacity: 0.7;
-      transition: background 0.15s, opacity 0.15s, border-color 0.15s, box-shadow 0.15s;
+      transition:
+        background 0.15s,
+        opacity 0.15s,
+        border-color 0.15s,
+        box-shadow 0.15s;
     }
 
     .view-tab.active {
@@ -460,7 +464,7 @@
         </select>
       </div>
 
-      <!-- logo controls ONLY when logo is enabled -->
+      <!-- logo controls ONLY when logo view enabled -->
       <div class="logo-controls hidden" id="logoControls">
         <label class="file-input-label">
           Logo
@@ -486,6 +490,9 @@
       </div>
       <div class="watermark" id="watermarkText">Spectrum · Visualizer</div>
     </section>
+
+    <!-- HIDDEN PICKER FOR CENTER CLICK (audio + image) -->
+    <input id="centerFile" type="file" accept="audio/*,image/*" style="display:none" />
 
     <!-- TIMELINE + STATUS -->
     <div class="status-row">
@@ -536,20 +543,23 @@
       </div>
     </div>
 
-    <div id="nowPlaying" style="
-      text-align:left;
-      font-size:0.85rem;
-      letter-spacing:0.04em;
-      opacity:0.9;
-      margin-top:0.25rem;
-      text-transform:uppercase;
-      display:none;">
-    </div>
-
+    <div
+      id="nowPlaying"
+      style="
+        text-align: left;
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+        opacity: 0.9;
+        margin-top: 0.25rem;
+        text-transform: uppercase;
+        display: none;
+      "
+    ></div>
   </main>
 
   <script>
     const fileInput = document.getElementById("audioFile");
+    const centerFileInput = document.getElementById("centerFile");
     const logoFileInput = document.getElementById("logoFile");
     const clearLogoBtn = document.getElementById("clearLogo");
     const playPauseBtn = document.getElementById("playPause");
@@ -599,7 +609,7 @@
     let isRecording = false;
     let audioDestForRecording = null;
 
-    // NEW: two booleans for multi-select view
+    // view state
     let visualEnabled = true;
     let logoEnabled = false;
 
@@ -608,26 +618,28 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        label: "Neon"
+        label: "Neon",
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
         visBg: "radial-gradient(circle at center, #0b2c6a, #020716 75%)",
         barColors: ["#8fd3ff", "#ffffff", "#4a90e2"],
-        label: "XP"
+        label: "XP",
       },
       vapor: {
-        bodyBg: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a1c4fd 100%)",
-        visBg: "radial-gradient(circle at center, rgba(10,10,25,0.95), rgba(4,4,12,0.98))",
+        bodyBg:
+          "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a1c4fd 100%)",
+        visBg:
+          "radial-gradient(circle at center, rgba(10,10,25,0.95), rgba(4,4,12,0.98))",
         barColors: ["#ff9a9e", "#fecdff", "#a1c4fd"],
-        label: "Vaporwave"
+        label: "Vaporwave",
       },
       minimal: {
         bodyBg: "linear-gradient(135deg, #111111, #222222)",
         visBg: "radial-gradient(circle at center, #050505, #101010 80%)",
         barColors: ["#ffffff", "#cccccc", "#999999"],
-        label: "Minimal"
-      }
+        label: "Minimal",
+      },
     };
 
     let currentThemeKey = "neon";
@@ -698,13 +710,9 @@
           logoEnabled = !logoEnabled;
         }
 
-        // ensure not both off – keep at least the one you just clicked
         if (!visualEnabled && !logoEnabled) {
-          if (view === "visualizer") {
-            visualEnabled = true;
-          } else {
-            logoEnabled = true;
-          }
+          if (view === "visualizer") visualEnabled = true;
+          else logoEnabled = true;
         }
 
         updateViewTabsUI();
@@ -726,7 +734,8 @@
 
     function initAudioContext() {
       if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 2048;
         const bufferLength = analyser.frequencyBinCount;
@@ -738,7 +747,9 @@
     function formatTime(sec) {
       if (!isFinite(sec)) return "0:00";
       const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60).toString().padStart(2, "0");
+      const s = Math.floor(sec % 60)
+        .toString()
+        .padStart(2, "0");
       return `${m}:${s}`;
     }
 
@@ -777,7 +788,9 @@
 
       if (audioElement) audioElement.pause();
       if (audioSource) {
-        try { audioSource.disconnect(); } catch (e) {}
+        try {
+          audioSource.disconnect();
+        } catch (e) {}
       }
 
       if (currentFileUrl) {
@@ -826,14 +839,7 @@
       nowPlayingText.style.display = "block";
     }
 
-    fileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      loadAudioFile(file);
-      event.target.value = "";
-    });
-
-    logoFileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
+    function loadLogoFileFromFile(file) {
       if (!file) return;
       if (!file.type.startsWith("image/")) {
         statusText.textContent = "This file is not an image. Please use PNG/JPG.";
@@ -845,9 +851,35 @@
       img.onload = () => {
         logoImage = img;
         statusText.textContent = `Logo loaded: ${file.name}`;
-        logoFileInput.value = "";
       };
       img.src = logoUrl;
+    }
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      loadAudioFile(file);
+      event.target.value = "";
+    });
+
+    logoFileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      loadLogoFileFromFile(file);
+      event.target.value = "";
+    });
+
+    // center click picker: audio OR image
+    centerFileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.type.startsWith("audio/")) {
+        loadAudioFile(file);
+      } else if (file.type.startsWith("image/")) {
+        loadLogoFileFromFile(file);
+      } else {
+        statusText.textContent =
+          "Unsupported file type. Use MP3/WAV for audio or PNG/JPG for logo.";
+      }
+      centerFileInput.value = "";
     });
 
     clearLogoBtn.addEventListener("click", () => {
@@ -891,7 +923,9 @@
     clearTrackBtn.addEventListener("click", () => {
       if (audioElement) audioElement.pause();
       if (audioSource) {
-        try { audioSource.disconnect(); } catch (e) {}
+        try {
+          audioSource.disconnect();
+        } catch (e) {}
       }
       if (currentFileUrl) {
         URL.revokeObjectURL(currentFileUrl);
@@ -944,20 +978,23 @@
         analyser.connect(audioDestForRecording);
         combinedStream = new MediaStream([
           ...canvasStream.getVideoTracks(),
-          ...audioDestForRecording.stream.getAudioTracks()
+          ...audioDestForRecording.stream.getAudioTracks(),
         ]);
       }
 
       recordedChunks = [];
       try {
         mediaRecorder = new MediaRecorder(combinedStream, {
-          mimeType: "video/webm;codecs=vp9,opus"
+          mimeType: "video/webm;codecs=vp9,opus",
         });
       } catch (e) {
         try {
-          mediaRecorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
+          mediaRecorder = new MediaRecorder(combinedStream, {
+            mimeType: "video/webm",
+          });
         } catch (err) {
-          statusText.textContent = "Recording is not supported in this browser.";
+          statusText.textContent =
+            "Recording is not supported in this browser.";
           return;
         }
       }
@@ -1001,7 +1038,9 @@
         mediaRecorder.stop();
       }
       if (audioDestForRecording && analyser) {
-        try { analyser.disconnect(audioDestForRecording); } catch (e) {}
+        try {
+          analyser.disconnect(audioDestForRecording);
+        } catch (e) {}
       }
       audioDestForRecording = null;
     }
@@ -1022,7 +1061,7 @@
         fx: currentFx,
         volume: volumeSlider.value,
         visualEnabled,
-        logoEnabled
+        logoEnabled,
       };
       try {
         localStorage.setItem("djvizPreset", JSON.stringify(preset));
@@ -1064,7 +1103,6 @@
         if (typeof preset.logoEnabled === "boolean") {
           logoEnabled = preset.logoEnabled;
         }
-        // make sure at least one is true
         if (!visualEnabled && !logoEnabled) visualEnabled = true;
 
         updateViewTabsUI();
@@ -1148,7 +1186,7 @@
         const diff = Math.abs(arr[i] - 128);
         sum += diff;
       }
-      return (sum / arr.length) * 2; // roughly 0–255
+      return (sum / arr.length) * 2;
     }
 
     function startVisualizer() {
@@ -1253,7 +1291,12 @@
       const centerX = width / 2;
       const centerY = height / 2;
 
-      const grad = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
+      const grad = ctx.createLinearGradient(
+        centerX - radius,
+        centerY,
+        centerX + radius,
+        centerY
+      );
       grad.addColorStop(0, c1);
       grad.addColorStop(0.5, c2);
       grad.addColorStop(1, c3);
@@ -1379,7 +1422,8 @@
         const h = 1 + Math.random() * 3;
         const x = Math.random() * width;
         const y = Math.random() * height;
-        ctx.fillStyle = i % 2 === 0 ? "rgba(255,255,255,0.7)" : "rgba(0,255,200,0.7)";
+        ctx.fillStyle =
+          i % 2 === 0 ? "rgba(255,255,255,0.7)" : "rgba(0,255,200,0.7)";
         ctx.fillRect(x, y, w, h);
       }
       ctx.restore();
@@ -1426,7 +1470,12 @@
         glowGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.globalAlpha = 0.9;
         ctx.fillStyle = glowGrad;
-        ctx.fillRect(lx - logoW * 0.3, ly - logoH * 0.3, logoW * 1.6, logoH * 1.6);
+        ctx.fillRect(
+          lx - logoW * 0.3,
+          ly - logoH * 0.3,
+          logoW * 1.6,
+          logoH * 1.6
+        );
 
         ctx.globalCompositeOperation = "screen";
         ctx.globalAlpha = 0.7;
@@ -1450,7 +1499,12 @@
         glowGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.globalAlpha = 0.9;
         ctx.fillStyle = glowGrad;
-        ctx.fillRect(lx - logoW * 0.4, ly - logoH * 0.4, logoW * 1.8, logoH * 1.8);
+        ctx.fillRect(
+          lx - logoW * 0.4,
+          ly - logoH * 0.4,
+          logoW * 1.8,
+          logoH * 1.8
+        );
 
         ctx.globalAlpha = 1;
         ctx.drawImage(logoImage, lx, ly, logoW, logoH);
@@ -1459,9 +1513,10 @@
       ctx.restore();
     }
 
+    // center click => open audio/image picker
     visualizerWrapper.addEventListener("click", (e) => {
       if (e.target === visualizerWrapper || e.target === canvas) {
-        fileInput.click();
+        centerFileInput.click();
       }
     });
 
@@ -1472,7 +1527,11 @@
 
     function handleDragLeave(e) {
       e.preventDefault();
-      if (e.target === document.body || e.clientX <= 0 || e.clientY <= 0) {
+      if (
+        e.target === document.body ||
+        e.clientX <= 0 ||
+        e.clientY <= 0
+      ) {
         document.body.classList.remove("drag-over");
       }
     }

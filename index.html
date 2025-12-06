@@ -347,8 +347,6 @@
       opacity: 0.45;
     }
 
-    /* Performance mode */
-
     body.perform-mode header,
     body.perform-mode .status-row {
       display: none;
@@ -481,7 +479,7 @@
       <div class="visualizer-inner">
         <canvas id="visualizer"></canvas>
       </div>
-      <div class="watermark" id="watermarkText">Spectrum · v1.6 · Logo / Presets / VHS</div>
+      <div class="watermark" id="watermarkText">Spectrum · v1.7 · Logo / CRT</div>
     </section>
   </main>
 
@@ -526,11 +524,9 @@
     let currentFile = null;
     let currentFileUrl = null;
 
-    // Logo
     let logoImage = null;
     let logoUrl = null;
 
-    // Recording
     let mediaRecorder = null;
     let recordedChunks = [];
     let isRecording = false;
@@ -541,7 +537,7 @@
         bodyBg: "radial-gradient(circle at top, #141927, #050609 60%)",
         visBg: "radial-gradient(circle at center, #111322, #020307 70%)",
         barColors: ["#4cc9f0", "#f72585", "#b5179e"],
-        watermark: "Spectrum · v1.6 · Neon"
+        watermark: "Spectrum · Neon"
       },
       xp: {
         bodyBg: "radial-gradient(circle at top, #1b3b73, #020b1f 70%)",
@@ -579,7 +575,7 @@
       const theme = themes[currentThemeKey] || themes.neon;
       if (watermarkText) {
         let recLabel = isRecording ? " · REC" : "";
-        let fxLabel = currentFx === "vhs" ? " · VHS" : "";
+        let fxLabel = currentFx === "vhs" ? " · CRT" : "";
         watermarkText.textContent =
           theme.watermark + " · " + currentVisualizer.toUpperCase() + fxLabel + recLabel;
       }
@@ -626,9 +622,7 @@
     function formatTime(sec) {
       if (!isFinite(sec)) return "0:00";
       const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60)
-        .toString()
-        .padStart(2, "0");
+      const s = Math.floor(sec % 60).toString().padStart(2, "0");
       return `${m}:${s}`;
     }
 
@@ -672,13 +666,9 @@
         return;
       }
 
-      if (audioElement) {
-        audioElement.pause();
-      }
+      if (audioElement) audioElement.pause();
       if (audioSource) {
-        try {
-          audioSource.disconnect();
-        } catch (e) {}
+        try { audioSource.disconnect(); } catch (e) {}
       }
       stopVisualizer();
 
@@ -734,7 +724,6 @@
       event.target.value = "";
     });
 
-    // Logo upload
     logoFileInput.addEventListener("change", (event) => {
       const file = event.target.files[0];
       if (!file) return;
@@ -742,9 +731,7 @@
         statusText.textContent = "This file is not an image. Please use PNG/JPG.";
         return;
       }
-      if (logoUrl) {
-        URL.revokeObjectURL(logoUrl);
-      }
+      if (logoUrl) URL.revokeObjectURL(logoUrl);
       logoUrl = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
@@ -796,13 +783,9 @@
     });
 
     clearTrackBtn.addEventListener("click", () => {
-      if (audioElement) {
-        audioElement.pause();
-      }
+      if (audioElement) audioElement.pause();
       if (audioSource) {
-        try {
-          audioSource.disconnect();
-        } catch (e) {}
+        try { audioSource.disconnect(); } catch (e) {}
       }
       if (currentFileUrl) {
         URL.revokeObjectURL(currentFileUrl);
@@ -815,7 +798,6 @@
       resetUIToEmpty();
     });
 
-    // Download audio
     downloadAudioBtn.addEventListener("click", () => {
       if (!currentFile || !currentFileUrl) return;
       const a = document.createElement("a");
@@ -826,7 +808,6 @@
       a.remove();
     });
 
-    // Download visualizer frame as PNG
     downloadFrameBtn.addEventListener("click", () => {
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -842,7 +823,6 @@
       }, "image/png");
     });
 
-    // Start recording (video + audio)
     function startRecording() {
       if (!canvas.captureStream) {
         statusText.textContent = "Recording not supported in this browser.";
@@ -870,9 +850,7 @@
         });
       } catch (e) {
         try {
-          mediaRecorder = new MediaRecorder(combinedStream, {
-            mimeType: "video/webm"
-          });
+          mediaRecorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
         } catch (err) {
           statusText.textContent = "Recording is not supported in this browser.";
           return;
@@ -918,9 +896,7 @@
         mediaRecorder.stop();
       }
       if (audioDestForRecording && analyser) {
-        try {
-          analyser.disconnect(audioDestForRecording);
-        } catch (e) {}
+        try { analyser.disconnect(audioDestForRecording); } catch (e) {}
       }
       audioDestForRecording = null;
     }
@@ -933,7 +909,6 @@
       }
     });
 
-    // Presets (save/load to localStorage)
     function savePresetToStorage() {
       const preset = {
         theme: currentThemeKey,
@@ -990,7 +965,6 @@
       loadPresetFromStorage(true);
     });
 
-    // Fullscreen
     fullscreenBtn.addEventListener("click", () => {
       if (!document.fullscreenElement) {
         if (visualizerWrapper.requestFullscreen) {
@@ -1009,7 +983,6 @@
       resizeCanvas();
     });
 
-    // Keyboard shortcuts: SPACE = play/pause, P = performance, R = record
     document.addEventListener("keydown", async (e) => {
       if (e.code === "Space") {
         e.preventDefault();
@@ -1052,7 +1025,7 @@
         const width = canvas.width / (window.devicePixelRatio || 1);
         const height = canvas.height / (window.devicePixelRatio || 1);
 
-        ctx.fillStyle = "rgba(3, 4, 9, 0.35)";
+        ctx.fillStyle = "rgba(3, 4, 9, 0.4)";
         ctx.fillRect(0, 0, width, height);
 
         const theme = themes[currentThemeKey] || themes.neon;
@@ -1081,7 +1054,7 @@
     function drawBars(width, height, c1, c2, c3) {
       analyser.getByteFrequencyData(dataArray);
 
-      const barCount = 128;
+      const barCount = 96;
       const step = Math.floor(dataArray.length / barCount);
       const barWidth = (width / barCount) * 0.9;
       const gap = (width / barCount) * 0.1;
@@ -1214,47 +1187,121 @@
       ctx.closePath();
     }
 
+    // Stronger CRT / VHS effect
     function applyVhsFx(width, height) {
+      // Slight vignette
+      const grad = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        Math.min(width, height) * 0.1,
+        width / 2,
+        height / 2,
+        Math.max(width, height) * 0.7
+      );
+      grad.addColorStop(0, "rgba(0,0,0,0)");
+      grad.addColorStop(1, "rgba(0,0,0,0.55)");
       ctx.save();
-      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+
+      // Scanlines
+      ctx.save();
+      ctx.globalAlpha = 0.28;
       ctx.fillStyle = "#000000";
       for (let y = 0; y < height; y += 3) {
         ctx.fillRect(0, y, width, 1);
       }
       ctx.restore();
 
+      // Random noise streaks
       ctx.save();
-      ctx.globalAlpha = 0.09;
-      for (let i = 0; i < 35; i++) {
-        const w = 2 + Math.random() * 8;
-        const h = 1 + Math.random() * 5;
+      ctx.globalAlpha = 0.12;
+      for (let i = 0; i < 40; i++) {
+        const w = 10 + Math.random() * 80;
+        const h = 1 + Math.random() * 3;
         const x = Math.random() * width;
         const y = Math.random() * height;
-        ctx.fillStyle = i % 2 === 0 ? "#ffffff" : "#00ffe0";
+        ctx.fillStyle = i % 2 === 0 ? "rgba(255,255,255,0.7)" : "rgba(0,255,200,0.7)";
         ctx.fillRect(x, y, w, h);
       }
       ctx.restore();
 
+      // Subtle frame border
       ctx.save();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.13)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
       ctx.lineWidth = 2;
-      ctx.strokeRect(4, 4, width - 8, height - 8);
+      ctx.strokeRect(6, 6, width - 12, height - 12);
       ctx.restore();
     }
 
+    // Logo in center with CRT-style glow / RGB shift when FX = VHS
     function drawLogoOverlay(width, height) {
       if (!logoImage) return;
-      const margin = 16;
-      const maxWidth = width * 0.2;
-      const scale = Math.min(maxWidth / logoImage.width, 1);
+
+      const isCrt = currentFx === "vhs";
+
+      const baseMax = isCrt ? width * 0.45 : width * 0.2;
+      const scale = Math.min(baseMax / logoImage.width, 1);
       const logoW = logoImage.width * scale;
       const logoH = logoImage.height * scale;
-      const x = margin;
-      const y = height - logoH - margin;
+
+      const x = isCrt ? (width - logoW) / 2 : 16;
+      const y = isCrt ? (height - logoH) / 2 : height - logoH - 16;
+
+      if (!isCrt) {
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.drawImage(logoImage, x, y, logoW, logoH);
+        ctx.restore();
+        return;
+      }
+
+      // CRT mode: pulsing scale with audio energy
+      analyser.getByteFrequencyData(dataArray);
+      let avg = 0;
+      for (let i = 0; i < dataArray.length; i++) avg += dataArray[i];
+      avg /= dataArray.length || 1;
+      const pulse = 1 + (avg / 255) * 0.08;
+
+      const cx = width / 2;
+      const cy = height / 2;
 
       ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(pulse, pulse);
+      ctx.translate(-cx, -cy);
+
+      const lx = (width - logoW) / 2;
+      const ly = (height - logoH) / 2;
+
+      // Soft glow behind logo
+      const glowGrad = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        0,
+        width / 2,
+        height / 2,
+        Math.max(logoW, logoH)
+      );
+      glowGrad.addColorStop(0, "rgba(0,255,180,0.45)");
+      glowGrad.addColorStop(1, "rgba(0,0,0,0)");
       ctx.globalAlpha = 0.9;
-      ctx.drawImage(logoImage, x, y, logoW, logoH);
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(lx - logoW * 0.3, ly - logoH * 0.3, logoW * 1.6, logoH * 1.6);
+
+      // RGB split passes
+      ctx.globalCompositeOperation = "screen";
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(logoImage, lx - 2, ly, logoW, logoH); // red-ish
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(logoImage, lx + 2, ly, logoW, logoH); // cyan-ish
+
+      // Base logo
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+      ctx.drawImage(logoImage, lx, ly, logoW, logoH);
+
       ctx.restore();
     }
 
@@ -1289,7 +1336,6 @@
     window.addEventListener("dragleave", handleDragLeave);
     window.addEventListener("drop", handleDrop);
 
-    // init
     applyTheme(currentThemeKey);
     resizeCanvas();
     resetUIToEmpty();

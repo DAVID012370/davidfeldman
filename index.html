@@ -431,7 +431,6 @@
         </select>
       </div>
 
-      <!-- NEW: Glitch Tiles -->
       <div>
         <label class="control-label" for="glitchTilesSelect">Glitch Tiles</label><br />
         <select id="glitchTilesSelect">
@@ -441,7 +440,6 @@
         </select>
       </div>
 
-      <!-- NEW: Glitch Angle -->
       <div>
         <label class="control-label" for="glitchAngleSelect">Glitch Angle</label><br />
         <select id="glitchAngleSelect">
@@ -501,7 +499,6 @@
     <button id="downloadAudioBtn" class="dl-audio-btn">DL Audio</button>
   </div>
 
-  <!-- Hidden inputs -->
   <input type="file" id="audioInput" accept="audio/*" style="display:none" />
   <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg" style="display:none" />
   <input type="file" id="centerInput" accept="audio/*,image/png,image/jpeg,image/jpg" style="display:none" />
@@ -1014,6 +1011,7 @@
     }
   }
 
+  // 👉 כאן נכנס ה-flip החדש בתוך הגליץ'
   function drawLogoGlitchPieces(mainCtx, strength) {
     const w = logoBuffer.width;
     const h = logoBuffer.height;
@@ -1031,6 +1029,9 @@
     const angleFactor = getAngleFactor();
     const baseAngleDeg = 6 + 6 * strength;
     const maxAngle = baseAngleDeg * angleFactor * (Math.PI / 180);
+
+    // כמה פליפ יש – גדל ככל שהגליץ' חזק
+    const baseFlipChance = 0.1 + strength * 0.5; // 10%–60% בערך
 
     for (let i = 0; i < glitchCount; i++) {
       const sxIndex = Math.floor(Math.random() * tilesX);
@@ -1061,6 +1062,17 @@
       mainCtx.save();
       mainCtx.translate(dx + sw / 2, dy + sh / 2);
       mainCtx.rotate(angle);
+
+      // 🔁 Flip אופקי / אנכי / שניהם – רנדומלי לפי עוצמת הגליץ'
+      let flipX = 1;
+      let flipY = 1;
+      if (Math.random() < baseFlipChance) {
+        const mode = Math.floor(Math.random() * 3);
+        if (mode === 0) flipX = -1;          // אופקי
+        else if (mode === 1) flipY = -1;     // אנכי
+        else { flipX = -1; flipY = -1; }     // שניהם
+      }
+      mainCtx.scale(flipX, flipY);
 
       mainCtx.drawImage(
         logoBuffer,

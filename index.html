@@ -503,7 +503,8 @@
   <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg" style="display:none" />
   <input type="file" id="centerInput" accept="audio/*,image/png,image/jpeg,image/jpg" style="display:none" />
   <audio id="audioElement" crossorigin="anonymous"></audio>
-<script>
+
+  <script>
   const audioEl = document.getElementById("audioElement");
   const loadTrackBtn = document.getElementById("loadTrackBtn");
   const playPauseBtn = document.getElementById("playPauseBtn");
@@ -819,6 +820,8 @@
 
   function drawBars() {
     if (!analyser || !dataArray) return;
+    analyser.getByteFrequencyData(dataArray);
+
     const w = canvasDisplayWidth;
     const h = canvasDisplayHeight;
     const barCount = 120;
@@ -837,10 +840,27 @@
       grad.addColorStop(1, "#ff3da0");
 
       ctx.save();
-      ctx.beginPath();
-      ctx.roundRect(x + 1, y - barH, barWidth - 2, barH * 2, 999);
       ctx.fillStyle = grad;
+
+      const rx = x + 1;
+      const ry = y - barH;
+      const rw = barWidth - 2;
+      const rh = barH * 2;
+      const radius = Math.min(rw / 2, rh / 2);
+
+      ctx.beginPath();
+      ctx.moveTo(rx + radius, ry);
+      ctx.lineTo(rx + rw - radius, ry);
+      ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+      ctx.lineTo(rx + rw, ry + rh - radius);
+      ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+      ctx.lineTo(rx + radius, ry + rh);
+      ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+      ctx.lineTo(rx, ry + radius);
+      ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+      ctx.closePath();
       ctx.fill();
+
       ctx.restore();
     }
 
@@ -1008,13 +1028,12 @@
       drawLogoGlitchPieces(mainCtx, strength);
     }
   }
-  // Softer, cleaner tile-based glitch with occasional flips
   function drawLogoGlitchPieces(mainCtx, strength) {
     const w = logoBuffer.width;
     const h = logoBuffer.height;
     if (!w || !h || strength <= 0.01) return;
 
-    const tileSize = Math.round(w / 12);
+    const tileSize = Math.round(w / 14);
     const tilesX = Math.ceil(w / tileSize);
     const tilesY = Math.ceil(h / tileSize);
     const totalTiles = tilesX * tilesY;
@@ -1027,7 +1046,7 @@
     const baseAngleDeg = 2 + 3 * strength;
     const maxAngle = baseAngleDeg * angleFactor * (Math.PI / 180);
 
-    const baseFlipChance = 0.05 + strength * 0.25; // 5%–30%
+    const baseFlipChance = 0.05 + strength * 0.25;
 
     for (let i = 0; i < glitchCount; i++) {
       const sxIndex = Math.floor(Math.random() * tilesX);
@@ -1052,19 +1071,11 @@
 
       const angle = (Math.random() - 0.5) * maxAngle;
 
-      // map tile position to screen (keeps same baseline)
-      const baseW = w;
-      const baseH = h;
-      const dxBase = sx;
-      const dyBase = sy;
-      const dw = sw;
-      const dh = sh;
-
-      const dx = dxBase + offsetX;
-      const dy = dyBase + offsetY;
+      const dx = sx + offsetX;
+      const dy = sy + offsetY;
 
       mainCtx.save();
-      mainCtx.translate(dx + dw / 2, dy + dh / 2);
+      mainCtx.translate(dx + sw / 2, dy + sh / 2);
       mainCtx.rotate(angle);
 
       let flipX = 1;
@@ -1086,10 +1097,10 @@
         sy,
         sw,
         sh,
-        -dw / 2,
-        -dh / 2,
-        dw,
-        dh
+        -sw / 2,
+        -sh / 2,
+        sw,
+        sh
       );
 
       mainCtx.restore();
@@ -1097,6 +1108,7 @@
   }
 
   logoUploadBtn.addEventListener("click", () => {
+    logoInput.value = "";
     logoInput.click();
   });
 
@@ -1285,7 +1297,7 @@
 
   resizeCanvas();
   render();
-</script>
+  </script>
 </div>
 </body>
 </html>

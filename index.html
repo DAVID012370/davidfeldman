@@ -131,29 +131,37 @@
       border: 1px solid rgba(255,255,255,0.08);
       overflow: hidden;
       cursor: pointer;
+      background-color: #020308;
     }
 
     /* === CRT LOGO MODE (analog screen style) === */
     #dropZone.crt-logo {
-      position: relative;
       box-shadow:
         0 0 22px rgba(0, 255, 200, 0.18),
         0 0 42px rgba(0, 180, 255, 0.28);
       transform: perspective(900px) scale(1.01);
-      background-color: #020308;
+      transform-origin: center;
     }
 
+    /* Barrel-like “screen” curvature on canvas in logo mode */
+    #dropZone.crt-logo #visualCanvas {
+      border-radius: 26px;
+      transform: perspective(900px) translateZ(0) scale(1.03);
+      transform-origin: center;
+    }
+
+    /* Vignette + scanlines overlay in logo mode */
     #dropZone.crt-logo::before {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-      /* Vignette + scanlines */
       background-image:
         radial-gradient(ellipse at center,
-          transparent 0%,
-          rgba(0, 0, 0, 0.2) 55%,
-          rgba(0, 0, 0, 0.85) 100%
+          rgba(255, 255, 255, 0.08) 0%,
+          transparent 40%,
+          rgba(0, 0, 0, 0.35) 70%,
+          rgba(0, 0, 0, 0.9) 100%
         ),
         repeating-linear-gradient(
           to bottom,
@@ -163,9 +171,10 @@
           transparent 3px
         );
       mix-blend-mode: soft-light;
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
+    /* Noise + flicker in logo mode */
     #dropZone.crt-logo::after {
       content: "";
       position: absolute;
@@ -183,10 +192,44 @@
       100% { opacity: 0.2;  transform: translate(-0.4px, 0.4px); }
     }
 
+    /* RGB subpixel glow layer (only active in logo mode) */
+    .crt-rgb-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
+      transition: opacity 0.18s ease;
+    }
+
+    #dropZone.crt-logo .crt-rgb-layer {
+      opacity: 0.38;
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba(255, 0, 0, 0.16) 0px,
+        rgba(255, 0, 0, 0.16) 1px,
+        rgba(0, 255, 0, 0.16) 1px,
+        rgba(0, 255, 0, 0.16) 2px,
+        rgba(0, 0, 255, 0.16) 2px,
+        rgba(0, 0, 255, 0.16) 3px,
+        transparent 3px,
+        transparent 4px
+      );
+      animation: crtRgbJitter 260ms steps(3, end) infinite;
+    }
+
+    @keyframes crtRgbJitter {
+      0%   { transform: translate(0, 0); }
+      33%  { transform: translate(0.3px, -0.3px); }
+      66%  { transform: translate(-0.3px, 0.3px); }
+      100% { transform: translate(0, 0); }
+    }
+
     #visualCanvas {
       display: block;
       width: 100%;
       height: 440px;
+      background: transparent;
     }
 
     .drop-hint {
@@ -204,6 +247,7 @@
       transition: opacity 0.3s ease;
       text-align: center;
       padding: 0 1rem;
+      z-index: 2;
     }
 
     #dropZone.drag-over .drop-hint {
@@ -219,6 +263,7 @@
       opacity: 0.7;
       letter-spacing: 0.12em;
       text-transform: uppercase;
+      z-index: 2;
     }
 
     .timeline-row {
@@ -458,17 +503,6 @@
       margin-top: 0.9rem;
     }
 
-    .now-playing {
-      margin-bottom: 0.4rem;
-      text-align: center;
-      font-size: 0.8rem;
-      opacity: 0.85;
-    }
-
-    .now-playing span {
-      opacity: 0.7;
-    }
-
     .hidden-input {
       display: none;
     }
@@ -604,6 +638,9 @@
     <div class="visual-wrapper">
       <div id="dropZone">
         <canvas id="visualCanvas"></canvas>
+        <!-- RGB subpixel overlay layer -->
+        <div class="crt-rgb-layer"></div>
+
         <div class="drop-hint">
           Drag & drop audio or logo here.
         </div>
@@ -1031,6 +1068,7 @@
         audioLoaded = true;
         lastAudioFile = file;
         lastAudioFileName = file.name || "track";
+        fileNamePill.textContent = lastAudioFileName;
         updateNowPlaying(lastAudioFileName);
         playPauseBtn.textContent = "Play";
       }
@@ -1147,7 +1185,12 @@
           themeSelect.value = theme;
           visualizerSelect.value = visualizerType;
           fxSelect.value = fxMode === "glitch" ? "glitch" : "none";
-          fxStrengthSelect.value = fxStrength;
+
+          // Map fxStrength to slider position
+          if (fxStrength === "soft") fxStrengthRange.value = 20;
+          else if (fxStrength === "hard") fxStrengthRange.value = 80;
+          else fxStrengthRange.value = 50;
+
           visualizerViewBtn.classList.toggle("active", visualizerEnabled);
           logoViewBtn.classList.toggle("active", logoEnabled);
           dropZone.classList.toggle("crt-logo", logoEnabled);

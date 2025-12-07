@@ -151,6 +151,12 @@
       transform: translateY(-0.5px);
     }
 
+    /* REC active state */
+    .chip-btn.rec-on {
+      background: radial-gradient(circle at top, #ff1744, #ff9100);
+      box-shadow: 0 0 18px rgba(255, 23, 68, 0.7);
+    }
+
     .logo-buttons {
       display: flex;
       align-items: center;
@@ -504,10 +510,17 @@
   let dataArray;
   let sourceNode;
   let gainNode;
+  let mediaDest;           // for recording audio
   let isPlaying = false;
   let audioLoaded = false;
   let lastAudioFile = null;
   let lastAudioFileName = "";
+
+  // Recording
+  const recordBtn = document.getElementById("recordBtn");
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isRecording = false;
 
   function initAudioContext() {
     if (!audioCtx) {
@@ -521,9 +534,14 @@
       gainNode.gain.value = parseFloat(volumeRange.value);
 
       sourceNode = audioCtx.createMediaElementSource(audioEl);
+
+      mediaDest = audioCtx.createMediaStreamDestination();
+
+      // Graph: source -> gain -> analyser & speakers & recorder
       sourceNode.connect(gainNode);
       gainNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
+      gainNode.connect(audioCtx.destination);
+      gainNode.connect(mediaDest);
     }
   }
 
@@ -612,6 +630,73 @@
     a.download = lastAudioFileName || "audio";
     a.click();
   });
+
+  // Recording video+audio
+  recordBtn.addEventListener("click", () => {
+    initAudioContext();
+    if (!audioCtx || !mediaDest) {
+      alert("Audio context not ready.");
+      return;
+    }
+    if (!isRecording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  });
+
+  function startRecording() {
+    const canvas = document.getElementById("visualCanvas");
+    const canvasStream = canvas.captureStream(60);
+    const audioStream = mediaDest.stream;
+
+    const mixedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...audioStream.getAudioTracks()
+    ]);
+
+    try {
+      mediaRecorder = new MediaRecorder(mixedStream, {
+        mimeType: "video/webm;codecs=vp9,opus"
+      });
+    } catch (err) {
+      mediaRecorder = new MediaRecorder(mixedStream);
+    }
+
+    recordedChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        recordedChunks.push(e.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dj-visualizer-recording.webm";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      recordBtn.textContent = "REC";
+      recordBtn.classList.remove("rec-on");
+      isRecording = false;
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    recordBtn.textContent = "Stop REC";
+    recordBtn.classList.add("rec-on");
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+    }
+  }
 
   audioEl.addEventListener("timeupdate", () => {
     if (!audioEl.duration || isNaN(audioEl.duration)) return;
@@ -836,7 +921,6 @@
   const logoUploadBtn = document.getElementById("logoUploadBtn");
   const logoClearBtn = document.getElementById("logoClearBtn");
   const downloadPngBtn = document.getElementById("downloadPngBtn");
-  const recordBtn = document.getElementById("recordBtn");
   const savePresetBtn = document.getElementById("savePresetBtn");
   const loadPresetBtn = document.getElementById("loadPresetBtn");
 
@@ -958,7 +1042,6 @@
     if (file) loadLogoFile(file);
   });
 
-  // 🔥 This version auto-enables the Logo view when a logo is loaded
   function loadLogoFile(file) {
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -1067,10 +1150,6 @@
     link.href = canvas.toDataURL("image/png");
     link.download = "visualizer.png";
     link.click();
-  });
-
-  recordBtn.addEventListener("click", () => {
-    alert("Recording to MP4/WebM is not fully implemented in this version yet.");
   });
 
   const PRESET_KEY = "dj_visualizer_preset_v1";

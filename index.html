@@ -151,7 +151,6 @@
       transform: translateY(-0.5px);
     }
 
-    /* REC active state */
     .chip-btn.rec-on {
       background: radial-gradient(circle at top, #ff1744, #ff9100);
       box-shadow: 0 0 18px rgba(255, 23, 68, 0.7);
@@ -432,6 +431,26 @@
         </select>
       </div>
 
+      <!-- NEW: Glitch Tiles -->
+      <div>
+        <label class="control-label" for="glitchTilesSelect">Glitch Tiles</label><br />
+        <select id="glitchTilesSelect">
+          <option value="normal">Normal</option>
+          <option value="more">More</option>
+          <option value="less">Less</option>
+        </select>
+      </div>
+
+      <!-- NEW: Glitch Angle -->
+      <div>
+        <label class="control-label" for="glitchAngleSelect">Glitch Angle</label><br />
+        <select id="glitchAngleSelect">
+          <option value="normal">Normal</option>
+          <option value="soft">Soft</option>
+          <option value="wild">Wild</option>
+        </select>
+      </div>
+
       <div class="logo-buttons">
         <button class="chip-btn secondary" id="logoUploadBtn">Logo</button>
         <button class="chip-btn secondary" id="logoClearBtn">Logo X</button>
@@ -485,7 +504,6 @@
   <!-- Hidden inputs -->
   <input type="file" id="audioInput" accept="audio/*" style="display:none" />
   <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg" style="display:none" />
-  <!-- Center input: audio + images -->
   <input type="file" id="centerInput" accept="audio/*,image/png,image/jpeg,image/jpg" style="display:none" />
   <audio id="audioElement" crossorigin="anonymous"></audio>
 </div>
@@ -510,13 +528,12 @@
   let dataArray;
   let sourceNode;
   let gainNode;
-  let mediaDest;           // for recording audio
+  let mediaDest;
   let isPlaying = false;
   let audioLoaded = false;
   let lastAudioFile = null;
   let lastAudioFileName = "";
 
-  // Recording
   const recordBtn = document.getElementById("recordBtn");
   let mediaRecorder = null;
   let recordedChunks = [];
@@ -534,10 +551,8 @@
       gainNode.gain.value = parseFloat(volumeRange.value);
 
       sourceNode = audioCtx.createMediaElementSource(audioEl);
-
       mediaDest = audioCtx.createMediaStreamDestination();
 
-      // Graph: source -> gain -> analyser & speakers & recorder
       sourceNode.connect(gainNode);
       gainNode.connect(analyser);
       gainNode.connect(audioCtx.destination);
@@ -631,18 +646,14 @@
     a.click();
   });
 
-  // Recording video+audio
   recordBtn.addEventListener("click", () => {
     initAudioContext();
     if (!audioCtx || !mediaDest) {
       alert("Audio context not ready.");
       return;
     }
-    if (!isRecording) {
-      startRecording();
-    } else {
-      stopRecording();
-    }
+    if (!isRecording) startRecording();
+    else stopRecording();
   });
 
   function startRecording() {
@@ -728,6 +739,8 @@
   const visualizerSelect = document.getElementById("visualizerSelect");
   const fxSelect = document.getElementById("fxSelect");
   const fxStrengthSelect = document.getElementById("fxStrengthSelect");
+  const glitchTilesSelect = document.getElementById("glitchTilesSelect");
+  const glitchAngleSelect = document.getElementById("glitchAngleSelect");
 
   const visualizerViewBtn = document.getElementById("visualizerViewBtn");
   const logoViewBtn = document.getElementById("logoViewBtn");
@@ -736,6 +749,8 @@
   let visualizerType = visualizerSelect.value;
   let fxMode = "none";
   let fxStrength = "soft";
+  let glitchTilesMode = glitchTilesSelect.value;
+  let glitchAngleMode = glitchAngleSelect.value;
   let visualizerEnabled = true;
   let logoEnabled = false;
   let lastEnergy = 0;
@@ -942,6 +957,30 @@
     }
   }
 
+  function getTilesFactor() {
+    switch (glitchTilesMode) {
+      case "more":
+        return 1.6;
+      case "less":
+        return 0.6;
+      case "normal":
+      default:
+        return 1.0;
+    }
+  }
+
+  function getAngleFactor() {
+    switch (glitchAngleMode) {
+      case "soft":
+        return 0.5;
+      case "wild":
+        return 1.6;
+      case "normal":
+      default:
+        return 1.0;
+    }
+  }
+
   function renderLogoFrame(mainCtx) {
     if (!logoLoaded || !logoImage) return;
 
@@ -984,7 +1023,14 @@
     const tilesX = Math.ceil(w / tileSize);
     const tilesY = Math.ceil(h / tileSize);
     const totalTiles = tilesX * tilesY;
-    const glitchCount = Math.round(totalTiles * (0.08 + 0.25 * strength));
+
+    const tilesFactor = getTilesFactor();
+    const baseCount = 0.08 + 0.25 * strength;
+    const glitchCount = Math.round(totalTiles * baseCount * tilesFactor);
+
+    const angleFactor = getAngleFactor();
+    const baseAngleDeg = 6 + 6 * strength;
+    const maxAngle = baseAngleDeg * angleFactor * (Math.PI / 180);
 
     for (let i = 0; i < glitchCount; i++) {
       const sxIndex = Math.floor(Math.random() * tilesX);
@@ -1007,7 +1053,6 @@
       const offsetX = (Math.random() - 0.5) * maxOffset;
       const offsetY = (Math.random() - 0.5) * maxOffset;
 
-      const maxAngle = (6 + 6 * strength) * (Math.PI / 180);
       const angle = (Math.random() - 0.5) * maxAngle;
 
       const dx = sx + offsetX;
@@ -1048,11 +1093,8 @@
     img.onload = () => {
       logoImage = img;
       logoLoaded = true;
-
-      // Auto-enable logo view + highlight button
       logoEnabled = true;
       logoViewBtn.classList.add("active");
-
       URL.revokeObjectURL(url);
     };
     img.src = url;
@@ -1062,8 +1104,6 @@
     logoLoaded = false;
     logoImage = null;
   });
-
-  /* DRAG & DROP + CLICK CENTER */
 
   dropZone.addEventListener("click", () => {
     centerInput.value = "";
@@ -1093,8 +1133,6 @@
     });
   });
 
-  /* TOGGLES & FX */
-
   visualizerViewBtn.addEventListener("click", () => {
     visualizerEnabled = !visualizerEnabled;
     visualizerViewBtn.classList.toggle("active", visualizerEnabled);
@@ -1119,6 +1157,14 @@
 
   fxStrengthSelect.addEventListener("change", () => {
     fxStrength = fxStrengthSelect.value;
+  });
+
+  glitchTilesSelect.addEventListener("change", () => {
+    glitchTilesMode = glitchTilesSelect.value;
+  });
+
+  glitchAngleSelect.addEventListener("change", () => {
+    glitchAngleMode = glitchAngleSelect.value;
   });
 
   function updateFooterTag() {

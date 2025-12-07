@@ -958,12 +958,18 @@
     if (file) loadLogoFile(file);
   });
 
+  // 🔥 This version auto-enables the Logo view when a logo is loaded
   function loadLogoFile(file) {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
       logoImage = img;
       logoLoaded = true;
+
+      // Auto-enable logo view + highlight button
+      logoEnabled = true;
+      logoViewBtn.classList.add("active");
+
       URL.revokeObjectURL(url);
     };
     img.src = url;
@@ -998,7 +1004,6 @@
     }
   });
 
-  // Prevent browser from opening file in the window
   ["dragover","drop"].forEach(ev => {
     window.addEventListener(ev, (e) => {
       e.preventDefault();

@@ -151,6 +151,14 @@
       transform: translateY(-0.5px);
     }
 
+    /* LOGO BUTTONS WRAPPER */
+    .logo-buttons {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.9rem;
+    }
+
     /* NOW PLAYING – TOP CENTER */
     .now-playing {
       margin-bottom: 0.4rem;
@@ -372,7 +380,7 @@
   <header>
     <div class="title-block">
       <h1>DJ VISUALIZER</h1>
-      <p>Audio reactive visuals · XP vibes soon</p>
+      <p>Audio reactive visuals · enjoy : )</p>
     </div>
     <div class="view-toggle">
       <button class="pill-toggle active" id="visualizerViewBtn">Visualizer</button>
@@ -422,10 +430,10 @@
         </select>
       </div>
 
-      <div>
-        <label class="control-label">Logo</label><br />
+      <!-- Logo buttons without label -->
+      <div class="logo-buttons">
         <button class="chip-btn secondary" id="logoUploadBtn">Logo</button>
-        <button class="chip-btn ghost" id="logoClearBtn">Logo X</button>
+        <button class="chip-btn secondary" id="logoClearBtn">Logo X</button>
       </div>
     </div>
 

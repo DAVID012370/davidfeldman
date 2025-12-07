@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DJ Visualizer</title>
+  <title>DJ Visualizer – Visual + Logo Views</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
     }
 
     body {
@@ -19,1168 +18,1274 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 2rem 1rem;
+      align-items: stretch;
     }
 
     .app {
       width: 100%;
-      max-width: 1280px;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
+      max-width: 1200px;
+      padding: 1.5rem 1.75rem 2rem;
     }
 
     header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
+      align-items: baseline;
+      margin-bottom: 1.25rem;
     }
 
-    .brand {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .brand-title {
+    .title-block h1 {
       font-size: 1.6rem;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
-    .brand-sub {
-      font-size: 0.8rem;
-      opacity: 0.7;
+    .title-block p {
+      font-size: 0.82rem;
+      margin-top: 0.15rem;
+      opacity: 0.75;
     }
 
-    .top-right {
+    .view-toggle {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
-    .toggle-pill {
-      display: inline-flex;
-      padding: 0.3rem;
-      background: rgba(255, 255, 255, 0.04);
+    .pill-toggle {
       border-radius: 999px;
-    }
-
-    .toggle-pill button {
-      padding: 0.35rem 1.1rem;
-      border-radius: 999px;
-      border: none;
-      background: transparent;
-      color: #f5f5f5;
+      padding: 0.35rem 0.9rem;
       font-size: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: radial-gradient(circle at top, #25223a, #11111a);
+      color: #f5f5f5;
       cursor: pointer;
-      transition: background 0.15s ease, box-shadow 0.15s ease,
-        color 0.15s ease;
+      transition: all 0.18s ease-out;
+      box-shadow: 0 0 0 rgba(255,0,150,0.0);
     }
 
-    .toggle-pill button.active {
-      background: linear-gradient(135deg, #ff4bda, #ff9f5b);
-      box-shadow: 0 0 15px rgba(255, 90, 200, 0.6);
-      color: #080814;
+    .pill-toggle.active {
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 18px rgba(255, 61, 160, 0.55);
+      border-color: transparent;
+    }
+
+    .pill-toggle:focus-visible {
+      outline: 2px solid #4fc3ff;
+      outline-offset: 2px;
     }
 
     .controls-row {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.75rem;
       justify-content: space-between;
-    }
-
-    .controls-left,
-    .controls-right {
-      display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.35rem;
     }
 
-    label {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-right: 0.25rem;
+    .left-controls,
+    .right-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
     }
 
-    .select-pill {
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(11, 12, 20, 0.9);
-      color: #f5f5f5;
-      font-size: 0.8rem;
-      cursor: pointer;
-      min-width: 90px;
-    }
-
-    .btn-pill {
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      border: none;
-      background: rgba(255, 255, 255, 0.04);
-      color: #f5f5f5;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: background 0.15s ease, box-shadow 0.15s ease,
-        transform 0.1s ease;
-      white-space: nowrap;
-    }
-
-    .btn-pill.primary {
-      background: linear-gradient(135deg, #ff4bda, #ff9f5b);
-      color: #080814;
-      box-shadow: 0 0 12px rgba(255, 90, 200, 0.6);
-    }
-
-    .btn-pill.danger {
-      background: radial-gradient(circle at top, #ff4b6b, #7b0d2b);
-      color: #fff;
-    }
-
-    .btn-pill:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.09);
-    }
-
-    .visualizer-wrapper {
-      position: relative;
-      border-radius: 26px;
-      background: radial-gradient(circle at top, #11182a, #05060a 75%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
-      overflow: hidden;
-      padding: 1.5rem 1.5rem 1.2rem 1.5rem;
-    }
-
-    .drag-hint {
-      position: absolute;
-      top: 1.1rem;
-      left: 1.75rem;
-      font-size: 0.8rem;
-      opacity: 0.7;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 460px;
-      border-radius: 18px;
-      background: radial-gradient(circle at top, #141a32, #05060b 70%);
-    }
-
-    .hud-footer {
-      position: absolute;
-      right: 1.9rem;
-      bottom: 1rem;
+    label.control-label {
       font-size: 0.7rem;
-      letter-spacing: 0.18em;
       text-transform: uppercase;
-      opacity: 0.72;
+      letter-spacing: 0.16em;
+      opacity: 0.75;
     }
 
-    .timeline-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-top: 0.2rem;
-      font-size: 0.75rem;
-      opacity: 0.9;
-    }
-
-    .timeline-time {
-      width: 2.6rem;
-      text-align: center;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
+    select,
+    button.chip-btn {
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(5, 5, 10, 0.85);
+      color: #f5f5f5;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      cursor: pointer;
       outline: none;
+      transition: all 0.16s ease-out;
     }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
+    select {
+      padding-right: 1.8rem;
+      background-image: linear-gradient(45deg, transparent 50%, #f5f5f5 50%), linear-gradient(135deg, #f5f5f5 50%, transparent 50%);
+      background-position: calc(100% - 13px) calc(50% - 3px), calc(100% - 8px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
       appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #34d2ff;
-      box-shadow: 0 0 12px rgba(52, 210, 255, 0.8);
-      cursor: pointer;
-      border: 2px solid #040611;
     }
 
-    input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #34d2ff;
-      border: 2px solid #040611;
-      cursor: pointer;
+    select:focus-visible,
+    .chip-btn:focus-visible {
+      outline: 2px solid #4fc3ff;
+      outline-offset: 2px;
     }
 
-    .transport-row {
+    button.chip-btn {
+      border-radius: 999px;
+      padding: 0.4rem 1.1rem;
+      border: none;
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 15px rgba(255, 61, 160, 0.5);
+    }
+
+    button.chip-btn.secondary {
+      background: radial-gradient(circle at top, #262337, #14121e);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.23);
+    }
+
+    button.chip-btn.ghost {
+      background: transparent;
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: none;
+    }
+
+    button.chip-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-0.5px);
+    }
+
+    .chip-btn.rec-on {
+      background: radial-gradient(circle at top, #ff1744, #ff9100);
+      box-shadow: 0 0 18px rgba(255, 23, 68, 0.7);
+    }
+
+    .logo-buttons {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 0.6rem;
-      gap: 0.75rem;
-    }
-
-    .transport-left,
-    .transport-middle,
-    .transport-right {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .label-small {
-      font-size: 0.75rem;
-      opacity: 0.7;
+      gap: 0.4rem;
+      margin-top: 0.9rem;
     }
 
     .now-playing {
+      margin-bottom: 0.4rem;
+      text-align: center;
       font-size: 0.8rem;
       opacity: 0.85;
-      text-align: center;
-      margin-top: -0.3rem;
     }
 
     .now-playing span {
       opacity: 0.7;
     }
 
-    .hidden {
-      display: none !important;
+    .visual-wrapper {
+      margin-top: 0.1rem;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #141927, #050609 60%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(255,255,255,0.02);
+      padding: 0.9rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    @media (max-width: 900px) {
-      canvas {
-        height: 360px;
+    #dropZone {
+      position: relative;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    #visualCanvas {
+      display: block;
+      width: 100%;
+      height: 440px;
+    }
+
+    .drop-hint {
+      position: absolute;
+      left: 1.25rem;
+      top: 1rem;
+      font-size: 0.76rem;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .footer-tag {
+      position: absolute;
+      right: 1.25rem;
+      bottom: 0.9rem;
+      font-size: 0.7rem;
+      opacity: 0.7;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+      font-size: 0.78rem;
+    }
+
+    .time-label {
+      width: 2.8rem;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    input[type="range"].timeline {
+      flex: 1;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      outline: none;
+    }
+
+    input[type="range"].timeline::-webkit-slider-thumb {
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #ff3da0;
+      box-shadow: 0 0 12px rgba(255,61,160,0.7);
+      cursor: pointer;
+      margin-top: -4px;
+    }
+
+    .audio-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+    }
+
+    .audio-buttons {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .audio-buttons button {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(10,10,18,0.92);
+      color: #f5f5f5;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+
+    .audio-buttons button.primary {
+      border: none;
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 15px rgba(255,61,160,0.45);
+    }
+
+    .audio-buttons button.danger {
+      background: transparent;
+      border-color: rgba(255,130,130,0.7);
+      color: #ff9e9e;
+    }
+
+    .audio-buttons button:hover {
+      filter: brightness(1.08);
+      transform: translateY(-0.5px);
+    }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .volume-wrap span {
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+
+    input[type="range"].volume {
+      width: 120px;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      outline: none;
+    }
+
+    input[type="range"].volume::-webkit-slider-thumb {
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #4fc3ff;
+      box-shadow: 0 0 12px rgba(79,195,255,0.7);
+      cursor: pointer;
+      margin-top: -4px;
+    }
+
+    .audio-note {
+      flex: 1;
+      text-align: left;
+      font-size: 0.76rem;
+      opacity: 0.7;
+      min-width: 220px;
+    }
+
+    .dl-audio-btn {
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at top, #ff3da0, #b326ff);
+      box-shadow: 0 0 15px rgba(255,61,160,0.45);
+      color: #f5f5f5;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .dl-audio-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-0.5px);
+    }
+
+    @media (max-width: 800px) {
+      #visualCanvas {
+        height: 320px;
       }
-      .visualizer-wrapper {
-        padding: 1.15rem 1.1rem 1rem 1.1rem;
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
       }
-      .hud-footer {
-        right: 1.2rem;
+      .now-playing {
+        text-align: left;
+      }
+      .audio-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .dl-audio-btn {
+        align-self: flex-end;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="brand">
-        <div class="brand-title">DJ VISUALIZER</div>
-        <div class="brand-sub">Audio reactive visuals · enjoy :)</div>
-      </div>
-      <div class="top-right">
-        <div class="toggle-pill" id="modeToggle">
-          <button id="btnModeVisualizer" class="active">Visualizer</button>
-          <button id="btnModeLogo">Logo</button>
-        </div>
-      </div>
-    </header>
-
-    <div class="controls-row">
-      <div class="controls-left">
-        <div>
-          <label for="themeSelect">Theme</label>
-          <select id="themeSelect" class="select-pill">
-            <option>Neon</option>
-            <option>Dark</option>
-            <option>Sunset</option>
-          </select>
-        </div>
-        <div>
-          <label for="visualizerSelect">Visualizer</label>
-          <select id="visualizerSelect" class="select-pill">
-            <option>Bars</option>
-            <option>Circle</option>
-            <option>Waveform</option>
-          </select>
-        </div>
-        <div>
-          <label for="fxSelect">FX</label>
-          <select id="fxSelect" class="select-pill">
-            <option value="clean">Clean</option>
-            <option value="glitch">Glitch</option>
-          </select>
-        </div>
-        <div>
-          <label for="fxStrengthSelect">FX strength</label>
-          <select id="fxStrengthSelect" class="select-pill">
-            <option value="soft">Soft</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
-        <div>
-          <button id="btnLogoUpload" class="btn-pill">Logo</button>
-          <button id="btnLogoClear" class="btn-pill">Logo X</button>
-          <input
-            id="logoFileInput"
-            type="file"
-            accept="image/png,image/jpeg"
-            class="hidden"
-          />
-        </div>
-      </div>
-
-      <div class="controls-right">
-        <button id="btnDlPng" class="btn-pill primary">DL PNG</button>
-        <button id="btnRec" class="btn-pill danger">REC</button>
-        <button id="btnPerf" class="btn-pill">PERF</button>
-        <button id="btnSave" class="btn-pill">SAVE</button>
-        <button id="btnLoad" class="btn-pill">LOAD</button>
-      </div>
+<div class="app">
+  <header>
+    <div class="title-block">
+      <h1>DJ VISUALIZER</h1>
+      <p>Audio reactive visuals · enjoy : )</p>
     </div>
-
-    <div class="visualizer-wrapper">
-      <div class="drag-hint" id="dragHint">
-        Drag &amp; drop audio or logo here.
-      </div>
-      <canvas id="visCanvas"></canvas>
-      <div class="hud-footer" id="hudFooter">
-        SPECTRUM · NEON · VISUAL + LOGO · BARS · FX CLEAN · SOFT
-      </div>
+    <div class="view-toggle">
+      <button class="pill-toggle active" id="visualizerViewBtn">Visualizer</button>
+      <button class="pill-toggle" id="logoViewBtn">Logo</button>
     </div>
+  </header>
 
-    <div class="now-playing" id="nowPlaying">
-      Now Playing: <span>— none —</span>
-    </div>
-
-    <div class="timeline-row">
-      <div class="timeline-time" id="timeCurrent">0:00</div>
-      <input id="timeline" type="range" min="0" max="1" step="0.001" value="0" />
-      <div class="timeline-time" id="timeTotal">0:00</div>
-    </div>
-
-    <div class="transport-row">
-      <div class="transport-left">
-        <button id="btnLoadTrack" class="btn-pill">Load Track</button>
-        <button id="btnPlayPause" class="btn-pill primary">Play</button>
-        <button id="btnClearAudio" class="btn-pill">Clear</button>
-      </div>
-
-      <div class="transport-middle">
-        <span class="label-small">Vol</span>
-        <input
-          id="volumeSlider"
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value="0.8"
-          style="width: 120px"
-        />
-        <span class="label-small">Space = Play/Pause · P = Performance mode.</span>
-      </div>
-
-      <div class="transport-right">
-        <button id="btnDlAudio" class="btn-pill primary">DL Audio</button>
-      </div>
-    </div>
-
-    <audio id="audio" crossorigin="anonymous"></audio>
-    <input
-      id="audioFileInput"
-      type="file"
-      accept="audio/mpeg,audio/wav,audio/x-wav,audio/wave,audio/x-pn-wav"
-      class="hidden"
-    />
+  <div class="now-playing" id="nowPlaying">
+    <span>Now Playing:</span> — none —
   </div>
 
-  <script>
-    // --- DOM references ---
-    const canvas = document.getElementById("visCanvas");
-    const ctx = canvas.getContext("2d");
-    const audio = document.getElementById("audio");
+  <div class="controls-row">
+    <div class="left-controls">
+      <div>
+        <label class="control-label" for="themeSelect">Theme</label><br />
+        <select id="themeSelect">
+          <option value="neon">Neon</option>
+          <option value="midnight">Midnight</option>
+          <option value="sunset">Sunset</option>
+        </select>
+      </div>
 
-    const themeSelect = document.getElementById("themeSelect");
-    const visualizerSelect = document.getElementById("visualizerSelect");
-    const fxSelect = document.getElementById("fxSelect");
-    const fxStrengthSelect = document.getElementById("fxStrengthSelect");
+      <div>
+        <label class="control-label" for="visualizerSelect">Visualizer</label><br />
+        <select id="visualizerSelect">
+          <option value="bars">Bars</option>
+          <option value="circle">Circle</option>
+          <option value="wave">Waveform</option>
+        </select>
+      </div>
 
-    const btnModeVisualizer = document.getElementById("btnModeVisualizer");
-    const btnModeLogo = document.getElementById("btnModeLogo");
+      <div>
+        <label class="control-label" for="fxSelect">FX</label><br />
+        <select id="fxSelect">
+          <option value="none">Clean</option>
+          <option value="glitch">Glitch</option>
+        </select>
+      </div>
 
-    const btnLogoUpload = document.getElementById("btnLogoUpload");
-    const btnLogoClear = document.getElementById("btnLogoClear");
-    const logoFileInput = document.getElementById("logoFileInput");
+      <div>
+        <label class="control-label" for="fxStrengthSelect">FX Strength</label><br />
+        <select id="fxStrengthSelect">
+          <option value="soft">Soft</option>
+          <option value="medium">Medium</option>
+          <option value="hardcore">Hardcore</option>
+        </select>
+      </div>
 
-    const btnDlPng = document.getElementById("btnDlPng");
-    const btnRec = document.getElementById("btnRec");
-    const btnPerf = document.getElementById("btnPerf");
-    const btnSave = document.getElementById("btnSave");
-    const btnLoad = document.getElementById("btnLoad");
+      <div>
+        <label class="control-label" for="glitchTilesSelect">Glitch Tiles</label><br />
+        <select id="glitchTilesSelect">
+          <option value="normal">Normal</option>
+          <option value="more">More</option>
+          <option value="less">Less</option>
+        </select>
+      </div>
 
-    const dragHint = document.getElementById("dragHint");
-    const hudFooter = document.getElementById("hudFooter");
+      <div>
+        <label class="control-label" for="glitchAngleSelect">Glitch Angle</label><br />
+        <select id="glitchAngleSelect">
+          <option value="normal">Normal</option>
+          <option value="soft">Soft</option>
+          <option value="wild">Wild</option>
+        </select>
+      </div>
 
-    const nowPlaying = document.getElementById("nowPlaying").querySelector("span");
+      <div class="logo-buttons">
+        <button class="chip-btn secondary" id="logoUploadBtn">Logo</button>
+        <button class="chip-btn secondary" id="logoClearBtn">Logo X</button>
+      </div>
+    </div>
 
-    const timeline = document.getElementById("timeline");
-    const timeCurrent = document.getElementById("timeCurrent");
-    const timeTotal = document.getElementById("timeTotal");
+    <div class="right-controls">
+      <button class="chip-btn" id="downloadPngBtn">DL PNG</button>
+      <button class="chip-btn secondary" id="recordBtn">REC</button>
+      <button class="chip-btn secondary" id="savePresetBtn">SAVE</button>
+      <button class="chip-btn secondary" id="loadPresetBtn">LOAD</button>
+    </div>
+  </div>
 
-    const btnLoadTrack = document.getElementById("btnLoadTrack");
-    const btnPlayPause = document.getElementById("btnPlayPause");
-    const btnClearAudio = document.getElementById("btnClearAudio");
+  <div class="visual-wrapper">
+    <div id="dropZone">
+      <canvas id="visualCanvas"></canvas>
+      <div class="drop-hint">
+        Drag & drop audio or logo here.
+      </div>
+      <div class="footer-tag" id="footerTag">
+        SPECTRUM · NEON · BARS · CLEAN
+      </div>
+    </div>
+  </div>
 
-    const volumeSlider = document.getElementById("volumeSlider");
-    const btnDlAudio = document.getElementById("btnDlAudio");
-    const audioFileInput = document.getElementById("audioFileInput");
+  <div class="timeline-row">
+    <div class="time-label" id="currentTimeLabel">0:00</div>
+    <input type="range" min="0" max="100" value="0" class="timeline" id="timelineRange" />
+    <div class="time-label" id="durationLabel">0:00</div>
+  </div>
 
-    // --- Canvas sizing ---
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  <div class="audio-row">
+    <div class="audio-buttons">
+      <button id="loadTrackBtn">Load Track</button>
+      <button class="primary" id="playPauseBtn">Play</button>
+      <button id="clearAudioBtn" class="danger">Clear</button>
+      <div class="volume-wrap">
+        <span>Vol</span>
+        <input type="range" min="0" max="1" step="0.01" value="0.9" class="volume" id="volumeRange" />
+      </div>
+    </div>
+
+    <div class="audio-note">
+      Space = Play/Pause · P = Performance mode.
+    </div>
+
+    <button id="downloadAudioBtn" class="dl-audio-btn">DL Audio</button>
+  </div>
+
+  <input type="file" id="audioInput" accept="audio/*" style="display:none" />
+  <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg" style="display:none" />
+  <input type="file" id="centerInput" accept="audio/*,image/png,image/jpeg,image/jpg" style="display:none" />
+  <audio id="audioElement" crossorigin="anonymous"></audio>
+<script>
+  const audioEl = document.getElementById("audioElement");
+  const loadTrackBtn = document.getElementById("loadTrackBtn");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const audioInput = document.getElementById("audioInput");
+  const centerInput = document.getElementById("centerInput");
+  const volumeRange = document.getElementById("volumeRange");
+  const clearAudioBtn = document.getElementById("clearAudioBtn");
+  const downloadAudioBtn = document.getElementById("downloadAudioBtn");
+  const nowPlayingEl = document.getElementById("nowPlaying");
+
+  const timelineRange = document.getElementById("timelineRange");
+  const currentTimeLabel = document.getElementById("currentTimeLabel");
+  const durationLabel = document.getElementById("durationLabel");
+
+  let audioCtx;
+  let analyser;
+  let dataArray;
+  let sourceNode;
+  let gainNode;
+  let mediaDest;
+  let isPlaying = false;
+  let audioLoaded = false;
+  let lastAudioFile = null;
+  let lastAudioFileName = "";
+
+  const recordBtn = document.getElementById("recordBtn");
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isRecording = false;
+
+  function initAudioContext() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      dataArray = new Uint8Array(bufferLength);
+
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = parseFloat(volumeRange.value);
+
+      sourceNode = audioCtx.createMediaElementSource(audioEl);
+      mediaDest = audioCtx.createMediaStreamDestination();
+
+      sourceNode.connect(gainNode);
+      gainNode.connect(analyser);
+      gainNode.connect(audioCtx.destination);
+      gainNode.connect(mediaDest);
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+  }
 
-    // --- Audio context + analyser ---
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-    let analyser = null;
-    let sourceNode = null;
-    const freqData = new Uint8Array(256);
+  function formatTime(sec) {
+    if (!isFinite(sec)) return "0:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return m + ":" + (s < 10 ? "0" + s : s);
+  }
 
-    function ensureAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new AudioContext();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 512;
-        analyser.smoothingTimeConstant = 0.85;
+  function updateNowPlaying(name) {
+    nowPlayingEl.innerHTML = '<span>Now Playing:</span> ' + (name || "— none —");
+  }
+
+  function loadAudioFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    audioEl.src = url;
+    audioEl.load();
+    audioLoaded = true;
+    lastAudioFile = file;
+    lastAudioFileName = file.name || "track";
+    updateNowPlaying(lastAudioFileName);
+    playPauseBtn.textContent = "Play";
+  }
+
+  loadTrackBtn.addEventListener("click", () => {
+    audioInput.click();
+  });
+
+  audioInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) loadAudioFile(file);
+  });
+
+  centerInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type.startsWith("audio")) {
+      loadAudioFile(file);
+    } else if (file.type.startsWith("image")) {
+      loadLogoFile(file);
+    }
+  });
+
+  playPauseBtn.addEventListener("click", () => {
+    togglePlayPause();
+  });
+
+  function togglePlayPause() {
+    if (!audioLoaded) return;
+    initAudioContext();
+    if (!isPlaying) {
+      audioEl.play();
+      isPlaying = true;
+      playPauseBtn.textContent = "Pause";
+    } else {
+      audioEl.pause();
+      isPlaying = false;
+      playPauseBtn.textContent = "Play";
+    }
+  }
+
+  clearAudioBtn.addEventListener("click", () => {
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    isPlaying = false;
+    playPauseBtn.textContent = "Play";
+    audioLoaded = false;
+    lastAudioFile = null;
+    lastAudioFileName = "";
+    updateNowPlaying("— none —");
+  });
+
+  volumeRange.addEventListener("input", () => {
+    if (gainNode) gainNode.gain.value = parseFloat(volumeRange.value);
+  });
+
+  downloadAudioBtn.addEventListener("click", () => {
+    if (!lastAudioFile) {
+      alert("No local audio file loaded.");
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(lastAudioFile);
+    a.download = lastAudioFileName || "audio";
+    a.click();
+  });
+
+  recordBtn.addEventListener("click", () => {
+    initAudioContext();
+    if (!audioCtx || !mediaDest) {
+      alert("Audio context not ready.");
+      return;
+    }
+    if (!isRecording) startRecording();
+    else stopRecording();
+  });
+
+  function startRecording() {
+    const canvas = document.getElementById("visualCanvas");
+    const canvasStream = canvas.captureStream(60);
+    const audioStream = mediaDest.stream;
+
+    const mixedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...audioStream.getAudioTracks()
+    ]);
+
+    try {
+      mediaRecorder = new MediaRecorder(mixedStream, {
+        mimeType: "video/webm;codecs=vp9,opus"
+      });
+    } catch (err) {
+      mediaRecorder = new MediaRecorder(mixedStream);
+    }
+
+    recordedChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        recordedChunks.push(e.data);
       }
-      if (!sourceNode) {
-        sourceNode = audioCtx.createMediaElementSource(audio);
-        sourceNode.connect(analyser);
-        analyser.connect(audioCtx.destination);
-      }
-    }
-
-    // --- State ---
-    let visualizerModeActive = true;
-    let logoModeActive = false;
-    let performanceMode = false;
-
-    let logoImage = null;
-    let logoCanvas = document.createElement("canvas");
-    let logoCtx = logoCanvas.getContext("2d");
-    let logoScale = 1;
-
-    let isRecording = false;
-    let mediaRecorder = null;
-    let recordedChunks = [];
-
-    // --- Helpers ---
-    function formatTime(seconds) {
-      if (!isFinite(seconds)) return "0:00";
-      const m = Math.floor(seconds / 60);
-      const s = Math.floor(seconds % 60);
-      return m + ":" + String(s).padStart(2, "0");
-    }
-
-    function updateHudFooter() {
-      const theme = themeSelect.value.toUpperCase();
-      const vis = visualizerSelect.value.toUpperCase();
-      const fx = fxSelect.value.toUpperCase();
-      const fxStrength = fxStrengthSelect.value.toUpperCase();
-
-      const parts = [
-        "SPECTRUM",
-        theme,
-        visualizerModeActive ? "VISUAL" : null,
-        logoModeActive ? "LOGO" : null,
-        vis,
-        "FX " + fx,
-        fxStrength,
-      ].filter(Boolean);
-
-      hudFooter.textContent = parts.join(" · ");
-    }
-
-    themeSelect.addEventListener("change", updateHudFooter);
-    visualizerSelect.addEventListener("change", updateHudFooter);
-    fxSelect.addEventListener("change", updateHudFooter);
-    fxStrengthSelect.addEventListener("change", updateHudFooter);
-
-    // --- Mode toggle (Visualizer / Logo) ---
-    function syncModeButtons() {
-      btnModeVisualizer.classList.toggle("active", visualizerModeActive);
-      btnModeLogo.classList.toggle("active", logoModeActive);
-      updateHudFooter();
-    }
-
-    btnModeVisualizer.addEventListener("click", () => {
-      visualizerModeActive = !visualizerModeActive;
-      if (!visualizerModeActive && !logoModeActive) {
-        logoModeActive = true;
-      }
-      syncModeButtons();
-    });
-
-    btnModeLogo.addEventListener("click", () => {
-      logoModeActive = !logoModeActive;
-      if (!visualizerModeActive && !logoModeActive) {
-        visualizerModeActive = true;
-      }
-      syncModeButtons();
-    });
-
-    syncModeButtons();
-
-    // --- Logo loading ---
-    function handleLogoFile(file) {
-      if (!file) return;
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        logoImage = img;
-        // setup offscreen canvas
-        const maxW = 420;
-        const scale = Math.min(1, maxW / img.width);
-        logoCanvas.width = img.width * scale;
-        logoCanvas.height = img.height * scale;
-        logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
-        logoCtx.drawImage(
-          img,
-          0,
-          0,
-          img.width,
-          img.height,
-          0,
-          0,
-          logoCanvas.width,
-          logoCanvas.height
-        );
-        logoScale = 1;
-        logoModeActive = true;
-        syncModeButtons();
-      };
-      img.src = url;
-    }
-
-    btnLogoUpload.addEventListener("click", () => logoFileInput.click());
-    logoFileInput.addEventListener("change", (e) =>
-      handleLogoFile(e.target.files[0])
-    );
-
-    btnLogoClear.addEventListener("click", () => {
-      logoImage = null;
-      logoCanvas.width = 1;
-      logoCanvas.height = 1;
-    });
-
-    // --- Drag & drop (audio or logo) ---
-    function isAudioFile(file) {
-      return /^audio\//.test(file.type);
-    }
-    function isImageFile(file) {
-      return /^image\//.test(file.type);
-    }
-
-    function handleDroppedFile(file) {
-      if (isAudioFile(file)) {
-        loadAudioFile(file);
-      } else if (isImageFile(file)) {
-        handleLogoFile(file);
-      }
-    }
-
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-      canvas.addEventListener(eventName, preventDefaults, false);
-    });
-
-    canvas.addEventListener("dragover", () => {
-      dragHint.style.opacity = 0.2;
-    });
-
-    canvas.addEventListener("dragleave", () => {
-      dragHint.style.opacity = 0.8;
-    });
-
-    canvas.addEventListener("drop", (e) => {
-      dragHint.style.opacity = 0.8;
-      const dt = e.dataTransfer;
-      const file = dt.files[0];
-      if (file) handleDroppedFile(file);
-    });
-
-    // Also use click on canvas to open appropriate picker depending on what
-    // the user probably wants:
-    canvas.addEventListener("click", () => {
-      // If shift is held – upload logo; otherwise audio
-      // (nice small hidden shortcut).
-      // For normal click we still prefer audio (most common).
-      audioFileInput.click();
-    });
-
-    // --- Audio loading ---
-    function loadAudioFile(file) {
-      const url = URL.createObjectURL(file);
-      audio.src = url;
-      audio.load();
-      nowPlaying.textContent = file.name || "custom audio";
-      ensureAudioContext();
-      dragHint.textContent = "Drag & drop audio or logo here.";
-      audio.play().catch(() => {});
-      btnPlayPause.textContent = "Pause";
-    }
-
-    btnLoadTrack.addEventListener("click", () => audioFileInput.click());
-    audioFileInput.addEventListener("change", (e) =>
-      loadAudioFile(e.target.files[0])
-    );
-
-    btnClearAudio.addEventListener("click", () => {
-      audio.pause();
-      audio.removeAttribute("src");
-      audio.load();
-      nowPlaying.textContent = "— none —";
-      timeline.value = 0;
-      timeCurrent.textContent = "0:00";
-      timeTotal.textContent = "0:00";
-      btnPlayPause.textContent = "Play";
-    });
-
-    btnPlayPause.addEventListener("click", togglePlayPause);
-
-    function togglePlayPause() {
-      if (!audio.src) return audioFileInput.click();
-      ensureAudioContext();
-      if (audio.paused) {
-        audio.play();
-        btnPlayPause.textContent = "Pause";
-      } else {
-        audio.pause();
-        btnPlayPause.textContent = "Play";
-      }
-    }
-
-    audio.addEventListener("loadedmetadata", () => {
-      timeTotal.textContent = formatTime(audio.duration);
-    });
-
-    audio.addEventListener("timeupdate", () => {
-      if (!audio.duration) return;
-      const ratio = audio.currentTime / audio.duration;
-      timeline.value = ratio;
-      timeCurrent.textContent = formatTime(audio.currentTime);
-    });
-
-    timeline.addEventListener("input", () => {
-      if (!audio.duration) return;
-      const t = timeline.value * audio.duration;
-      audio.currentTime = t;
-      timeCurrent.textContent = formatTime(t);
-    });
-
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = volumeSlider.value;
-    });
-    audio.volume = volumeSlider.value;
-
-    btnDlAudio.addEventListener("click", () => {
-      if (!audio.src) return;
-      const a = document.createElement("a");
-      a.href = audio.src;
-      a.download = "audio-track";
-      a.click();
-    });
-
-    // space / performance hotkeys
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        togglePlayPause();
-      } else if (e.key.toLowerCase() === "p") {
-        performanceMode = !performanceMode;
-        btnPerf.classList.toggle("primary", performanceMode);
-      }
-    });
-
-    // --- Save / Load presets (simple) ---
-    const PRESET_KEY = "dj-vis-preset-v1";
-    btnSave.addEventListener("click", () => {
-      const preset = {
-        theme: themeSelect.value,
-        vis: visualizerSelect.value,
-        fx: fxSelect.value,
-        fxStrength: fxStrengthSelect.value,
-        visualizerModeActive,
-        logoModeActive,
-      };
-      localStorage.setItem(PRESET_KEY, JSON.stringify(preset));
-      btnSave.textContent = "Saved!";
-      setTimeout(() => (btnSave.textContent = "SAVE"), 900);
-    });
-
-    btnLoad.addEventListener("click", () => {
-      const raw = localStorage.getItem(PRESET_KEY);
-      if (!raw) return;
-      try {
-        const preset = JSON.parse(raw);
-        themeSelect.value = preset.theme || "Neon";
-        visualizerSelect.value = preset.vis || "Bars";
-        fxSelect.value = preset.fx || "clean";
-        fxStrengthSelect.value = preset.fxStrength || "medium";
-        visualizerModeActive =
-          preset.visualizerModeActive !== undefined
-            ? preset.visualizerModeActive
-            : true;
-        logoModeActive =
-          preset.logoModeActive !== undefined ? preset.logoModeActive : false;
-        syncModeButtons();
-        updateHudFooter();
-      } catch (err) {
-        console.warn("Bad preset", err);
-      }
-    });
-
-    // --- Record canvas + audio to WebM (REC) ---
-    btnRec.addEventListener("click", () => {
-      if (isRecording) {
-        stopRecording();
-      } else {
-        startRecording();
-      }
-    });
-
-    function startRecording() {
-      if (!audioCtx) ensureAudioContext();
-      try {
-        const canvasStream = canvas.captureStream(60);
-        const dest = audioCtx.createMediaStreamDestination();
-        analyser.connect(dest);
-        const combined = new MediaStream([
-          ...canvasStream.getVideoTracks(),
-          ...dest.stream.getAudioTracks(),
-        ]);
-        mediaRecorder = new MediaRecorder(combined, {
-          mimeType: "video/webm;codecs=vp9",
-        });
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data.size > 0) recordedChunks.push(e.data);
-        };
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: "video/webm" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "dj-visualizer.webm";
-          a.click();
-          URL.revokeObjectURL(url);
-        };
-        mediaRecorder.start();
-        isRecording = true;
-        btnRec.textContent = "REC ●";
-        btnRec.classList.add("primary");
-      } catch (err) {
-        console.error(err);
-        alert("Recording is not supported in this browser.");
-      }
-    }
-
-    function stopRecording() {
-      if (!mediaRecorder || !isRecording) return;
-      mediaRecorder.stop();
-      isRecording = false;
-      btnRec.textContent = "REC";
-      btnRec.classList.remove("primary");
-    }
-
-    // --- Take PNG screenshot ---
-    btnDlPng.addEventListener("click", () => {
-      const a = document.createElement("a");
-      a.href = canvas.toDataURL("image/png");
-      a.download = "visualizer.png";
-      a.click();
-    });
-
-    // --- GLITCH configuration ---
-    const FX_STRENGTH = {
-      soft: { probability: 0.12, maxOffset: 6, maxRot: 0.04 },
-      medium: { probability: 0.22, maxOffset: 10, maxRot: 0.08 },
-      hard: { probability: 0.33, maxOffset: 16, maxRot: 0.15 },
     };
 
-    // --- VIS drawing helpers ---
-    function drawBackground(theme) {
-      const { width, height } = canvas;
-      const grad = ctx.createLinearGradient(0, 0, 0, height);
-      if (theme === "Sunset") {
-        grad.addColorStop(0, "#30183a");
-        grad.addColorStop(0.45, "#0b1f3b");
-        grad.addColorStop(1, "#02030a");
-      } else if (theme === "Dark") {
-        grad.addColorStop(0, "#111319");
-        grad.addColorStop(0.4, "#070914");
-        grad.addColorStop(1, "#020308");
-      } else {
-        // Neon
-        grad.addColorStop(0, "#111a33");
-        grad.addColorStop(0.4, "#061124");
-        grad.addColorStop(1, "#02030a");
-      }
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dj-visualizer-recording.webm";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      recordBtn.textContent = "REC";
+      recordBtn.classList.remove("rec-on");
+      isRecording = false;
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    recordBtn.textContent = "Stop REC";
+    recordBtn.classList.add("rec-on");
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+    }
+  }
+
+  audioEl.addEventListener("timeupdate", () => {
+    if (!audioEl.duration || isNaN(audioEl.duration)) return;
+    const progress = (audioEl.currentTime / audioEl.duration) * 100;
+    timelineRange.value = progress;
+    currentTimeLabel.textContent = formatTime(audioEl.currentTime);
+    durationLabel.textContent = formatTime(audioEl.duration);
+  });
+
+  timelineRange.addEventListener("input", () => {
+    if (!audioEl.duration || isNaN(audioEl.duration)) return;
+    const pct = parseFloat(timelineRange.value) / 100;
+    audioEl.currentTime = audioEl.duration * pct;
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !e.target.matches("input, textarea, select")) {
+      e.preventDefault();
+      if (audioLoaded) togglePlayPause();
+    }
+  });
+
+  const canvas = document.getElementById("visualCanvas");
+  const ctx = canvas.getContext("2d");
+  const dropZone = document.getElementById("dropZone");
+  const footerTag = document.getElementById("footerTag");
+
+  const themeSelect = document.getElementById("themeSelect");
+  const visualizerSelect = document.getElementById("visualizerSelect");
+  const fxSelect = document.getElementById("fxSelect");
+  const fxStrengthSelect = document.getElementById("fxStrengthSelect");
+  const glitchTilesSelect = document.getElementById("glitchTilesSelect");
+  const glitchAngleSelect = document.getElementById("glitchAngleSelect");
+
+  const visualizerViewBtn = document.getElementById("visualizerViewBtn");
+  const logoViewBtn = document.getElementById("logoViewBtn");
+
+  let theme = themeSelect.value;
+  let visualizerType = visualizerSelect.value;
+  let fxMode = "none";
+  let fxStrength = "soft";
+  let glitchTilesMode = glitchTilesSelect.value;
+  let glitchAngleMode = glitchAngleSelect.value;
+  let visualizerEnabled = true;
+  let logoEnabled = false;
+  let lastEnergy = 0;
+
+  let canvasDisplayWidth = 0;
+  let canvasDisplayHeight = 440;
+
+  function resizeCanvas() {
+    const rect = dropZone.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    canvasDisplayWidth = rect.width;
+    canvasDisplayHeight = 440;
+
+    canvas.width = canvasDisplayWidth * dpr;
+    canvas.height = canvasDisplayHeight * dpr;
+    canvas.style.height = canvasDisplayHeight + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  function drawBackground() {
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
+    const g = ctx.createRadialGradient(
+      w / 2,
+      h * 0.1,
+      0,
+      w / 2,
+      h / 2,
+      Math.max(w, h)
+    );
+
+    if (theme === "neon") {
+      g.addColorStop(0, "#1b2145");
+      g.addColorStop(0.5, "#060712");
+      g.addColorStop(1, "#020308");
+    } else if (theme === "midnight") {
+      g.addColorStop(0, "#101826");
+      g.addColorStop(0.5, "#05060b");
+      g.addColorStop(1, "#000000");
+    } else {
+      g.addColorStop(0, "#ff7a88");
+      g.addColorStop(0.45, "#251432");
+      g.addColorStop(1, "#050408");
+    }
+
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = "#ffffff";
+    const stripeH = 2;
+    for (let y = 0; y < h; y += 20) {
+      ctx.fillRect(0, y, w, stripeH);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function computeEnergy() {
+    if (!analyser || !dataArray) return 0;
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+    const avg = sum / dataArray.length / 255;
+    lastEnergy = avg;
+    return avg;
+  }
+
+  function drawBars() {
+    if (!analyser || !dataArray) return;
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
+    const barCount = 120;
+    const barWidth = w / barCount;
+
+    for (let i = 0; i < barCount; i++) {
+      const idx = Math.floor((i / barCount) * dataArray.length);
+      const v = dataArray[idx] / 255;
+      const barH = v * h * 0.48;
+      const x = i * barWidth;
+      const y = h / 2;
+
+      const grad = ctx.createLinearGradient(x, y - barH, x, y + barH);
+      grad.addColorStop(0, "#4fc3ff");
+      grad.addColorStop(0.5, "#b326ff");
+      grad.addColorStop(1, "#ff3da0");
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(x + 1, y - barH, barWidth - 2, barH * 2, 999);
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
-
-      // Scanlines
-      ctx.fillStyle = "rgba(0,0,0,0.35)";
-      for (let y = 0; y < height; y += 4) {
-        ctx.fillRect(0, y, width, 1);
-      }
-
-      // Vignette
-      const rad = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        0,
-        width / 2,
-        height / 2,
-        width / 1.2
-      );
-      rad.addColorStop(0, "rgba(0,0,0,0)");
-      rad.addColorStop(1, "rgba(0,0,0,0.85)");
-      ctx.fillStyle = rad;
-      ctx.fillRect(0, 0, width, height);
+      ctx.fill();
+      ctx.restore();
     }
 
-    function getAudioEnergy() {
-      if (!analyser) return 0;
-      analyser.getByteFrequencyData(freqData);
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = "#f5f5f5";
+    ctx.fillRect(0, h / 2, w, 1);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawCircle() {
+    if (!analyser || !dataArray) return;
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
+    const energy = computeEnergy();
+    const cx = w / 2;
+    const cy = h / 2;
+    const baseRadius = Math.min(w, h) * 0.18;
+    const innerRadius = baseRadius * (1 - 0.12 * (energy + 0.2));
+
+    const glow = ctx.createRadialGradient(
+      cx,
+      cy,
+      innerRadius * 0.6,
+      cx,
+      cy,
+      baseRadius * 1.6
+    );
+    glow.addColorStop(0, "rgba(79,195,255,0.45)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, baseRadius * 1.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    const tickCount = 160;
+    for (let i = 0; i < tickCount; i++) {
+      const idx = Math.floor((i / tickCount) * dataArray.length);
+      const v = dataArray[idx] / 255;
+      const amp = v * 40 * (0.8 + energy);
+      const a = (i / tickCount) * Math.PI * 2;
+
+      const x1 = cx + Math.cos(a) * innerRadius;
+      const y1 = cy + Math.sin(a) * innerRadius;
+      const x2 = cx + Math.cos(a) * (innerRadius + amp);
+      const y2 = cy + Math.sin(a) * (innerRadius + amp);
+
+      ctx.strokeStyle = `rgba(79,195,255,${0.3 + v * 0.7})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+  }
+
+  function drawWaveform() {
+    if (!analyser || !dataArray) return;
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
+
+    analyser.getByteTimeDomainData(dataArray);
+    ctx.lineWidth = 3;
+    const grad = ctx.createLinearGradient(0, 0, w, 0);
+    grad.addColorStop(0, "#4fc3ff");
+    grad.addColorStop(0.5, "#b326ff");
+    grad.addColorStop(1, "#ff3da0");
+    ctx.strokeStyle = grad;
+
+    ctx.beginPath();
+    const slice = w / dataArray.length;
+    for (let i = 0; i < dataArray.length; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * h) / 2;
+      const x = i * slice;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  const logoInput = document.getElementById("logoInput");
+  const logoUploadBtn = document.getElementById("logoUploadBtn");
+  const logoClearBtn = document.getElementById("logoClearBtn");
+  const downloadPngBtn = document.getElementById("downloadPngBtn");
+  const savePresetBtn = document.getElementById("savePresetBtn");
+  const loadPresetBtn = document.getElementById("loadPresetBtn");
+
+  let logoImage = null;
+  let logoLoaded = false;
+
+  const logoBuffer = document.createElement("canvas");
+  const logoBufferCtx = logoBuffer.getContext("2d");
+
+  function getGlitchStrengthFactor() {
+    switch (fxStrength) {
+      case "hardcore":
+        return 1.0;
+      case "medium":
+        return 0.55;
+      case "soft":
+      default:
+        return 0.3;
+    }
+  }
+
+  function getTilesFactor() {
+    switch (glitchTilesMode) {
+      case "more":
+        return 1.3;
+      case "less":
+        return 0.7;
+      case "normal":
+      default:
+        return 1.0;
+    }
+  }
+
+  function getAngleFactor() {
+    switch (glitchAngleMode) {
+      case "soft":
+        return 0.5;
+      case "wild":
+        return 1.4;
+      case "normal":
+      default:
+        return 1.0;
+    }
+  }
+
+  function renderLogoFrame(mainCtx) {
+    if (!logoLoaded || !logoImage) return;
+
+    const w = canvasDisplayWidth;
+    const h = canvasDisplayHeight;
+
+    logoBuffer.width = w;
+    logoBuffer.height = h;
+    logoBufferCtx.clearRect(0, 0, w, h);
+
+    const maxW = w * 0.55;
+    const maxH = h * 0.55;
+    const ratio = logoImage.width / logoImage.height;
+    let drawW = maxW;
+    let drawH = drawW / ratio;
+    if (drawH > maxH) {
+      drawH = maxH;
+      drawW = drawH * ratio;
+    }
+    const dx = (w - drawW) / 2;
+    const dy = (h - drawH) / 2;
+
+    logoBufferCtx.drawImage(logoImage, dx, dy, drawW, drawH);
+
+    mainCtx.drawImage(logoBuffer, 0, 0);
+
+    if (fxMode === "glitch") {
+      const energy = Math.min(lastEnergy * 1.4 + 0.15, 1);
+      const strength = getGlitchStrengthFactor() * energy;
+      drawLogoGlitchPieces(mainCtx, strength);
+    }
+  }
+  // Softer, cleaner tile-based glitch with occasional flips
+  function drawLogoGlitchPieces(mainCtx, strength) {
+    const w = logoBuffer.width;
+    const h = logoBuffer.height;
+    if (!w || !h || strength <= 0.01) return;
+
+    const tileSize = Math.round(w / 12);
+    const tilesX = Math.ceil(w / tileSize);
+    const tilesY = Math.ceil(h / tileSize);
+    const totalTiles = tilesX * tilesY;
+
+    const tilesFactor = getTilesFactor();
+    const baseCount = 0.035 + 0.15 * strength;
+    const glitchCount = Math.round(totalTiles * baseCount * tilesFactor);
+
+    const angleFactor = getAngleFactor();
+    const baseAngleDeg = 2 + 3 * strength;
+    const maxAngle = baseAngleDeg * angleFactor * (Math.PI / 180);
+
+    const baseFlipChance = 0.05 + strength * 0.25; // 5%–30%
+
+    for (let i = 0; i < glitchCount; i++) {
+      const sxIndex = Math.floor(Math.random() * tilesX);
+      const syIndex = Math.floor(Math.random() * tilesY);
+
+      const sx = sxIndex * tileSize;
+      const sy = syIndex * tileSize;
+      const sw = tileSize;
+      const sh = tileSize;
+
+      const sample = logoBufferCtx.getImageData(sx, sy, sw, sh);
       let sum = 0;
-      for (let i = 0; i < freqData.length; i++) sum += freqData[i];
-      return sum / (freqData.length * 255);
+      for (let j = 0; j < sample.data.length; j += 4) {
+        sum += sample.data[j] + sample.data[j + 1] + sample.data[j + 2];
+      }
+      const avg = sum / (sample.data.length / 4) / 255;
+      if (avg < 0.05) continue;
+
+      const maxOffset = tileSize * (0.12 + 0.28 * strength);
+      const offsetX = (Math.random() - 0.5) * maxOffset;
+      const offsetY = (Math.random() - 0.5) * maxOffset * 0.6;
+
+      const angle = (Math.random() - 0.5) * maxAngle;
+
+      // map tile position to screen (keeps same baseline)
+      const baseW = w;
+      const baseH = h;
+      const dxBase = sx;
+      const dyBase = sy;
+      const dw = sw;
+      const dh = sh;
+
+      const dx = dxBase + offsetX;
+      const dy = dyBase + offsetY;
+
+      mainCtx.save();
+      mainCtx.translate(dx + dw / 2, dy + dh / 2);
+      mainCtx.rotate(angle);
+
+      let flipX = 1;
+      let flipY = 1;
+      if (Math.random() < baseFlipChance) {
+        const mode = Math.floor(Math.random() * 3);
+        if (mode === 0) flipX = -1;
+        else if (mode === 1) flipY = -1;
+        else { flipX = -1; flipY = -1; }
+      }
+      mainCtx.scale(flipX, flipY);
+
+      const alpha = 0.65 + Math.random() * 0.3;
+      mainCtx.globalAlpha = alpha;
+
+      mainCtx.drawImage(
+        logoBuffer,
+        sx,
+        sy,
+        sw,
+        sh,
+        -dw / 2,
+        -dh / 2,
+        dw,
+        dh
+      );
+
+      mainCtx.restore();
     }
+  }
 
-    function drawBars(energy) {
-      if (!analyser) return;
-      analyser.getByteFrequencyData(freqData);
-      const { width, height } = canvas;
-      const barCount = 80;
-      const barWidth = (width * 0.6) / barCount;
-      const centerX = width * 0.23;
-      const centerY = height * 0.5;
+  logoUploadBtn.addEventListener("click", () => {
+    logoInput.click();
+  });
 
-      ctx.save();
-      ctx.translate(centerX, centerY);
+  logoInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) loadLogoFile(file);
+  });
 
-      for (let i = 0; i < barCount; i++) {
-        const idx = Math.floor((i / barCount) * freqData.length);
-        const v = freqData[idx] / 255;
-        const barH = v * (height * 0.4);
-        const x = (i - barCount * 0.1) * barWidth * 0.9;
-        const y = -barH / 2;
+  function loadLogoFile(file) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      logoImage = img;
+      logoLoaded = true;
+      logoEnabled = true;
+      logoViewBtn.classList.add("active");
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
 
-        const hue = 185 + v * 45;
-        const sat = 80 + v * 20;
-        const light = 60 + v * 20;
-        const alpha = 0.9;
+  logoClearBtn.addEventListener("click", () => {
+    logoLoaded = false;
+    logoImage = null;
+  });
 
-        ctx.fillStyle = `hsla(${hue},${sat}%,${light}%,${alpha})`;
-        const radius = barWidth * 0.45;
-        const h = barH;
+  dropZone.addEventListener("click", () => {
+    centerInput.value = "";
+    centerInput.click();
+  });
 
-        ctx.beginPath();
-        ctx.moveTo(x - radius, y);
-        ctx.lineTo(x + radius, y);
-        ctx.quadraticCurveTo(x + radius, y, x + radius, y + radius);
-        ctx.lineTo(x + radius, y + h - radius);
-        ctx.quadraticCurveTo(
-          x + radius,
-          y + h,
-          x,
-          y + h + radius * 1.5
-        );
-        ctx.quadraticCurveTo(
-          x - radius,
-          y + h,
-          x - radius,
-          y + h - radius
-        );
-        ctx.lineTo(x - radius, y + radius);
-        ctx.quadraticCurveTo(x - radius, y, x - radius, y);
-        ctx.closePath();
-        ctx.fill();
-      }
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+  });
 
-      ctx.restore();
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (!files || !files.length) return;
+    const file = files[0];
+    if (file.type.startsWith("audio")) {
+      loadAudioFile(file);
+    } else if (file.type.startsWith("image")) {
+      loadLogoFile(file);
     }
+  });
 
-    function drawCircleSpectrum(energy) {
-      if (!analyser) return;
-      analyser.getByteFrequencyData(freqData);
-      const { width, height } = canvas;
-      const cx = width * 0.5;
-      const cy = height * 0.52;
-      const baseR = Math.min(width, height) * 0.16;
-      const maxExtra = baseR * 0.6;
+  ["dragover","drop"].forEach(ev => {
+    window.addEventListener(ev, (e) => {
+      e.preventDefault();
+    });
+  });
 
-      ctx.save();
-      ctx.translate(cx, cy);
+  visualizerViewBtn.addEventListener("click", () => {
+    visualizerEnabled = !visualizerEnabled;
+    visualizerViewBtn.classList.toggle("active", visualizerEnabled);
+  });
 
-      // Outer arc
-      ctx.beginPath();
-      ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
-      ctx.lineWidth = 3;
-      ctx.stroke();
+  logoViewBtn.addEventListener("click", () => {
+    logoEnabled = !logoEnabled;
+    logoViewBtn.classList.toggle("active", logoEnabled);
+  });
 
-      const bars = 180;
-      for (let i = 0; i < bars; i++) {
-        const idx = Math.floor((i / bars) * freqData.length);
-        const v = freqData[idx] / 255;
-        const ang = (i / bars) * Math.PI * 2;
-        const r1 = baseR + 4;
-        const r2 = baseR + 4 + v * maxExtra;
+  themeSelect.addEventListener("change", () => {
+    theme = themeSelect.value;
+  });
 
-        const x1 = Math.cos(ang) * r1;
-        const y1 = Math.sin(ang) * r1;
-        const x2 = Math.cos(ang) * r2;
-        const y2 = Math.sin(ang) * r2;
+  visualizerSelect.addEventListener("change", () => {
+    visualizerType = visualizerSelect.value;
+  });
 
-        const hue = 185 + v * 40;
-        const sat = 70 + v * 30;
-        const light = 55 + v * 20;
-        ctx.strokeStyle = `hsla(${hue},${sat}%,${light}%,0.9)`;
-        ctx.lineWidth = 2.4;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-      }
+  fxSelect.addEventListener("change", () => {
+    fxMode = fxSelect.value === "glitch" ? "glitch" : "none";
+  });
 
-      ctx.restore();
+  fxStrengthSelect.addEventListener("change", () => {
+    fxStrength = fxStrengthSelect.value;
+  });
+
+  glitchTilesSelect.addEventListener("change", () => {
+    glitchTilesMode = glitchTilesSelect.value;
+  });
+
+  glitchAngleSelect.addEventListener("change", () => {
+    glitchAngleMode = glitchAngleSelect.value;
+  });
+
+  function updateFooterTag() {
+    const modeLabel = visualizerEnabled && logoEnabled
+      ? "VISUAL + LOGO"
+      : visualizerEnabled
+      ? "VISUAL"
+      : logoEnabled
+      ? "LOGO"
+      : "IDLE";
+
+    const fxLabel = fxMode === "glitch" ? "GLITCH" : "CLEAN";
+
+    footerTag.textContent =
+      "SPECTRUM · " +
+      theme.toUpperCase() +
+      " · " +
+      modeLabel +
+      " · " +
+      visualizerType.toUpperCase() +
+      " · FX " +
+      fxLabel +
+      " · " +
+      fxStrength.toUpperCase();
+  }
+
+  downloadPngBtn.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "visualizer.png";
+    link.click();
+  });
+
+  const PRESET_KEY = "dj_visualizer_preset_v1";
+
+  savePresetBtn.addEventListener("click", () => {
+    const preset = {
+      theme,
+      visualizerType,
+      fxMode,
+      fxStrength,
+      visualizerEnabled,
+      logoEnabled
+    };
+    localStorage.setItem(PRESET_KEY, JSON.stringify(preset));
+    alert("Preset saved!");
+  });
+
+  loadPresetBtn.addEventListener("click", () => {
+    const raw = localStorage.getItem(PRESET_KEY);
+    if (!raw) {
+      alert("No preset saved yet.");
+      return;
     }
+    try {
+      const preset = JSON.parse(raw);
+      theme = preset.theme || "neon";
+      visualizerType = preset.visualizerType || "bars";
+      fxMode = preset.fxMode || "none";
+      fxStrength = preset.fxStrength || "soft";
+      visualizerEnabled = !!preset.visualizerEnabled;
+      logoEnabled = !!preset.logoEnabled;
 
-    function drawWaveform(energy) {
-      if (!analyser) return;
-      analyser.getByteTimeDomainData(freqData);
-      const { width, height } = canvas;
-      const cx = width * 0.5;
-      const cy = height * 0.76;
+      themeSelect.value = theme;
+      visualizerSelect.value = visualizerType;
+      fxSelect.value = fxMode === "glitch" ? "glitch" : "none";
+      fxStrengthSelect.value = fxStrength;
+      visualizerViewBtn.classList.toggle("active", visualizerEnabled);
+      logoViewBtn.classList.toggle("active", logoEnabled);
 
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      const len = freqData.length;
-      const spread = width * 0.5;
-
-      ctx.beginPath();
-      for (let i = 0; i < len; i++) {
-        const t = (i / (len - 1)) * 2 - 1;
-        const x = t * spread;
-        const v = (freqData[i] - 128) / 128;
-        const y = v * (height * 0.16);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = "rgba(196, 112, 255,0.85)";
-      ctx.lineWidth = 3;
-      ctx.shadowColor = "rgba(196,112,255,0.9)";
-      ctx.shadowBlur = 12;
-      ctx.stroke();
-
-      ctx.restore();
-      ctx.shadowBlur = 0;
+      alert("Preset loaded.");
+    } catch (err) {
+      console.error(err);
+      alert("Could not load preset.");
     }
+  });
 
-    // --- Logo drawing: clean ---
-    function drawLogoClean() {
-      if (!logoImage || logoCanvas.width === 0) return;
-      const { width, height } = canvas;
-      const logoW = logoCanvas.width;
-      const logoH = logoCanvas.height;
-      const targetW = Math.min(width * 0.35, logoW);
-      const scale = targetW / logoW;
-      const drawW = logoW * scale * logoScale;
-      const drawH = logoH * scale * logoScale;
-
-      const x = width * 0.63 - drawW / 2;
-      const y = height * 0.5 - drawH / 2;
-
-      ctx.save();
-      ctx.globalAlpha = 0.98;
-      ctx.drawImage(logoCanvas, x, y, drawW, drawH);
-      ctx.restore();
-    }
-
-    // --- Logo GLITCH: BAR / TILE based with random flips ---
-    function drawLogoGlitch(energy) {
-      if (!logoImage || logoCanvas.width === 0) return;
-      const strength = FX_STRENGTH[fxStrengthSelect.value] || FX_STRENGTH.medium;
-
-      const { width, height } = canvas;
-      const logoW = logoCanvas.width;
-      const logoH = logoCanvas.height;
-      const targetW = Math.min(width * 0.35, logoW);
-      const baseScale = targetW / logoW;
-      const baseW = logoW * baseScale * logoScale;
-      const baseH = logoH * baseScale * logoScale;
-
-      const baseX = width * 0.63 - baseW / 2;
-      const baseY = height * 0.5 - baseH / 2;
-
-      // Draw base logo (clean)
-      ctx.save();
-      ctx.drawImage(logoCanvas, baseX, baseY, baseW, baseH);
-      ctx.restore();
-
-      // Glitch tiles overlay
-      const tilesX = 14;
-      const tilesY = 6;
-      const sw = logoCanvas.width / tilesX;
-      const sh = logoCanvas.height / tilesY;
-
-      const maxOffset = strength.maxOffset * (0.5 + energy);
-      const maxRot = strength.maxRot * (0.5 + energy);
-      const probability = strength.probability * (0.5 + energy * 1.5);
-
-      for (let ty = 0; ty < tilesY; ty++) {
-        for (let tx = 0; tx < tilesX; tx++) {
-          if (Math.random() > probability) continue;
-
-          const sx = tx * sw;
-          const sy = ty * sh;
-
-          // Destination tile position (aligned to baseline)
-          const dxBase = baseX + (sx / logoCanvas.width) * baseW;
-          const dyBase = baseY + (sy / logoCanvas.height) * baseH;
-          const dw = (sw / logoCanvas.width) * baseW;
-          const dh = (sh / logoCanvas.height) * baseH;
-
-          // Random small offset
-          const offX = (Math.random() * 2 - 1) * maxOffset;
-          const offY = (Math.random() * 2 - 1) * maxOffset * 0.6;
-
-          const centerX = dxBase + dw / 2 + offX;
-          const centerY = dyBase + dh / 2 + offY;
-
-          ctx.save();
-          ctx.translate(centerX, centerY);
-
-          // Small rotation
-          const rot =
-            (Math.random() * 2 - 1) *
-            maxRot *
-            (0.4 + energy * 1.6);
-          ctx.rotate(rot);
-
-          // Decide if we flip this tile
-          let flipX = false;
-          let flipY = false;
-          const r = Math.random();
-          if (r < 0.2) flipX = true;
-          else if (r < 0.35) flipY = true;
-
-          const scaleX = flipX ? -1 : 1;
-          const scaleY = flipY ? -1 : 1;
-          ctx.scale(scaleX, scaleY);
-
-          // Slight alpha variation
-          const alpha = 0.65 + Math.random() * 0.3;
-          ctx.globalAlpha = alpha;
-
-          ctx.drawImage(
-            logoCanvas,
-            sx,
-            sy,
-            sw,
-            sh,
-            -dw / 2,
-            -dh / 2,
-            dw,
-            dh
-          );
-          ctx.restore();
-        }
-      }
-
-      // Occasional global tint streaks
-      if (Math.random() < 0.09 * (0.5 + energy)) {
-        const streakH = baseH * (0.08 + Math.random() * 0.15);
-        const offsetY =
-          baseY +
-          Math.random() * (baseH - streakH);
-        const grad = ctx.createLinearGradient(baseX, offsetY, baseX + baseW, offsetY);
-        grad.addColorStop(0, "rgba(0,255,255,0.0)");
-        grad.addColorStop(0.5, "rgba(255,255,255,0.16)");
-        grad.addColorStop(1, "rgba(255,0,255,0.0)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(baseX - 18, offsetY, baseW + 36, streakH);
-      }
-    }
-
-    // --- Main render loop ---
-    let lastTime = 0;
-    function render(now) {
-      requestAnimationFrame(render);
-      const dt = (now - lastTime) / 1000 || 0;
-      lastTime = now;
-
-      const theme = themeSelect.value;
-      drawBackground(theme);
-
-      const energy = getAudioEnergy();
-
-      if (visualizerModeActive) {
-        const mode = visualizerSelect.value;
-        if (mode === "Bars") drawBars(energy);
-        else if (mode === "Circle") drawCircleSpectrum(energy);
-        else if (mode === "Waveform") drawWaveform(energy);
-      }
-
-      const fxMode = fxSelect.value;
-
-      if (logoModeActive && logoImage) {
-        if (fxMode === "glitch") drawLogoGlitch(energy);
-        else drawLogoClean();
-      }
-
-      // Gentle noise overlay for CRT feel
-      ctx.save();
-      const { width, height } = canvas;
-      const noiseAlpha = 0.05 + energy * 0.08;
-      ctx.globalAlpha = noiseAlpha;
-      for (let i = 0; i < 80; i++) {
-        const w = 2 + Math.random() * 8;
-        const h = 1 + Math.random() * 6;
-        const x = Math.random() * width;
-        const y = Math.random() * height;
-        ctx.fillStyle = "rgba(255,255,255,0.25)";
-        ctx.fillRect(x, y, w, h);
-      }
-      ctx.restore();
-    }
+  function render() {
     requestAnimationFrame(render);
+    drawBackground();
 
-    updateHudFooter();
-  </script>
+    if (visualizerEnabled && analyser && dataArray) {
+      if (visualizerType === "bars") {
+        drawBars();
+      } else if (visualizerType === "circle") {
+        drawCircle();
+      } else {
+        drawWaveform();
+      }
+    } else {
+      if (analyser && dataArray) computeEnergy();
+    }
+
+    if (logoEnabled) {
+      renderLogoFrame(ctx);
+    }
+
+    updateFooterTag();
+  }
+
+  resizeCanvas();
+  render();
+</script>
+</div>
 </body>
 </html>

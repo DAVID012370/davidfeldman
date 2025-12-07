@@ -151,7 +151,6 @@
       transform: translateY(-0.5px);
     }
 
-    /* LOGO BUTTONS WRAPPER */
     .logo-buttons {
       display: flex;
       align-items: center;
@@ -159,7 +158,6 @@
       margin-top: 0.9rem;
     }
 
-    /* NOW PLAYING – TOP CENTER */
     .now-playing {
       margin-bottom: 0.4rem;
       text-align: center;
@@ -335,7 +333,6 @@
       min-width: 220px;
     }
 
-    /* DL AUDIO – RIGHT SIDE */
     .dl-audio-btn {
       border-radius: 999px;
       border: none;
@@ -388,7 +385,6 @@
     </div>
   </header>
 
-  <!-- NOW PLAYING – TOP CENTER -->
   <div class="now-playing" id="nowPlaying">
     <span>Now Playing:</span> — none —
   </div>
@@ -430,7 +426,6 @@
         </select>
       </div>
 
-      <!-- Logo buttons without label -->
       <div class="logo-buttons">
         <button class="chip-btn secondary" id="logoUploadBtn">Logo</button>
         <button class="chip-btn secondary" id="logoClearBtn">Logo X</button>
@@ -478,13 +473,14 @@
       Space = Play/Pause · P = Performance mode.
     </div>
 
-    <!-- DL AUDIO – RIGHT -->
     <button id="downloadAudioBtn" class="dl-audio-btn">DL Audio</button>
   </div>
 
   <!-- Hidden inputs -->
   <input type="file" id="audioInput" accept="audio/*" style="display:none" />
   <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg" style="display:none" />
+  <!-- Center input: audio + images -->
+  <input type="file" id="centerInput" accept="audio/*,image/png,image/jpeg,image/jpg" style="display:none" />
   <audio id="audioElement" crossorigin="anonymous"></audio>
 </div>
 
@@ -493,6 +489,7 @@
   const loadTrackBtn = document.getElementById("loadTrackBtn");
   const playPauseBtn = document.getElementById("playPauseBtn");
   const audioInput = document.getElementById("audioInput");
+  const centerInput = document.getElementById("centerInput");
   const volumeRange = document.getElementById("volumeRange");
   const clearAudioBtn = document.getElementById("clearAudioBtn");
   const downloadAudioBtn = document.getElementById("downloadAudioBtn");
@@ -559,8 +556,16 @@
 
   audioInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file) loadAudioFile(file);
+  });
+
+  centerInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type.startsWith("audio")) {
       loadAudioFile(file);
+    } else if (file.type.startsWith("image")) {
+      loadLogoFile(file);
     }
   });
 
@@ -594,9 +599,7 @@
   });
 
   volumeRange.addEventListener("input", () => {
-    if (gainNode) {
-      gainNode.gain.value = parseFloat(volumeRange.value);
-    }
+    if (gainNode) gainNode.gain.value = parseFloat(volumeRange.value);
   });
 
   downloadAudioBtn.addEventListener("click", () => {
@@ -721,7 +724,6 @@
 
   function drawBars() {
     if (!analyser || !dataArray) return;
-
     const w = canvasDisplayWidth;
     const h = canvasDisplayHeight;
     const barCount = 120;
@@ -972,8 +974,16 @@
     logoImage = null;
   });
 
+  /* DRAG & DROP + CLICK CENTER */
+
+  dropZone.addEventListener("click", () => {
+    centerInput.value = "";
+    centerInput.click();
+  });
+
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
   });
 
   dropZone.addEventListener("drop", (e) => {
@@ -981,13 +991,21 @@
     const files = e.dataTransfer.files;
     if (!files || !files.length) return;
     const file = files[0];
-
     if (file.type.startsWith("audio")) {
       loadAudioFile(file);
     } else if (file.type.startsWith("image")) {
       loadLogoFile(file);
     }
   });
+
+  // Prevent browser from opening file in the window
+  ["dragover","drop"].forEach(ev => {
+    window.addEventListener(ev, (e) => {
+      e.preventDefault();
+    });
+  });
+
+  /* TOGGLES & FX */
 
   visualizerViewBtn.addEventListener("click", () => {
     visualizerEnabled = !visualizerEnabled;
